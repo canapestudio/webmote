@@ -1,7 +1,11 @@
 package io.github.krank56.webmote.core.faketv
 
+import io.github.krank56.webmote.core.SessionConfig
+import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
@@ -22,6 +26,7 @@ import java.net.InetAddress
 import java.net.ServerSocket
 import java.util.UUID
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * A scriptable stand-in for a webOS TV on loopback: an encrypted SSAP WebSocket server with a
@@ -39,7 +44,19 @@ class FakeTv(
 
     // Identity
 
+    @Volatile var uuid: String = "fake-tv-uuid-1"
+    @Volatile var model: String = "OLED55C6LA"
+    /** The hello's `deviceOSReleaseVersion`; webOS 26 reports 11.x. */
+    @Volatile var osVersion: String = "11.2.0"
     @Volatile var certificate: HeldCertificate = newCertificate()
+
+    // Pairing
+
+    /** How the user answers the pairing prompt. [PromptAnswer.Wait] leaves it to [acceptPrompt] / [declinePrompt]. */
+    @Volatile var promptAnswer: PromptAnswer = PromptAnswer.Accept
+
+    /** The client keys this TV has issued. */
+    val issuedKeys: MutableList<String> = CopyOnWriteArrayList()
 
     // Recording
 
@@ -50,8 +67,21 @@ class FakeTv(
     private val handlers = java.util.concurrent.ConcurrentHashMap<String, (Received) -> JsonObject>()
     private val clients = CopyOnWriteArrayList<Client>()
     private var server: MockWebServer? = null
+    private val pendingPrompts = CopyOnWriteArrayList<() -> Unit>()
+    private val pendingDeclines = CopyOnWriteArrayList<() -> Unit>()
 
     val isOn: Boolean get() = server != null
+
+    init {
+        installDefaultHandlers()
+    }
+
+    /** The session configuration that aims a session at this TV. */
+    fun sessionConfig(): SessionConfig = SessionConfig(
+        port = port,
+        connectTimeout = 2.seconds,
+        ioDispatcher = Dispatchers.IO,
+    )
 
     // Power
 
@@ -78,6 +108,20 @@ class FakeTv(
         server = null
     }
 
+    // Pairing prompt
+
+    fun acceptPrompt() {
+        pendingPrompts.forEach { it() }
+        pendingPrompts.clear()
+        pendingDeclines.clear()
+    }
+
+    fun declinePrompt() {
+        pendingDeclines.forEach { it() }
+        pendingPrompts.clear()
+        pendingDeclines.clear()
+    }
+
     // Scripting
 
     /** Replaces how the TV answers [uri]. The handler returns the reply payload, or throws [TvError]. */
@@ -93,6 +137,7 @@ class FakeTv(
 
     private inner class Client : WebSocketListener() {
         lateinit var socket: WebSocket
+        @Volatile var registered = false
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             socket = webSocket
@@ -109,6 +154,9 @@ class FakeTv(
             )
             requests += received
             when (received.type) {
+                // Firmware 33.20 and later ignores a hello without a payload key.
+                "hello" -> if ("payload" in message) send("hello", received.id, helloPayload())
+                "register" -> register(received)
                 "request" -> request(received)
             }
         }
@@ -122,8 +170,41 @@ class FakeTv(
             clients -= this
         }
 
+        private fun register(received: Received) {
+            val manifest = received.payload["manifest"] as? JsonObject
+            if (manifest != null && ("signatures" in manifest || "signed" in manifest)) {
+                sendError(received.id, "403 Error!! blacklisted certificate")
+                return
+            }
+            val key = received.payload["client-key"]?.jsonPrimitive?.contentOrNull
+            if (key != null && key in issuedKeys) {
+                return registered(received.id, key)
+            } else if (key != null) {
+                return sendError(received.id, "401 insufficient permissions")
+            }
+            // Ready for the user's answer before the client can report the prompt.
+            if (promptAnswer == PromptAnswer.Wait) {
+                pendingPrompts += { registered(received.id, newKey()) }
+                pendingDeclines += { sendError(received.id, "403 cancelled") }
+            }
+            send("response", received.id, buildJsonObject { put("pairingType", "PROMPT"); put("returnValue", true) })
+            when (promptAnswer) {
+                PromptAnswer.Accept -> registered(received.id, newKey())
+                PromptAnswer.Decline -> sendError(received.id, "403 cancelled")
+                PromptAnswer.Wait -> Unit
+            }
+        }
+
+        private fun registered(id: String?, key: String) {
+            registered = true
+            send("registered", id, buildJsonObject { put("client-key", key) })
+        }
+
         private fun request(received: Received) {
             val uri = received.uri ?: return sendError(received.id, "400 no uri")
+            // Newer firmware only answers getSystemInfo before registration, and nothing else until then.
+            if (registered && uri == SYSTEM_INFO) return sendError(received.id, "401 insufficient permissions")
+            if (!registered && uri != SYSTEM_INFO) return sendError(received.id, "401 insufficient permissions (not registered)")
             val handler = handlers[uri] ?: return sendError(received.id, "404 no such service or method")
             try {
                 send("response", received.id, handler(received))
@@ -154,18 +235,51 @@ class FakeTv(
         }
     }
 
+    private fun helloPayload() = buildJsonObject {
+        put("protocolVersion", 1)
+        put("deviceType", "tv")
+        put("deviceOS", "webOS")
+        put("deviceOSVersion", "4.1.0")
+        put("deviceOSReleaseVersion", osVersion)
+        put("deviceUUID", uuid)
+    }
+
+    private fun newKey(): String = UUID.randomUUID().toString().replace("-", "").also { issuedKeys += it }
+
+    // Default behaviour for every URI in the command contract
+
+    private fun installDefaultHandlers() {
+        on(SYSTEM_INFO) { ok { put("modelName", model); put("receiverType", "dvb") } }
+
+        on("ssap://audio/volumeUp") { ok() }
+        on("ssap://audio/volumeDown") { ok() }
+    }
+
     companion object {
+        const val SYSTEM_INFO = "ssap://system/getSystemInfo"
+
         fun newCertificate(): HeldCertificate = HeldCertificate.Builder()
             .commonName("LG webOS TV ${UUID.randomUUID()}")
             .addSubjectAlternativeName("localhost")
             .build()
 
         private fun reservePort(): Int = ServerSocket(0).use { it.localPort }
+
+        /** A successful reply payload. */
+        fun ok(build: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit = {}): JsonObject = buildJsonObject {
+            put("returnValue", true)
+            build()
+        }
     }
 }
 
 /** A message the fake TV received on its SSAP socket. */
-data class Received(val type: String, val id: String?, val uri: String?, val payload: JsonObject)
+data class Received(val type: String, val id: String?, val uri: String?, val payload: JsonObject) {
+    fun string(key: String): String? = (payload[key] as? JsonPrimitive)?.contentOrNull
+    operator fun get(key: String): JsonElement? = payload[key]
+}
 
 /** Thrown by a handler to answer with an SSAP error. */
 class TvError(message: String) : Exception(message)
+
+enum class PromptAnswer { Accept, Decline, Wait }

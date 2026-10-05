@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Webmote</string>
+    <string name="tv_generic_name">TV</string>
+    <string name="action_try_again">Try again</string>
+    <string name="connecting_title">Connecting to %1$s…</string>
+    <string name="problem_certificate_title">Security check failed</string>
+    <string name="problem_certificate_body">%1$s presented a different security certificate from the one saved when you paired it. This can happen after the TV is reset, but it could also be another device pretending to be your TV.</string>
+    <string name="problem_declined_title">Pairing declined</string>
+    <string name="problem_declined_body">The pairing request was declined on %1$s.</string>
+    <string name="off_title">%1$s is off</string>
+    <string name="off_body">Turn it on, then try again.</string>
+    <string name="pairing_title_first">Connect your TV</string>
+    <string name="pairing_intro">Make sure the TV is on and connected to the same Wi-Fi network as your phone.</string>
+    <string name="pairing_connect">Connect</string>
+    <string name="pairing_manual_header">Enter the IP address</string>
+    <string name="pairing_manual_body">You’ll find the address in the TV’s network settings.</string>
+    <string name="pairing_manual_label">TV IP address</string>
+    <string name="pairing_manual_placeholder" translatable="false">192.168.1.20</string>
+    <string name="pairing_connecting">Connecting to %1$s…</string>
+    <string name="pairing_prompt_title">Accept the prompt on your TV</string>
+    <string name="pairing_prompt_title_named">Accept the prompt on %1$s</string>
+    <string name="pairing_prompt_body">Use the TV remote to accept the “Allow this device?” message. Webmote connects as soon as you do.</string>
+    <string name="pairing_declined">Pairing was declined on the TV.</string>
+    <string name="pairing_unreachable">Couldn’t reach %1$s. Check that the TV is on and connected to the same network as your phone.</string>
+    <string name="pairing_certificate">This TV presented a different security certificate from the one saved for it.</string>
+    <string name="remote_volume_down">Volume down</string>
+    <string name="remote_volume_up">Volume up</string>
 </resources>

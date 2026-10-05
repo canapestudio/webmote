@@ -1,4 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Webmote</string>
+    <string name="tv_generic_name">TV</string>
+    <string name="action_try_again">Réessayer</string>
+    <string name="connecting_title">Connexion à %1$s…</string>
+    <string name="problem_certificate_title">Échec du contrôle de sécurité</string>
+    <string name="problem_certificate_body">La TV « %1$s » a présenté un certificat de sécurité différent de celui enregistré lors de l’association. Cela peut arriver après une réinitialisation de la TV, mais il peut aussi s’agir d’un autre appareil qui se fait passer pour elle.</string>
+    <string name="problem_declined_title">Association refusée</string>
+    <string name="problem_declined_body">La demande d’association a été refusée sur la TV « %1$s ».</string>
+    <string name="off_title">La TV « %1$s » est éteinte</string>
+    <string name="off_body">Allumez-la, puis réessayez.</string>
+    <string name="pairing_title_first">Connecter votre TV</string>
+    <string name="pairing_intro">Vérifiez que la TV est allumée et connectée au même réseau Wi-Fi que votre téléphone.</string>
+    <string name="pairing_connect">Connecter</string>
+    <string name="pairing_manual_header">Saisir l’adresse IP</string>
+    <string name="pairing_manual_body">L’adresse figure dans les paramètres réseau de la TV.</string>
+    <string name="pairing_manual_label">Adresse IP de la TV</string>
+    <string name="pairing_connecting">Connexion à %1$s…</string>
+    <string name="pairing_prompt_title">Acceptez la demande sur votre TV</string>
+    <string name="pairing_prompt_title_named">Acceptez la demande sur la TV « %1$s »</string>
+    <string name="pairing_prompt_body">Avec la télécommande de la TV, acceptez le message « Autoriser cet appareil ? ». Webmote se connecte dès que c’est fait.</string>
+    <string name="pairing_declined">L’association a été refusée sur la TV.</string>
+    <string name="pairing_unreachable">Impossible de joindre %1$s. Vérifiez que la TV est allumée et connectée au même réseau que votre téléphone.</string>
+    <string name="pairing_certificate">Cette TV a présenté un certificat de sécurité différent de celui enregistré.</string>
+    <string name="remote_volume_down">Baisser le volume</string>
+    <string name="remote_volume_up">Monter le volume</string>
 </resources>

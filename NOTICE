@@ -21,6 +21,18 @@ resulting work.
 
 Third-party notices
 
+Webmote's protocol client is written from scratch, using these projects as references; parts of
+their protocol details (the pairing manifest's permission list) are ported from them:
+
+- aiowebostv (Apache License 2.0), aiowebostv authors: Home Assistant Team
+  https://github.com/home-assistant-libs/aiowebostv
+- bscpylgtv (MIT License), Copyright (c) 2017 Dennis Karpienski, Copyright (c) 2019 Josh Bendavid
+  https://github.com/chros73/bscpylgtv
+- LGTV Companion (MIT License), Copyright (c) 2021-2026 Jörgen Persson
+  https://github.com/JPersson77/LGTVCompanion
+- lgtv2 (MIT License), Copyright (c) Sebastian Raff
+  https://github.com/hobbyquaker/lgtv2
+
 The app's libraries (Kotlin and kotlinx, OkHttp and Okio, AndroidX, Jetpack Compose and Material
 Components, Guava's ListenableFuture, JSpecify) are under the Apache License 2.0.
 

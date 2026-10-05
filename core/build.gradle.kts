@@ -37,3 +37,12 @@ tasks.test {
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
 }
+
+// A fake TV for trying the app by hand without a TV (see FakeTvMain.kt).
+tasks.register<JavaExec>("runFakeTv") {
+    group = "verification"
+    description = "Serves a fake webOS TV on 127.0.0.1:3001."
+    classpath = sourceSets["test"].runtimeClasspath
+    mainClass.set("io.github.krank56.webmote.core.faketv.FakeTvMainKt")
+    standardInput = System.`in`
+}

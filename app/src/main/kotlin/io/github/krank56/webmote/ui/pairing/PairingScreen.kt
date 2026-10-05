@@ -1,0 +1,134 @@
+package io.github.krank56.webmote.ui.pairing
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import io.github.krank56.webmote.R
+import io.github.krank56.webmote.SessionHost
+import io.github.krank56.webmote.core.ConnectionState
+import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.common.SectionHeader
+
+/** Takes a TV's IP address and pairs with it. It's the first screen when no TV is saved. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun PairingScreen(host: SessionHost, state: TvState) {
+    val session = host.session
+
+    // The current pairing attempt. The session's state is about it once it names the attempt's address.
+    var attemptHost by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val connect: (String) -> Unit = { address ->
+        attemptHost = address
+        session.connect(address)
+    }
+
+    val attemptState = state.takeIf { attemptHost != null && it.host == attemptHost }
+
+    val shownStatus: ConnectionState? = when {
+        attemptHost != null -> attemptState?.connection ?: ConnectionState.Connecting
+        // Pairing in progress without an attempt from this screen, e.g. after the activity was recreated.
+        state.connection == ConnectionState.AwaitingPrompt -> state.connection
+        else -> null
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(stringResource(R.string.pairing_title_first)) },
+            )
+        },
+    ) { padding ->
+        Box(
+            Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding).imePadding(),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+            LazyColumn(
+                modifier = Modifier.widthIn(max = 600.dp).fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                item {
+                    Text(
+                        stringResource(R.string.pairing_intro),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                    )
+                }
+                if (shownStatus != null) {
+                    item {
+                        PairingStatusCard(
+                            connection = shownStatus,
+                            target = attemptHost.orEmpty(),
+                            onRetry = { attemptHost?.let { connect(it) } },
+                            modifier = Modifier.padding(vertical = 8.dp),
+                        )
+                    }
+                }
+                item {
+                    ManualEntry(onConnect = { address -> connect(address) })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ManualEntry(onConnect: (String) -> Unit) {
+    var address by rememberSaveable { mutableStateOf("") }
+    val submit = {
+        val value = address.trim()
+        if (value.isNotEmpty()) onConnect(value)
+    }
+    Column(Modifier.padding(start = 8.dp, end = 8.dp, top = 24.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        SectionHeader(stringResource(R.string.pairing_manual_header))
+        Text(
+            stringResource(R.string.pairing_manual_body),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            OutlinedTextField(
+                value = address,
+                onValueChange = { address = it.filterNot(Char::isWhitespace) },
+                label = { Text(stringResource(R.string.pairing_manual_label)) },
+                placeholder = { Text(stringResource(R.string.pairing_manual_placeholder)) },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
+                keyboardActions = KeyboardActions(onGo = { submit() }),
+                modifier = Modifier.weight(1f),
+            )
+            Button(onClick = submit, enabled = address.isNotBlank()) { Text(stringResource(R.string.pairing_connect)) }
+        }
+    }
+}

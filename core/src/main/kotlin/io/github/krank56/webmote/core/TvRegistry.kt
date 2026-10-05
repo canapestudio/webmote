@@ -10,11 +10,16 @@ import java.io.File
 /** A TV the user has paired, as persisted by [TvRegistry]. */
 @Serializable
 public data class SavedTv(
-    /** The TV's unique ID. */
+    /** The TV's `deviceUUID`, from its hello. */
     val id: String,
     val name: String,
     /** The last-known IP address or host name. */
     val host: String,
+    val model: String? = null,
+    val webOsVersion: String? = null,
+    val clientKey: String? = null,
+    /** SHA-256 fingerprint of the TV's certificate, recorded at pairing (trust on first use). */
+    val certificatePin: String? = null,
 )
 
 /**
@@ -42,6 +47,8 @@ public class TvRegistry(directory: File) {
     public val activeTv: SavedTv? get() = activeTvId.value?.let(::get)
 
     public operator fun get(id: String): SavedTv? = tvs.value.firstOrNull { it.id == id }
+
+    public fun findByHost(host: String): SavedTv? = tvs.value.firstOrNull { it.host == host }
 
     /** Adds [tv], or replaces the saved TV with the same ID. */
     public fun save(tv: SavedTv): Unit = mutate { tvs, active ->

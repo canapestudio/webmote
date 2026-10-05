@@ -12,10 +12,16 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val host = sessionHost
         setContent {
             WebmoteTheme {
-                WebmoteApp()
+                WebmoteApp(host)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        sessionHost.session.connect()
     }
 }
