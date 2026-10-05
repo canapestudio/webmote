@@ -20,13 +20,22 @@ public enum class ConnectionState {
     /** The TV shows "Allow this device?" and is waiting for the user to accept it with the remote. */
     AwaitingPrompt,
 
+    /** The TV shows a PIN that has to be submitted with [TvSession.submitPin]. */
+    AwaitingPin,
+
     Connected,
 
-    /** The user declined the pairing prompt. */
+    /** The TV rejected the stored client key. [TvSession.repair] pairs again. */
+    NeedsPairing,
+
+    /** The user declined the pairing prompt, or the PIN was wrong. */
     PairingDeclined,
 
-    /** The TV presented a certificate other than the pinned one. */
+    /** The TV presented a certificate other than the pinned one. [TvSession.repair] re-pins. */
     CertificateMismatch,
+
+    /** The TV only answers on the plain port 3000: it runs webOS 1–3, which Webmote doesn't support. */
+    Unsupported,
 
     /** The TV refused or didn't answer the connection: it's off or unreachable. */
     Off,

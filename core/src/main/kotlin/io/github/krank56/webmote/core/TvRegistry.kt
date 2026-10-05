@@ -57,6 +57,11 @@ public class TvRegistry(directory: File) {
         updated to active
     }
 
+    /** Applies [change] to the saved TV with [id]. Does nothing if there's none. */
+    public fun update(id: String, change: (SavedTv) -> SavedTv): Unit = mutate { tvs, active ->
+        tvs.map { if (it.id == id) change(it) else it } to active
+    }
+
     public fun setActive(id: String?): Unit = mutate { tvs, active ->
         tvs to (if (id == null || tvs.any { it.id == id }) id else active)
     }

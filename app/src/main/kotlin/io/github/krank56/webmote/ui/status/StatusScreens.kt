@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.GppMaybe
+import androidx.compose.material.icons.rounded.LinkOff
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.TvOff
 import androidx.compose.material3.Button
@@ -59,12 +60,13 @@ fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
 }
 
 /**
- * The active TV can't be used until the user acts: it's off, presented another certificate, or
- * declined pairing.
+ * The active TV can't be used until the user acts: it's off, rejected the saved key, presented
+ * another certificate, declined pairing, or is too old.
  */
 @Composable
 fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
     val name = tvName(tvs, state.tvId)
+    val repair = { host.session.repair() }
     val buttonModifier = Modifier.widthIn(min = 200.dp)
     TvScaffold(host, tvs, state) {
         when (state.connection) {
@@ -83,15 +85,31 @@ fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
                 body = stringResource(R.string.problem_certificate_body, name),
                 iconContainer = MaterialTheme.colorScheme.errorContainer,
                 iconContent = MaterialTheme.colorScheme.onErrorContainer,
-            )
-            // PairingDeclined, and anything else that lands here.
-            else -> StatusLayout(
+            ) {
+                Button(onClick = repair, modifier = buttonModifier) { Text(stringResource(R.string.action_repair_trust)) }
+            }
+            ConnectionState.PairingDeclined -> StatusLayout(
                 icon = Icons.Rounded.Block,
                 title = stringResource(R.string.problem_declined_title),
                 body = stringResource(R.string.problem_declined_body, name),
             ) {
-                Button(onClick = { host.session.connect() }, modifier = buttonModifier) {
-                    Text(stringResource(R.string.action_try_again))
+                Button(onClick = repair, modifier = buttonModifier) { Text(stringResource(R.string.action_repair)) }
+            }
+            ConnectionState.Unsupported -> StatusLayout(
+                icon = Icons.Rounded.TvOff,
+                title = stringResource(R.string.problem_unsupported_title),
+                body = stringResource(R.string.problem_unsupported_body, name),
+                iconContainer = MaterialTheme.colorScheme.errorContainer,
+                iconContent = MaterialTheme.colorScheme.onErrorContainer,
+            )
+            // NeedsPairing, and anything else that lands here.
+            else -> StatusLayout(
+                icon = Icons.Rounded.LinkOff,
+                title = stringResource(R.string.problem_needs_pairing_title),
+                body = stringResource(R.string.problem_needs_pairing_body, name),
+            ) {
+                Button(onClick = repair, modifier = buttonModifier) {
+                    Text(stringResource(R.string.action_repair))
                 }
             }
         }

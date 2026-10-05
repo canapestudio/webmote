@@ -39,6 +39,12 @@ public class TvSession(
 
     public fun disconnect(): Unit = onSession { connector.disconnect() }
 
+    /** Submits the PIN the TV shows, while [ConnectionState.AwaitingPin]. */
+    public fun submitPin(pin: String): Unit = onSession { connector.submitPin(pin) }
+
+    /** Discards the session's TV's client key and certificate pin, and pairs with it again. */
+    public fun repair(): Unit = onSession { connector.repair() }
+
     // Volume
 
     public fun volumeUp(): Unit = onSession { volume.up() }

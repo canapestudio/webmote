@@ -12,9 +12,11 @@ import kotlin.time.Duration.Companion.seconds
 public data class SessionConfig(
     /** The encrypted SSAP port. */
     val port: Int = 3001,
+    /** The plain port only pre-2018 TVs rely on; used to tell them apart from TVs that are off. */
+    val legacyPort: Int = 3000,
     /** How long to wait for the TV to answer an SSAP request. */
     val requestTimeout: Duration = 10.seconds,
-    /** Real-time socket timeout for TCP connections to the TV. */
+    /** Real-time socket timeout for TCP connections and probes to the TV. */
     val connectTimeout: Duration = 3.seconds,
     /** Where blocking network I/O runs. The registry's small file writes stay on the session's dispatcher. */
     val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,

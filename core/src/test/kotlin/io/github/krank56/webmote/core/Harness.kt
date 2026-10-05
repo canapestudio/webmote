@@ -1,6 +1,7 @@
 package io.github.krank56.webmote.core
 
 import io.github.krank56.webmote.core.faketv.FakeTv
+import io.github.krank56.webmote.core.faketv.Received
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.SupervisorJob
@@ -58,6 +59,21 @@ class Harness(
     /** Waits until the session reports [connection]. */
     fun awaitConnection(connection: ConnectionState, timeout: Duration = 5.seconds) =
         eventually(timeout, { "connection $connection" }) { state.connection == connection }
+
+    /** Waits until the fake TV has received [count] requests for [uri], and returns them. */
+    fun awaitRequests(uri: String, count: Int = 1): List<Received> {
+        eventually(message = { "$count request(s) for $uri, got ${tv.requests(uri).size}" }) { tv.requests(uri).size >= count }
+        return tv.requests(uri)
+    }
+
+    /** Lets real I/O settle for [millis] while running the session's work, without moving virtual time. */
+    fun settle(millis: Long = 150) {
+        val start = TimeSource.Monotonic.markNow()
+        while (start.elapsedNow().inWholeMilliseconds < millis) {
+            scheduler.runCurrent()
+            Thread.sleep(2)
+        }
+    }
 
     /** Powers the fake TV on, pairs with it by prompt, and waits until connected. */
     fun pair(name: String? = null) {

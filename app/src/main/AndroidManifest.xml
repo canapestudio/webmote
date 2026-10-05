@@ -3,6 +3,9 @@
 
     <!-- Exactly the permissions the spec lists: no location, no nearby devices. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <!-- The SSDP multicast lock. -->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_MULTICAST_STATE" />
 
     <application
         android:name=".WebmoteApplication"

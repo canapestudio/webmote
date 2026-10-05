@@ -20,8 +20,8 @@ You need JDK 17 and the Android SDK (set `sdk.dir` in `local.properties`, or `AN
 
 The project has two modules:
 
-- `core`: the TV session (pairing, the encrypted SSAP connection, certificate pinning). Plain Kotlin
-  with no Android dependencies, tested against a fake TV.
+- `core`: the TV session (pairing, the encrypted SSAP connection, certificate pinning, discovery).
+  Plain Kotlin with no Android dependencies, tested against a fake TV.
 - `app`: the Compose UI.
 
 To try the app without a TV, run the fake TV on your computer and point the emulator at it:

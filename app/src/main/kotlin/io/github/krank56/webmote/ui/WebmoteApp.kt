@@ -61,9 +61,11 @@ private fun stateScreen(tvs: List<SavedTv>, state: TvState): Screen {
     return when (state.connection) {
         ConnectionState.Connected -> Screen.Main
         ConnectionState.Connecting, ConnectionState.Disconnected -> Screen.Connecting
-        ConnectionState.AwaitingPrompt -> Screen.Pairing
+        ConnectionState.AwaitingPrompt, ConnectionState.AwaitingPin -> Screen.Pairing
         ConnectionState.Off,
+        ConnectionState.NeedsPairing,
         ConnectionState.CertificateMismatch,
-        ConnectionState.PairingDeclined -> Screen.Problem
+        ConnectionState.PairingDeclined,
+        ConnectionState.Unsupported -> Screen.Problem
     }
 }
