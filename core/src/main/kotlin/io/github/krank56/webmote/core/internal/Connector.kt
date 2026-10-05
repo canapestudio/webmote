@@ -348,6 +348,7 @@ private class LinkDroppedException : Exception("The TV closed the connection")
 internal fun urlHost(host: String): String = if (':' in host && !host.startsWith("[")) "[$host]" else host
 
 internal fun SavedTv.learnedCapabilities() = Capabilities(
+    pictureWrites = capabilities.pictureWrites,
     pointer = capabilities.pointer,
     volumeLevel = capabilities.volumeLevel,
 )

@@ -19,12 +19,19 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -34,6 +41,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.krank56.webmote.R
 import io.github.krank56.webmote.core.Capability
+import io.github.krank56.webmote.core.PictureSetting
 import io.github.krank56.webmote.core.RemoteButton
 import io.github.krank56.webmote.core.TvSession
 import io.github.krank56.webmote.core.TvState
@@ -44,13 +52,19 @@ import io.github.krank56.webmote.ui.common.RemoteIconButton
 import io.github.krank56.webmote.ui.common.TvSlider
 import kotlin.math.max
 
+/** The sheets the Remote tab opens. */
+private enum class RemoteSheetKind { Picture }
+
 /**
- * Everyday control: the D-pad with Mute, Settings, Back and Home around it, and volume. It fits the
- * screen without scrolling: the D-pad gets the height the rows below leave.
+ * Everyday control: the D-pad with Mute, Settings, Back and Home around it, volume, brightness, and a
+ * shortcut to the Picture sheet. It fits the screen without scrolling: the D-pad gets the height the
+ * rows below leave.
  */
 @Composable
 fun RemoteTab(session: TvSession, state: TvState) {
+    var sheet by rememberSaveable { mutableStateOf<RemoteSheetKind?>(null) }
     val pointerOk = state.capabilities.pointer != Capability.Unavailable
+    val pictureOk = state.capabilities.pictureWrites != Capability.Unavailable
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         FitColumn(
@@ -64,8 +78,14 @@ fun RemoteTab(session: TvSession, state: TvState) {
             },
             modifier = Modifier.widthIn(max = 480.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Sound(state = state, session = session)
+            SoundAndPicture(state = state, session = session, pictureOk = pictureOk)
+            ShortcutsRow(onOpen = { sheet = it })
         }
+    }
+
+    when (sheet) {
+        RemoteSheetKind.Picture -> PictureSheet(state, session, onDismiss = { sheet = null })
+        null -> Unit
     }
 }
 
@@ -147,9 +167,9 @@ private fun DPadAndTvKeys(session: TvSession, muted: Boolean, enabled: Boolean, 
     )
 }
 
-/** The volume slider, or − and + when there's none. */
+/** The volume slider (or − and + when there's none) and the brightness (backlight) slider. */
 @Composable
-private fun Sound(state: TvState, session: TvSession) {
+private fun SoundAndPicture(state: TvState, session: TvSession, pictureOk: Boolean) {
     val volume = state.volume
     // A soundbar (or a TV that reports no level) gets − and + in the slider's place.
     val showVolumeSlider = state.capabilities.volumeLevel != Capability.Unavailable && volume.level != null
@@ -170,6 +190,22 @@ private fun Sound(state: TvState, session: TvSession) {
                 )
             } else {
                 VolumeButtons(session)
+            }
+            TvSlider(
+                value = state.picture.backlight,
+                onDrag = { session.dragPicture(PictureSetting.Backlight, it) },
+                onRelease = { session.setPicture(PictureSetting.Backlight, it) },
+                label = stringResource(R.string.picture_backlight),
+                icon = Icons.Rounded.LightMode,
+                enabled = pictureOk,
+            )
+            if (!pictureOk) {
+                Text(
+                    stringResource(R.string.picture_unavailable_short),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(bottom = 4.dp),
+                )
             }
         }
     }
@@ -200,5 +236,13 @@ private fun VolumeButtons(session: TvSession) {
                 size = 48.dp,
             )
         }
+    }
+}
+
+/** Opens the Picture sheet. */
+@Composable
+private fun ShortcutsRow(onOpen: (RemoteSheetKind) -> Unit) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        LabelledIconButton(Icons.Rounded.Tune, stringResource(R.string.remote_picture), { onOpen(RemoteSheetKind.Picture) })
     }
 }

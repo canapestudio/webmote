@@ -112,7 +112,7 @@ fun RemoteIconButton(
     }
 }
 
-/** A tonal button with an icon over a short label, for the remote's labelled keys. */
+/** A tonal button with an icon over a short label, for the remote's labelled keys and shortcuts. */
 @Composable
 fun LabelledIconButton(
     icon: ImageVector,

@@ -19,7 +19,7 @@ internal object Manifest {
      * Ported from aiowebostv's unsigned webOS 26 manifest (`aiowebostv/handshake.py`, v0.9.2 and
      * later; Apache License 2.0, Home Assistant Team; see NOTICE). It's a
      * superset of LGTV Companion 5.7.0's. Includes CONTROL_MOUSE_AND_KEYBOARD for the pointer
-     * socket.
+     * socket, and WRITE_SETTINGS and WRITE_NOTIFICATION_ALERT for the picture alert workaround.
      */
     val permissions: List<String> = listOf(
         "APP_TO_APP",

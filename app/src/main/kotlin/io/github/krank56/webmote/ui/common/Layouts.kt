@@ -114,7 +114,7 @@ fun StatusLayout(
     }
 }
 
-/** A section title in lists. */
+/** A section title in lists and sheets. */
 @Composable
 fun SectionHeader(text: String, modifier: Modifier = Modifier) {
     Text(

@@ -29,6 +29,9 @@ public data class SavedTv(
 
 @Serializable
 public data class LearnedCapabilities(
+    val pictureWrites: Capability = Capability.Unknown,
+    /** The webOS version [pictureWrites] was learned on; a different version makes the session try again. */
+    val pictureWritesLearnedOn: String? = null,
     val pointer: Capability = Capability.Unknown,
     val volumeLevel: Capability = Capability.Unknown,
 )

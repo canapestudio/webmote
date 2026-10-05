@@ -3,6 +3,7 @@ package io.github.krank56.webmote.core.faketv
 import io.github.krank56.webmote.core.SessionConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
@@ -97,6 +98,18 @@ class FakeTv(
     /** The level the TV reports, or null when it reports none (sound goes to a soundbar). */
     @Volatile var volume: Int? = 12
     @Volatile var muted: Boolean = false
+
+    // Picture
+
+    val picture: MutableMap<String, String> = java.util.concurrent.ConcurrentHashMap(
+        mapOf("backlight" to "80", "brightness" to "50", "contrast" to "85", "color" to "50", "energySaving" to "off"),
+    )
+
+    /** Whether alert-workaround picture writes take effect. */
+    @Volatile var appliesPictureWrites: Boolean = true
+
+    /** Whether numeric picture values are reported as JSON numbers (as one webOS 25 capture shows) instead of strings. */
+    @Volatile var reportsPictureAsInts: Boolean = false
 
     // Pointer socket
 
@@ -475,6 +488,45 @@ class FakeTv(
         on("ssap://com.webos.service.networkinput/getPointerInputSocket") {
             ok { put("socketPath", "wss://$urlHost:$port$pointerPath") }
         }
+
+        on(GET_SETTINGS) { r ->
+            val keys = (r.payload["keys"] as? JsonArray)?.map { it.jsonPrimitive.content } ?: picture.keys.toList()
+            ok {
+                put("category", "picture")
+                putJsonObject("settings") { keys.forEach { key -> picture[key]?.let { putPictureValue(key, it) } } }
+            }
+        }
+        on(CREATE_ALERT) { r ->
+            val id = "alert-${UUID.randomUUID()}"
+            alerts[id] = r.payload
+            ok { put("alertId", id) }
+        }
+        on(CLOSE_ALERT) { r ->
+            val alert = alerts.remove(r.payload["alertId"]?.jsonPrimitive?.contentOrNull)
+                ?: throw TvError("404 no such alert")
+            runAlertAction(alert)
+            ok()
+        }
+    }
+
+    private val alerts = java.util.concurrent.ConcurrentHashMap<String, JsonObject>()
+
+    /** What a closed alert does on the TV: runs its `onclose` luna call, if picture writes are honoured. */
+    private fun runAlertAction(alert: JsonObject) {
+        val onClose = alert["onclose"] as? JsonObject ?: return
+        if (!appliesPictureWrites) return
+        if (onClose["uri"]?.jsonPrimitive?.contentOrNull != LUNA_SET_SETTINGS) return
+        val params = onClose["params"]?.jsonObject ?: return
+        if (params["category"]?.jsonPrimitive?.contentOrNull != "picture") return
+        val settings = params["settings"]?.jsonObject ?: return
+        val changed = settings.mapValues { (_, value) -> value.jsonPrimitive.content }
+        picture.putAll(changed)
+        push(GET_SETTINGS, ok { put("category", "picture"); putJsonObject("settings") { changed.forEach { (k, v) -> putPictureValue(k, v) } } })
+    }
+
+    private fun kotlinx.serialization.json.JsonObjectBuilder.putPictureValue(key: String, value: String) {
+        val number = value.toIntOrNull()
+        if (reportsPictureAsInts && number != null) put(key, number) else put(key, value)
     }
 
     private fun pushVolume() = push(GET_VOLUME, volumePayload())
@@ -581,6 +633,10 @@ class FakeTv(
         const val SYSTEM_INFO = "ssap://system/getSystemInfo"
         const val SET_PIN = "ssap://pairing/setPin"
         const val GET_VOLUME = "ssap://audio/getVolume"
+        const val GET_SETTINGS = "ssap://settings/getSystemSettings"
+        const val CREATE_ALERT = "ssap://system.notifications/createAlert"
+        const val CLOSE_ALERT = "ssap://system.notifications/closeAlert"
+        const val LUNA_SET_SETTINGS = "luna://com.webos.settingsservice/setSystemSettings"
         const val SECOND_SCREEN = "urn:lge-com:service:webos-second-screen:1"
         const val MEDIA_RENDERER = "urn:schemas-upnp-org:device:MediaRenderer:1"
 

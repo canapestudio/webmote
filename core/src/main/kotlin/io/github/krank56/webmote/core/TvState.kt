@@ -13,6 +13,7 @@ public data class TvState(
     val waking: Boolean = false,
     val info: TvInfo = TvInfo(),
     val volume: Volume = Volume(),
+    val picture: PictureValues = PictureValues(),
     val capabilities: Capabilities = Capabilities(),
 )
 
@@ -61,8 +62,42 @@ public data class Volume(
     val muted: Boolean = false,
 )
 
+/** Current picture settings. A null value hasn't been reported by the TV. */
+public data class PictureValues(
+    val backlight: Int? = null,
+    val brightness: Int? = null,
+    val contrast: Int? = null,
+    val color: Int? = null,
+    val energySaving: EnergySaving? = null,
+) {
+    public operator fun get(setting: PictureSetting): Int? = when (setting) {
+        PictureSetting.Backlight -> backlight
+        PictureSetting.Brightness -> brightness
+        PictureSetting.Contrast -> contrast
+        PictureSetting.Color -> color
+    }
+}
+
+/** A numeric picture setting, 0–100. On OLED sets [Backlight] is the OLED light. */
+public enum class PictureSetting(internal val key: String) {
+    Backlight("backlight"),
+    Brightness("brightness"),
+    Contrast("contrast"),
+    Color("color"),
+}
+
+public enum class EnergySaving(internal val key: String) {
+    Auto("auto"),
+    Off("off"),
+    Min("min"),
+    Med("med"),
+    Max("max"),
+}
+
 /** What the TV has been found to support. [Capability.Unknown] until the session learns otherwise. */
 public data class Capabilities(
+    /** Whether picture writes through the alert workaround take effect. */
+    val pictureWrites: Capability = Capability.Unknown,
     /** Whether the pointer socket (D-pad and buttons) can be opened. */
     val pointer: Capability = Capability.Unknown,
     /** Whether the TV reports a volume level. */

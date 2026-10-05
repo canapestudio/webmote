@@ -30,8 +30,10 @@ public data class SessionConfig(
     val wakeTimeout: Duration = 20.seconds,
     /** How often a waking or off TV is probed. */
     val pollInterval: Duration = 1.seconds,
-    /** Volume slider writes are sent at most this often while dragging. */
+    /** Slider writes (volume, picture) are sent at most this often while dragging. */
     val throttleInterval: Duration = 150.milliseconds,
+    /** A picture write that hasn't shown up in the TV's settings by then counts as ignored. */
+    val pictureVerifyTimeout: Duration = 2.seconds,
     /** How long to wait for the TV to answer an SSAP request. */
     val requestTimeout: Duration = 10.seconds,
     /** Real-time socket timeout for TCP connections and probes to the TV. */

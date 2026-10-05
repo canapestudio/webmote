@@ -34,7 +34,7 @@ import kotlin.math.roundToInt
 private const val SETTLE_TIMEOUT_MS = 2_500L
 
 /**
- * A 0–100 slider for a value the TV reports, like the volume.
+ * A 0–100 slider for a value the TV reports, like the volume or a picture setting.
  *
  * While dragging it shows the finger's value and reports each whole step to [onDrag]; on release it
  * reports the final value to [onRelease]. It then keeps showing that value until the TV reports it
