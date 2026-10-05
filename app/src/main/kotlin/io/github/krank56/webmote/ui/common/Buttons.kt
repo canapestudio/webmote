@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -36,6 +37,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import io.github.krank56.webmote.core.RemoteButton
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 
@@ -201,7 +203,17 @@ private fun Labelled(label: String, enabled: Boolean, width: Dp, modifier: Modif
     }
 }
 
-/** A round key with a text label, like the D-pad's OK. */
+/** The colour of a colour key, as on the TV's remote; null for any other button. */
+val RemoteButton.keyColour: Color?
+    get() = when (this) {
+        RemoteButton.Red -> Color(0xFFE53935)
+        RemoteButton.Green -> Color(0xFF43A047)
+        RemoteButton.Yellow -> Color(0xFFFDD835)
+        RemoteButton.Blue -> Color(0xFF1E88E5)
+        else -> null
+    }
+
+/** A round key with a text label, like the number pad's digits and the D-pad's OK. */
 @Composable
 fun RemoteTextButton(
     text: String,

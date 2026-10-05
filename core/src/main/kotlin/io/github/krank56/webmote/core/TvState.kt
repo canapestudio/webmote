@@ -14,6 +14,7 @@ public data class TvState(
     val info: TvInfo = TvInfo(),
     val volume: Volume = Volume(),
     val picture: PictureValues = PictureValues(),
+    val inputs: List<TvInput> = emptyList(),
     val capabilities: Capabilities = Capabilities(),
 )
 
@@ -94,6 +95,8 @@ public enum class EnergySaving(internal val key: String) {
     Max("max"),
 }
 
+public data class TvInput(val id: String, val label: String)
+
 /** What the TV has been found to support. [Capability.Unknown] until the session learns otherwise. */
 public data class Capabilities(
     /** Whether picture writes through the alert workaround take effect. */
@@ -118,4 +121,26 @@ public enum class RemoteButton(internal val wireName: String) {
     Home("HOME"),
     Settings("QMENU"),
     Info("INFO"),
+    Num0("0"),
+    Num1("1"),
+    Num2("2"),
+    Num3("3"),
+    Num4("4"),
+    Num5("5"),
+    Num6("6"),
+    Num7("7"),
+    Num8("8"),
+    Num9("9"),
+    Red("RED"),
+    Green("GREEN"),
+    Yellow("YELLOW"),
+    Blue("BLUE"),
+}
+
+public enum class MediaKey(internal val uri: String) {
+    Play("ssap://media.controls/play"),
+    Pause("ssap://media.controls/pause"),
+    Stop("ssap://media.controls/stop"),
+    Rewind("ssap://media.controls/rewind"),
+    FastForward("ssap://media.controls/fastForward"),
 }

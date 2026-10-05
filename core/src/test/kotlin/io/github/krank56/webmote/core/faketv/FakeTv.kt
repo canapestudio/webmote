@@ -121,6 +121,10 @@ class FakeTv(
     /** The screen-off/on URIs this TV implements; the others answer with an error. */
     @Volatile var screenOffUris: Set<String> = ScreenOffUris.all
 
+    // Catalog
+
+    @Volatile var inputs: List<Pair<String, String>> = listOf("HDMI_1" to "HDMI 1", "HDMI_2" to "HDMI 2", "HDMI_3" to "HDMI 3")
+
     // Wake-on-LAN
 
     /** Whether a magic packet for one of this TV's MACs powers it on. */
@@ -478,6 +482,21 @@ class FakeTv(
         ScreenOffUris.all.forEach { uri ->
             on(uri) { if (uri in screenOffUris) ok() else throw TvError("404 no such service or method") }
         }
+
+        on("ssap://tv/channelUp") { ok() }
+        on("ssap://tv/channelDown") { ok() }
+        on("ssap://tv/getExternalInputList") {
+            ok {
+                putJsonArray("devices") {
+                    inputs.forEach { (id, label) ->
+                        add(buildJsonObject { put("id", id); put("label", label); put("connected", true) })
+                    }
+                }
+            }
+        }
+        on("ssap://tv/switchInput") { ok() }
+        listOf("play", "pause", "stop", "rewind", "fastForward").forEach { on("ssap://media.controls/$it") { ok() } }
+        listOf("insertText", "deleteCharacters", "sendEnterKey").forEach { on("ssap://com.webos.service.ime/$it") { ok() } }
 
         on("ssap://com.webos.service.connectionmanager/getinfo") {
             ok {

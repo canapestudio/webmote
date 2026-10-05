@@ -7,7 +7,8 @@ No account, no analytics: Webmote talks only to your TVs, on your own network.
 ## Features
 
 - **Remote:** D-pad with OK, Back, Home, Settings and Mute around it, a volume slider that follows
-  the TV, and a brightness slider.
+  the TV, a brightness slider, media keys, inputs, a number pad with channels and colour keys, and
+  a live keyboard.
 - **Picture:** brightness, contrast, colour and energy saving. If a TV ignores picture changes,
   Webmote greys the controls out instead of pretending they work.
 - **Turn the TV on** with Wake-on-LAN, **several TVs**, English and French.

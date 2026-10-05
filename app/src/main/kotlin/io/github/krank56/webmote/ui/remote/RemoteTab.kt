@@ -1,5 +1,6 @@
 package io.github.krank56.webmote.ui.remote
 
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -18,11 +19,20 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.VolumeOff
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Dialpad
+import androidx.compose.material.icons.rounded.FastForward
+import androidx.compose.material.icons.rounded.FastRewind
 import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Keyboard
 import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Pause
+import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.Remove
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.SettingsInputHdmi
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -30,17 +40,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.krank56.webmote.R
 import io.github.krank56.webmote.core.Capability
+import io.github.krank56.webmote.core.MediaKey
 import io.github.krank56.webmote.core.PictureSetting
 import io.github.krank56.webmote.core.RemoteButton
 import io.github.krank56.webmote.core.TvSession
@@ -50,15 +64,16 @@ import io.github.krank56.webmote.ui.common.LabelledIconToggleButton
 import io.github.krank56.webmote.ui.common.Notice
 import io.github.krank56.webmote.ui.common.RemoteIconButton
 import io.github.krank56.webmote.ui.common.TvSlider
+import io.github.krank56.webmote.ui.common.rememberPressAction
 import kotlin.math.max
 
 /** The sheets the Remote tab opens. */
-private enum class RemoteSheetKind { Picture }
+private enum class RemoteSheetKind { Numbers, Keyboard, Inputs, Picture }
 
 /**
- * Everyday control: the D-pad with Mute, Settings, Back and Home around it, volume, brightness, and a
- * shortcut to the Picture sheet. It fits the screen without scrolling: the D-pad gets the height the
- * rows below leave.
+ * Everyday control: the D-pad with Mute, Settings, Back and Home around it, volume, brightness, the
+ * media keys, and shortcuts to the sheets. It fits the screen without scrolling: the D-pad gets the
+ * height the rows below leave.
  */
 @Composable
 fun RemoteTab(session: TvSession, state: TvState) {
@@ -79,11 +94,15 @@ fun RemoteTab(session: TvSession, state: TvState) {
             modifier = Modifier.widthIn(max = 480.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             SoundAndPicture(state = state, session = session, pictureOk = pictureOk)
+            MediaRow(session)
             ShortcutsRow(onOpen = { sheet = it })
         }
     }
 
     when (sheet) {
+        RemoteSheetKind.Numbers -> NumberSheet(session, pointerOk, onDismiss = { sheet = null })
+        RemoteSheetKind.Keyboard -> KeyboardSheet(session, onDismiss = { sheet = null })
+        RemoteSheetKind.Inputs -> InputSheet(state, session, onDismiss = { sheet = null })
         RemoteSheetKind.Picture -> PictureSheet(state, session, onDismiss = { sheet = null })
         null -> Unit
     }
@@ -239,10 +258,59 @@ private fun VolumeButtons(session: TvSession) {
     }
 }
 
-/** Opens the Picture sheet. */
+/** Rewind, play/pause, stop, fast-forward. */
+@Composable
+private fun MediaRow(session: TvSession) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        RemoteIconButton(
+            Icons.Rounded.FastRewind,
+            stringResource(R.string.remote_rewind),
+            onClick = { session.media(MediaKey.Rewind) },
+        )
+        PlayPauseButton(onClick = session::playPause)
+        RemoteIconButton(
+            Icons.Rounded.Stop,
+            stringResource(R.string.remote_stop),
+            onClick = { session.media(MediaKey.Stop) },
+        )
+        RemoteIconButton(
+            Icons.Rounded.FastForward,
+            stringResource(R.string.remote_fast_forward),
+            onClick = { session.media(MediaKey.FastForward) },
+        )
+    }
+}
+
+/** A single play/pause key: the TV doesn't reliably report playback, so it shows both symbols. */
+@Composable
+private fun PlayPauseButton(onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    val action = rememberPressAction(onClick, interactionSource)
+    val description = stringResource(R.string.remote_play_pause)
+    FilledTonalIconButton(
+        onClick = action,
+        interactionSource = interactionSource,
+        modifier = Modifier.size(56.dp).semantics { contentDescription = description },
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(Icons.Rounded.PlayArrow, contentDescription = null, modifier = Modifier.size(20.dp))
+            Icon(Icons.Rounded.Pause, contentDescription = null, modifier = Modifier.size(20.dp))
+        }
+    }
+}
+
+/** Opens the 123 sheet, the keyboard, the input picker and the Picture sheet. */
 @Composable
 private fun ShortcutsRow(onOpen: (RemoteSheetKind) -> Unit) {
     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+        LabelledIconButton(
+            Icons.Rounded.Dialpad,
+            stringResource(R.string.remote_numbers),
+            { onOpen(RemoteSheetKind.Numbers) },
+            contentDescription = stringResource(R.string.remote_numbers_description),
+        )
+        LabelledIconButton(Icons.Rounded.Keyboard, stringResource(R.string.remote_keyboard), { onOpen(RemoteSheetKind.Keyboard) })
+        LabelledIconButton(Icons.Rounded.SettingsInputHdmi, stringResource(R.string.remote_inputs), { onOpen(RemoteSheetKind.Inputs) })
         LabelledIconButton(Icons.Rounded.Tune, stringResource(R.string.remote_picture), { onOpen(RemoteSheetKind.Picture) })
     }
 }

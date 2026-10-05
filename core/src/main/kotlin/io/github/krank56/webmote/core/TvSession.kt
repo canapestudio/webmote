@@ -1,5 +1,7 @@
 package io.github.krank56.webmote.core
 
+import io.github.krank56.webmote.core.internal.CatalogControl
+import io.github.krank56.webmote.core.internal.Commands
 import io.github.krank56.webmote.core.internal.Connector
 import io.github.krank56.webmote.core.internal.PictureControl
 import io.github.krank56.webmote.core.internal.PointerControl
@@ -28,10 +30,12 @@ public class TvSession(
     private val volume = VolumeControl(core)
     private val pointer = PointerControl(core)
     private val picture = PictureControl(core)
+    private val catalog = CatalogControl(core)
+    private val commands = Commands(core)
     private val power = PowerControl(core, connector)
 
     init {
-        core.features += listOf(power, volume, pointer, picture)
+        core.features += listOf(power, volume, pointer, picture, catalog, commands)
     }
 
     public val state: StateFlow<TvState> = core.state.asStateFlow()
@@ -102,6 +106,26 @@ public class TvSession(
     public fun setPicture(setting: PictureSetting, value: Int): Unit = onSession { picture.set(setting, value) }
 
     public fun setEnergySaving(mode: EnergySaving): Unit = onSession { picture.setEnergySaving(mode) }
+
+    // Media, channels, inputs and text
+
+    public fun media(key: MediaKey): Unit = onSession { commands.media(key) }
+
+    /** Alternates play and pause, starting with play. */
+    public fun playPause(): Unit = onSession { commands.playPause() }
+
+    public fun channelUp(): Unit = onSession { commands.channelUp() }
+
+    public fun channelDown(): Unit = onSession { commands.channelDown() }
+
+    public fun switchInput(inputId: String): Unit = onSession { catalog.switchInput(inputId) }
+
+    /** Types [text] into the TV's focused text field. */
+    public fun insertText(text: String): Unit = onSession { commands.insertText(text) }
+
+    public fun deleteCharacters(count: Int = 1): Unit = onSession { commands.deleteCharacters(count) }
+
+    public fun sendEnter(): Unit = onSession { commands.sendEnter() }
 
     // Power
 

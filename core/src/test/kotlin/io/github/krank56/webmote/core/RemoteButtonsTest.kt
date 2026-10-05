@@ -41,6 +41,22 @@ class RemoteButtonsTest {
     }
 
     @Test
+    fun `digits and colour keys are sent as button messages, in the order they were pressed`() {
+        pairWithPointer()
+
+        val buttons = listOf(
+            RemoteButton.Num1, RemoteButton.Num2, RemoteButton.Num0, RemoteButton.Num9, RemoteButton.Num3,
+            RemoteButton.Num4, RemoteButton.Num5, RemoteButton.Num6, RemoteButton.Num7, RemoteButton.Num8,
+            RemoteButton.Red, RemoteButton.Green, RemoteButton.Yellow, RemoteButton.Blue,
+        )
+        buttons.forEach(h.session::press)
+
+        val names = listOf("1", "2", "0", "9", "3", "4", "5", "6", "7", "8", "RED", "GREEN", "YELLOW", "BLUE")
+        h.eventually { h.tv.pointerMessages.size == names.size }
+        assertEquals(names.map(::button), h.tv.pointerMessages)
+    }
+
+    @Test
     fun `a TV that refuses the pointer socket has no pointer capability, and the session remembers it`() {
         h.tv.pointerSocketAvailable = false
         h.pair()
