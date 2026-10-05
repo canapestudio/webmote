@@ -249,7 +249,7 @@ class WakeOnLanTest {
         h.awaitConnection(ConnectionState.Connecting)
 
         ConnectionRecorder(h.session).use { recorder ->
-            h.session.connect() // The app starting up.
+            h.session.connect() // The keep-alive service or the app starting up.
             h.settle(300)
             repeat(2) {
                 h.advance(h.pollInterval)

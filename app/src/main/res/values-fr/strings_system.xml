@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textes de la notification de connexion. -->
+<resources>
+    <!-- États de connexion, affichés par la notification -->
+    <string name="system_state_connected">Connecté</string>
+    <string name="system_state_connecting">Connexion…</string>
+    <string name="system_state_awaiting_prompt">Acceptez sur le téléviseur</string>
+    <string name="system_state_awaiting_pin">Saisissez le code du téléviseur</string>
+    <string name="system_state_needs_pairing">Association requise</string>
+    <string name="system_state_pairing_declined">Association refusée</string>
+    <string name="system_state_certificate_mismatch">Identité du téléviseur modifiée</string>
+    <string name="system_state_unsupported">Téléviseur non pris en charge</string>
+    <string name="system_state_off">Téléviseur éteint</string>
+    <string name="system_state_wake_failed">Le téléviseur ne s\'est pas allumé</string>
+    <string name="system_state_disconnected">Non connecté</string>
+
+    <!-- Notification de connexion -->
+    <string name="notif_channel_name">Connexion au téléviseur</string>
+    <string name="notif_channel_description">Garde la télécommande connectée au téléviseur tant qu\'il est allumé</string>
+    <string name="notif_action_volume_down">Vol −</string>
+    <string name="notif_action_volume_up">Vol +</string>
+    <string name="notif_action_mute">Muet</string>
+    <string name="notif_action_unmute">Réactiver</string>
+    <string name="notif_action_power_off">Éteindre</string>
+</resources>

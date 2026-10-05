@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Strings for the keep-alive notification. -->
+<resources>
+    <!-- Connection states, as shown by the notification -->
+    <string name="system_state_connected">Connected</string>
+    <string name="system_state_connecting">Connecting…</string>
+    <string name="system_state_awaiting_prompt">Accept on the TV</string>
+    <string name="system_state_awaiting_pin">Enter the TV\'s PIN</string>
+    <string name="system_state_needs_pairing">Needs pairing</string>
+    <string name="system_state_pairing_declined">Pairing declined</string>
+    <string name="system_state_certificate_mismatch">TV identity changed</string>
+    <string name="system_state_unsupported">TV not supported</string>
+    <string name="system_state_off">TV is off</string>
+    <string name="system_state_wake_failed">TV didn\'t turn on</string>
+    <string name="system_state_disconnected">Not connected</string>
+
+    <!-- Keep-alive notification -->
+    <string name="notif_channel_name">TV connection</string>
+    <string name="notif_channel_description">Keeps the remote connected to your TV while it\'s on</string>
+    <string name="notif_action_volume_down">Vol −</string>
+    <string name="notif_action_volume_up">Vol +</string>
+    <string name="notif_action_mute">Mute</string>
+    <string name="notif_action_unmute">Unmute</string>
+    <string name="notif_action_power_off">Turn off</string>
+</resources>

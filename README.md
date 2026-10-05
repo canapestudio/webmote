@@ -2,7 +2,8 @@
 
 A fast, private Android remote for LG TVs running webOS (2018 models and later).
 
-No account, no analytics: Webmote talks only to your TVs, on your own network.
+Open it and press a button, or don't open it at all: use the notification or your phone's volume
+keys. No account, no analytics: Webmote talks only to your TVs, on your own network.
 
 ## Features
 
@@ -13,6 +14,8 @@ No account, no analytics: Webmote talks only to your TVs, on your own network.
   Webmote greys the controls out instead of pretending they work.
 - **Touchpad and apps:** a Magic Remote-style touchpad and a grid of the TV's apps with pinned
   favourites.
+- **Without opening the app:** a notification with controls, and the phone's volume keys, even when
+  locked.
 - **Turn the TV on** with Wake-on-LAN, **several TVs**, English and French.
 
 ## Requirements
@@ -36,7 +39,7 @@ The project has two modules:
 - `core`: the TV session (pairing, the encrypted SSAP connection, certificate pinning, the pointer
   socket, Wake-on-LAN, discovery). Plain Kotlin with no Android dependencies, tested against a fake
   TV.
-- `app`: the Compose UI.
+- `app`: the Compose UI, the keep-alive service and the phone's volume keys.
 
 To try the app without a TV, run the fake TV on your computer and point the emulator at it:
 

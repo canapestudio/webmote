@@ -88,11 +88,13 @@ fun SettingsScreen(
                     tv = tv,
                     active = active,
                     onUse = {
+                        host.onUserInteraction()
                         session.switchTo(tv.id)
                         onDone()
                     },
                     onRename = { renamingId = tv.id },
                     onRepair = {
+                        host.onUserInteraction()
                         session.repair(tv.id)
                         onDone()
                     },

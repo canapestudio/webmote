@@ -77,6 +77,9 @@ public class TvSession(
         name.trim().takeIf { it.isNotEmpty() }?.let { registry.rename(tvId, it) }
     }
 
+    /** Call when the phone's network changes: the session checks the TV is still reachable. */
+    public fun onNetworkChanged(): Unit = onSession { power.onNetworkChanged() }
+
     /** While the TV is off, keep probing for it and connect as soon as it answers, until [stopOffPolling]. */
     public fun startOffPolling(): Unit = onSession { power.startOffPolling() }
 

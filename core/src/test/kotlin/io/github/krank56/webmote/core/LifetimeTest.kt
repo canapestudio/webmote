@@ -9,7 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.time.Duration.Companion.seconds
 
-/** How long the connection lasts: what happens when it drops. */
+/** How long the connection lasts: what happens when it drops, and when the phone's network changes. */
 class LifetimeTest {
     @TempDir lateinit var dir: File
     private val h by lazy { Harness(dir) }
@@ -100,6 +100,54 @@ class LifetimeTest {
 
         assertEquals(2, h.tv.registrations)
         assertEquals(ConnectionState.Connected, h.state.connection)
+    }
+
+    @Test
+    fun `a network change while connected keeps the link to a TV that's still reachable`() {
+        h.pair()
+
+        h.session.onNetworkChanged()
+        h.settle(300)
+
+        assertEquals(ConnectionState.Connected, h.state.connection)
+        assertEquals(1, h.tv.registrations)
+    }
+
+    @Test
+    fun `a network change while connected reports a TV that no longer answers off, without reconnecting`() {
+        h.pair()
+        h.tv.stopAccepting() // The phone left the TV's network; the open link hasn't noticed yet.
+        h.settle(300)
+        assertEquals(ConnectionState.Connected, h.state.connection)
+
+        h.session.onNetworkChanged()
+        h.awaitConnection(ConnectionState.Off)
+        h.settle(300)
+
+        assertEquals(ConnectionState.Off, h.state.connection)
+        assertEquals(1, h.tv.registrations)
+    }
+
+    @Test
+    fun `a network change while off connects to the TV if it answers`() {
+        h.pairThenTurnTvOff()
+        h.tv.powerOn()
+
+        h.session.onNetworkChanged()
+
+        h.awaitConnection(ConnectionState.Connected)
+    }
+
+    @Test
+    fun `a network change while off leaves a TV that doesn't answer off`() {
+        h.pairThenTurnTvOff()
+
+        ConnectionRecorder(h.session).use { recorder ->
+            h.session.onNetworkChanged()
+            h.settle(300)
+
+            assertEquals(listOf(ConnectionState.Off), recorder.states)
+        }
     }
 
     /** Pairs [Harness.tv], then [second], which leaves the second TV active and connected. */

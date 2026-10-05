@@ -99,6 +99,7 @@ fun PairingScreen(
 
     val connect: (String, String?) -> Unit = { address, name ->
         haptics.press()
+        host.onUserInteraction()
         attemptHost = address
         attemptName = name
         session.connect(address, name)
@@ -165,6 +166,7 @@ fun PairingScreen(
                             onRetry = { attemptHost?.let { connect(it, attemptName) } },
                             onRepair = {
                                 haptics.press()
+                                host.onUserInteraction()
                                 session.repair()
                             },
                             modifier = Modifier.padding(vertical = 8.dp),

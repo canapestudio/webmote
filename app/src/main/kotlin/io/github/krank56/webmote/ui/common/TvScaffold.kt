@@ -35,6 +35,7 @@ fun TvScaffold(
                 tvs = tvs,
                 activeTvId = state.tvId ?: registryActiveId,
                 onSwitch = { id ->
+                    host.onUserInteraction()
                     host.session.switchTo(id)
                 },
                 onSettings = { onOpen(Route.Settings) },

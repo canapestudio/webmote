@@ -29,6 +29,8 @@ internal class PowerControl(private val core: SessionCore, private val connector
 
     fun wake() = liveness.wake()
 
+    fun onNetworkChanged() = liveness.onNetworkChanged()
+
     fun startOffPolling() = liveness.startOffPolling()
 
     fun stopOffPolling() = liveness.stopOffPolling()

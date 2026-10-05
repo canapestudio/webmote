@@ -55,6 +55,7 @@ fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOp
         ) {
             if (showRetry) {
                 TextButton(onClick = {
+                    host.onUserInteraction()
                     host.session.connect()
                 }) { Text(stringResource(R.string.action_try_again)) }
             }
@@ -72,6 +73,7 @@ fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOpen:
     val name = tvName(tvs, state.tvId)
     val repair = {
         haptics.press()
+        host.onUserInteraction()
         host.session.repair()
     }
     val buttonModifier = Modifier.widthIn(min = 200.dp)

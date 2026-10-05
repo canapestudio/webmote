@@ -123,6 +123,18 @@ internal class Liveness(private val core: SessionCore, private val connector: Co
         offPolling = null
     }
 
+    /**
+     * The phone's network changed. While connected, a TV that no longer answers a probe is reported
+     * off (the phone has probably left its network) and the link closed; while off, a TV that answers
+     * is connected to. Only the TV is probed: nothing about the phone's network is read.
+     */
+    fun onNetworkChanged() {
+        core.scope.launch {
+            val link = core.link ?: return@launch connectIfReachable()
+            if (!reachable(link.host) && core.link === link) connector.stop(ConnectionState.Off)
+        }
+    }
+
     /** Connects to the active TV if it's off and answers a probe. */
     private suspend fun connectIfReachable() {
         if (core.state.value.connection !in OFF) return

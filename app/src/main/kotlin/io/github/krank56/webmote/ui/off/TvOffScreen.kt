@@ -68,6 +68,7 @@ fun TvOffScreen(
 
     val wake = {
         haptics.press()
+        host.onUserInteraction()
         session.wake()
     }
 

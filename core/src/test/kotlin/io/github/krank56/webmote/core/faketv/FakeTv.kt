@@ -210,6 +210,7 @@ class FakeTv(
             return
         }
         server = MockWebServer().apply {
+            serverSocketFactory = PausableListenerFactory()
             useHttps(HandshakeCertificates.Builder().heldCertificate(certificate).build().sslSocketFactory())
             dispatcher = object : Dispatcher() {
                 override fun dispatch(request: RecordedRequest): MockResponse = route(request)
@@ -233,6 +234,53 @@ class FakeTv(
     fun dropConnections() {
         clients.forEach { it.socket.close(1001, "going away") }
         clients.clear()
+    }
+
+    /**
+     * Stops accepting connections but leaves the open ones up, as the phone sees it right after
+     * leaving the TV's network: new connections fail while the open link hasn't noticed yet.
+     * [powerOff] then closes everything as usual.
+     */
+    fun stopAccepting() {
+        listener?.stopAccepting()
+    }
+
+    /** The SSAP server's listening socket, while the TV is on. */
+    @Volatile private var listener: PausableServerSocket? = null
+
+    private inner class PausableListenerFactory : javax.net.ServerSocketFactory() {
+        override fun createServerSocket(): ServerSocket = PausableServerSocket().also { listener = it }
+        override fun createServerSocket(port: Int): ServerSocket = unsupported()
+        override fun createServerSocket(port: Int, backlog: Int): ServerSocket = unsupported()
+        override fun createServerSocket(port: Int, backlog: Int, ifAddress: InetAddress?): ServerSocket = unsupported()
+        private fun unsupported(): Nothing = throw UnsupportedOperationException("MockWebServer binds the socket itself")
+    }
+
+    /**
+     * A listening socket that can stop accepting without MockWebServer noticing: MockWebServer closes
+     * every open connection when its accept loop ends, so after [stopAccepting] the loop is held in
+     * [accept] until the server really closes the socket.
+     */
+    private class PausableServerSocket : ServerSocket() {
+        @Volatile private var paused = false
+        private val closed = java.util.concurrent.CountDownLatch(1)
+
+        fun stopAccepting() {
+            paused = true
+            super.close() // Frees the port: new connections are refused.
+        }
+
+        override fun accept(): java.net.Socket = try {
+            super.accept()
+        } catch (e: SocketException) {
+            if (paused) closed.await()
+            throw e
+        }
+
+        override fun close() {
+            closed.countDown()
+            super.close()
+        }
     }
 
     // Pairing prompt
