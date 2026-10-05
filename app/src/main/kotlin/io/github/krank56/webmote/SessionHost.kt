@@ -22,8 +22,8 @@ import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
 /**
- * Holds the app's single [TvSession] for the active TV. The UI, the keep-alive service, the
- * notification and the volume keys all share it, so there's never a second connection.
+ * Holds the app's single [TvSession] for the active TV. The UI, the keep-alive service, tiles,
+ * widgets, the notification and the volume keys all share it, so there's never a second connection.
  */
 class SessionHost(private val context: Context) {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -45,16 +45,16 @@ class SessionHost(private val context: Context) {
     }.flowOn(Dispatchers.IO)
 
     /**
-     * Call on each user interaction from the app or the notification: starts the keep-alive service,
+     * Call on each user interaction from the app, a tile or a widget: starts the keep-alive service,
      * which holds the connection to the active TV while it's on. Those interactions are exempt from
      * Android's background limits on starting foreground services.
      */
     fun onUserInteraction() = KeepAliveService.start(context)
 
     /**
-     * Runs [action] on the session for a notification tap: starts the keep-alive service, connects
-     * if needed, and runs [action] once connected. Gives up if the TV doesn't connect in time (it's
-     * off, or needs pairing in the app).
+     * Runs [action] on the session for a tile, widget or notification tap: starts the keep-alive
+     * service, connects if needed, and runs [action] once connected. Gives up if the TV doesn't
+     * connect in time (it's off, or needs pairing in the app).
      */
     fun perform(action: (TvSession) -> Unit) {
         onUserInteraction()

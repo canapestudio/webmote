@@ -25,11 +25,11 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * The foreground service that holds the connection to the active TV while it's on.
  *
- * It owns nothing itself: the single TV session lives in [SessionHost.session], shared with the app.
- * The service keeps the process in the foreground while that session is live, shows the notification,
- * holds the volume-keys MediaSession, and tells the session when the network changes. It stops once
- * the session settles in a state that isn't live: the TV turned off, the phone left its network, or
- * pairing needs the user in the app.
+ * It owns nothing itself: the single TV session lives in [SessionHost.session], shared with the app,
+ * tiles and widgets. The service keeps the process in the foreground while that session is live,
+ * shows the notification, holds the volume-keys MediaSession, and tells the session when the network
+ * changes. It stops once the session settles in a state that isn't live: the TV turned off, the phone
+ * left its network, or pairing needs the user in the app.
  */
 class KeepAliveService : LifecycleService() {
     private val host: SessionHost by lazy { sessionHost }
@@ -53,7 +53,7 @@ class KeepAliveService : LifecycleService() {
         }
         if (!started) {
             started = true
-            // A session nobody has connected yet.
+            // A session nobody has connected yet (e.g. the process just started for a tile tap).
             if (host.session.state.value.connection == ConnectionState.Disconnected) host.session.connect()
             follow()
         }
@@ -146,7 +146,7 @@ class KeepAliveService : LifecycleService() {
         private var running = false
 
         /**
-         * Starts the service, from a user interaction (the app or the notification):
+         * Starts the service, from a user interaction (the app, a tile, a widget or the notification):
          * those are exempt from Android's background limits on starting foreground services. Does nothing
          * when it's already running, or when there's nothing to connect to: no TV yet, or a pairing problem
          * only the app can resolve.

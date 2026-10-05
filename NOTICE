@@ -34,8 +34,8 @@ picture settings, button names) are ported from them:
 - lgtv2 (MIT License), Copyright (c) Sebastian Raff
   https://github.com/hobbyquaker/lgtv2
 
-The app's libraries (Kotlin and kotlinx, OkHttp and Okio, AndroidX, Jetpack Compose and Material
-Components, Guava's ListenableFuture, JSpecify) are under the Apache License 2.0.
+The app's libraries (Kotlin and kotlinx, OkHttp and Okio, AndroidX, Jetpack Compose, Glance and
+Material Components, Guava's ListenableFuture, JSpecify) are under the Apache License 2.0.
 
 LG and webOS are trademarks of LG Electronics Inc. Webmote is an independent app, not affiliated
 with, endorsed or sponsored by LG Electronics.

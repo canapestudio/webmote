@@ -10,14 +10,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
- * What the notification shows about the active TV. It changes far less often than [TvState] (not on
- * every volume step), so the notification only redraws when something it shows changes.
+ * What the notification, tiles and widgets show about the active TV. It changes far less often than
+ * [TvState] (not on every volume step), so the surfaces only redraw when something they show changes.
  */
 internal data class TvSnapshot(
     /** The TV's display name, or null when no TV is saved yet. */
     val tvName: String?,
     val connection: ConnectionState,
     val muted: Boolean,
+    /** Whether only the app can move things forward: there's no TV yet, or pairing needs the user. */
+    val needsApp: Boolean,
 ) {
     val connected: Boolean get() = connection == ConnectionState.Connected
 }
@@ -28,6 +30,7 @@ internal fun SessionHost.snapshot(state: TvState = session.state.value): TvSnaps
         tvName = name,
         connection = state.connection,
         muted = state.volume.muted,
+        needsApp = state.connection.needsApp || (registry.activeTv == null && !state.connection.isLive),
     )
 }
 
@@ -73,5 +76,22 @@ internal val ConnectionState.label: Int
         ConnectionState.WakeFailed -> R.string.system_state_wake_failed
         ConnectionState.Disconnected -> R.string.system_state_disconnected
     }
+
+/**
+ * The power button of a tile or widget: turns the active TV off when it's connected, or wakes it.
+ * Returns false, doing nothing, when the app has to be opened instead ([TvSnapshot.needsApp]).
+ */
+internal fun SessionHost.togglePower(): Boolean {
+    val tv = snapshot()
+    when {
+        tv.needsApp -> return false
+        tv.connected -> perform { it.powerOff() }
+        else -> {
+            onUserInteraction()
+            session.wake()
+        }
+    }
+    return true
+}
 
 internal fun SessionHost.toggleMute() = perform { it.setMute(!it.state.value.volume.muted) }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Strings for the keep-alive notification. -->
+<!-- Strings for the keep-alive notification, Quick Settings tiles and widgets. -->
 <resources>
-    <!-- Connection states, as shown by the notification -->
+    <!-- Connection states, as shown by the notification, tiles and widgets -->
     <string name="system_state_connected">Connected</string>
     <string name="system_state_connecting">Connecting…</string>
     <string name="system_state_awaiting_prompt">Accept on the TV</string>
@@ -13,6 +13,10 @@
     <string name="system_state_off">TV is off</string>
     <string name="system_state_wake_failed">TV didn\'t turn on</string>
     <string name="system_state_disconnected">Not connected</string>
+    <string name="system_state_on">On</string>
+    <string name="system_state_muted">Muted</string>
+    <string name="system_state_sound_on">Sound on</string>
+    <string name="system_no_tv">No TV yet</string>
 
     <!-- Keep-alive notification -->
     <string name="notif_channel_name">TV connection</string>
@@ -22,4 +26,31 @@
     <string name="notif_action_mute">Mute</string>
     <string name="notif_action_unmute">Unmute</string>
     <string name="notif_action_power_off">Turn off</string>
+
+    <!-- Quick Settings tiles -->
+    <string name="tile_power">TV power</string>
+    <string name="tile_mute">TV mute</string>
+    <string name="tile_screen_off">TV screen off</string>
+    <string name="tile_remote">Remote</string>
+
+    <!-- Widgets -->
+    <string name="widget_strip_label">TV controls</string>
+    <string name="widget_strip_description">Power, volume and mute for your TV</string>
+    <string name="widget_remote_label">Mini remote</string>
+    <string name="widget_remote_description">D-pad, Back, Home, volume and power for your TV</string>
+
+    <!-- Button descriptions for accessibility -->
+    <string name="system_action_turn_off">Turn off the TV</string>
+    <string name="system_action_turn_on">Turn on the TV</string>
+    <string name="system_action_volume_down">Volume down</string>
+    <string name="system_action_volume_up">Volume up</string>
+    <string name="system_action_mute">Mute</string>
+    <string name="system_action_unmute">Unmute</string>
+    <string name="system_action_up">Up</string>
+    <string name="system_action_down">Down</string>
+    <string name="system_action_left">Left</string>
+    <string name="system_action_right">Right</string>
+    <string name="system_action_ok">OK</string>
+    <string name="system_action_back">Back</string>
+    <string name="system_action_home">Home</string>
 </resources>

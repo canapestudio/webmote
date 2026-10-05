@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- What the 4×2 mini remote looks like, for the widget picker on Android 12+. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/ic_widget_preview_background"
+    android:baselineAligned="false"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="@string/widget_remote_label"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_back"
+                android:tint="?android:attr/textColorPrimary" />
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_home"
+                android:tint="?android:attr/textColorPrimary" />
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_mute"
+                android:tint="?android:attr/textColorPrimary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_volume_down"
+                android:tint="?android:attr/textColorPrimary" />
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_volume_up"
+                android:tint="?android:attr/textColorPrimary" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_widget_preview_button"
+            android:importantForAccessibility="no"
+            android:padding="9dp"
+            android:src="@drawable/ic_widget_up"
+            android:tint="?android:attr/textColorPrimary" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_left"
+                android:tint="?android:attr/textColorPrimary" />
+
+            <TextView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="4dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:gravity="center"
+                android:text="@string/system_action_ok"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="@drawable/ic_widget_preview_button"
+                android:importantForAccessibility="no"
+                android:padding="9dp"
+                android:src="@drawable/ic_widget_right"
+                android:tint="?android:attr/textColorPrimary" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/ic_widget_preview_button"
+            android:importantForAccessibility="no"
+            android:padding="9dp"
+            android:src="@drawable/ic_widget_down"
+            android:tint="?android:attr/textColorPrimary" />
+    </LinearLayout>
+</LinearLayout>
