@@ -9,6 +9,7 @@ import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.TvOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -25,6 +26,7 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.Route
 import io.github.krank56.webmote.ui.common.LocalHaptics
 import io.github.krank56.webmote.ui.common.StatusLayout
 import io.github.krank56.webmote.ui.common.TvScaffold
@@ -35,7 +37,7 @@ private const val RETRY_AFTER_MS = 8_000L
 
 /** A light placeholder while the session connects to the active TV. */
 @Composable
-fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
+fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOpen: (Route) -> Unit) {
     val name = tvName(tvs, state.tvId)
     // Offer a manual retry only if connecting takes unusually long.
     var showRetry by remember { mutableStateOf(false) }
@@ -44,7 +46,7 @@ fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
         delay(RETRY_AFTER_MS)
         showRetry = true
     }
-    TvScaffold(host, tvs, state) {
+    TvScaffold(host, tvs, state, onOpen) {
         StatusLayout(
             icon = Icons.Rounded.Tv,
             title = stringResource(R.string.connecting_title, name),
@@ -65,7 +67,7 @@ fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
  * another certificate, declined pairing, or is too old.
  */
 @Composable
-fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
+fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOpen: (Route) -> Unit) {
     val haptics = LocalHaptics.current
     val name = tvName(tvs, state.tvId)
     val repair = {
@@ -73,7 +75,7 @@ fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
         host.session.repair()
     }
     val buttonModifier = Modifier.widthIn(min = 200.dp)
-    TvScaffold(host, tvs, state) {
+    TvScaffold(host, tvs, state, onOpen) {
         when (state.connection) {
             ConnectionState.Off -> StatusLayout(
                 icon = Icons.Rounded.TvOff,
@@ -106,7 +108,11 @@ fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
                 body = stringResource(R.string.problem_unsupported_body, name),
                 iconContainer = MaterialTheme.colorScheme.errorContainer,
                 iconContent = MaterialTheme.colorScheme.onErrorContainer,
-            )
+            ) {
+                OutlinedButton(onClick = { onOpen(Route.AddTv) }, modifier = buttonModifier) {
+                    Text(stringResource(R.string.action_add_another_tv))
+                }
+            }
             // NeedsPairing, and anything else that lands here.
             else -> StatusLayout(
                 icon = Icons.Rounded.LinkOff,

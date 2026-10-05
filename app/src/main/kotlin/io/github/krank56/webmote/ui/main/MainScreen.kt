@@ -15,6 +15,7 @@ import io.github.krank56.webmote.R
 import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.Route
 import io.github.krank56.webmote.ui.common.TvScaffold
 import io.github.krank56.webmote.ui.remote.RemoteTab
 
@@ -25,7 +26,7 @@ enum class MainTab(@StringRes val label: Int, val icon: ImageVector) {
 
 /**
  * The connected TV's remote: the Remote tab under the shared top bar. The selected [tab] is kept by
- * the caller.
+ * the caller so it survives a visit to Settings.
  */
 @Composable
 fun MainScreen(
@@ -34,6 +35,7 @@ fun MainScreen(
     state: TvState,
     tab: MainTab,
     onTabChange: (MainTab) -> Unit,
+    onOpen: (Route) -> Unit,
 ) {
     val session = host.session
     BackHandler(enabled = tab != MainTab.Remote) { onTabChange(MainTab.Remote) }
@@ -42,6 +44,7 @@ fun MainScreen(
         host = host,
         tvs = tvs,
         state = state,
+        onOpen = onOpen,
         bottomBar = {
             NavigationBar {
                 MainTab.entries.forEach { item ->

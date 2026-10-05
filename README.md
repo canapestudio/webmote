@@ -8,7 +8,7 @@ No account, no analytics: Webmote talks only to your TVs, on your own network.
 
 - **Remote:** D-pad with OK, Back, Home, Settings and Mute around it, and a volume slider that
   follows the TV.
-- English and French.
+- **Several TVs**, English and French.
 
 ## Requirements
 

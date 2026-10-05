@@ -2,9 +2,15 @@
 <resources>
     <string name="app_name">Webmote</string>
     <string name="tv_generic_name">TV</string>
+    <string name="action_back">Back</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="action_save">Save</string>
     <string name="action_try_again">Try again</string>
     <string name="action_repair">Re-pair</string>
     <string name="action_repair_trust">Re-pair and trust this TV</string>
+    <string name="action_add_another_tv">Add another TV</string>
+    <string name="switch_tv_description">%1$s. Switch TV</string>
+    <string name="switch_tv_active">Active TV</string>
     <string name="tab_remote">Remote</string>
     <string name="connecting_title">Connecting to %1$s…</string>
     <string name="problem_needs_pairing_title">Pair again</string>
@@ -18,10 +24,12 @@
     <string name="off_title">%1$s is off</string>
     <string name="off_body">Turn it on, then try again.</string>
     <string name="pairing_title_first">Connect your TV</string>
+    <string name="pairing_title_add">Add a TV</string>
     <string name="pairing_intro">Make sure the TV is on and connected to the same Wi-Fi network as your phone.</string>
     <string name="pairing_refresh">Search again</string>
     <string name="pairing_found_header">TVs on this network</string>
     <string name="pairing_none_found">No TVs found. Check that the TV is on, then search again or enter its IP address below.</string>
+    <string name="pairing_candidate_saved">%1$s · Already saved</string>
     <string name="pairing_connect">Connect</string>
     <string name="pairing_manual_header">Enter the IP address</string>
     <string name="pairing_manual_body">For networks that block discovery. You’ll find the address in the TV’s network settings.</string>
@@ -54,4 +62,17 @@
     <string name="remote_volume_up">Volume up</string>
     <string name="remote_mute">Mute</string>
     <string name="remote_volume">Volume</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_tvs">TVs</string>
+    <string name="settings_tv_active">Active</string>
+    <string name="settings_tv_active_details">Active · %1$s</string>
+    <string name="settings_tv_more">More options for %1$s</string>
+    <string name="settings_tv_use">Use this TV</string>
+    <string name="settings_tv_rename">Rename</string>
+    <string name="settings_tv_forget">Forget</string>
+    <string name="settings_add_tv">Add a TV</string>
+    <string name="settings_rename_title">Rename TV</string>
+    <string name="settings_rename_label">Name</string>
+    <string name="settings_forget_title">Forget %1$s?</string>
+    <string name="settings_forget_body">Webmote removes its pairing and everything it learned about this TV. You’ll need to pair it again to use it.</string>
 </resources>

@@ -55,15 +55,46 @@ internal class Connector(private val core: SessionCore) {
     }
 
     /**
-     * Discards the session's TV's client key and certificate pin, closes any connection, and pairs
-     * with it again. It's re-paired where the session last reached it, which may be a new address.
+     * Discards [tvId]'s client key and certificate pin (by default the session's TV), makes it the
+     * active TV, closes any connection, and pairs with it again. The session's own TV is re-paired
+     * where the session last reached it, which may be a new address.
      */
-    fun repair() {
-        val id = core.state.value.tvId ?: core.registry.activeTvId.value ?: return
+    fun repair(tvId: String?) {
+        val id = tvId ?: core.state.value.tvId ?: core.registry.activeTvId.value ?: return
         val last = target?.takeIf { core.state.value.tvId == id }
         val host = last?.host ?: core.registry[id]?.host ?: return
         core.registry.update(id) { it.copy(clientKey = null, certificatePin = null) }
+        if (core.registry[id] != null) core.registry.setActive(id)
         start(Target(host, last?.name, id), restart = true)
+    }
+
+    /**
+     * Makes [tvId] the active TV and connects to it, closing the current connection. Does nothing
+     * more if the session is already connected or connecting to it.
+     */
+    fun switchTo(tvId: String) {
+        val tv = core.registry[tvId] ?: return
+        core.registry.setActive(tvId)
+        if (core.state.value.tvId == tvId && job?.isActive == true) return
+        start(Target(tv.host, name = null, tvId = tvId), restart = true)
+    }
+
+    /**
+     * Forgets [tvId] with everything stored for it. If the session was on it, closes the connection
+     * and connects to the TV that's active next, or reports no TV at all if none is left.
+     */
+    fun forget(tvId: String) {
+        val inUse = core.state.value.tvId == tvId
+        core.registry.forget(tvId)
+        if (!inUse) return
+        val next = core.registry.activeTv
+        if (next != null) {
+            start(Target(next.host, name = null, tvId = next.id), restart = true)
+        } else {
+            disconnect()
+            target = null
+            core.update { TvState() }
+        }
     }
 
     fun disconnect() {

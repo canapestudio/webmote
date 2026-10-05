@@ -48,8 +48,25 @@ public class TvSession(
     /** Submits the PIN the TV shows, while [ConnectionState.AwaitingPin]. */
     public fun submitPin(pin: String): Unit = onSession { connector.submitPin(pin) }
 
-    /** Discards the session's TV's client key and certificate pin, and pairs with it again. */
-    public fun repair(): Unit = onSession { connector.repair() }
+    /**
+     * Discards [tvId]'s client key and certificate pin, makes it the active TV and pairs with it
+     * again. By default it's the session's current TV.
+     */
+    public fun repair(tvId: String? = null): Unit = onSession { connector.repair(tvId) }
+
+    /** Makes [tvId] the active TV: closes the current connection and connects to it. */
+    public fun switchTo(tvId: String): Unit = onSession { connector.switchTo(tvId) }
+
+    /**
+     * Forgets [tvId] with its key and pin. If it was the active TV, another saved TV becomes active
+     * and the session connects to it.
+     */
+    public fun forget(tvId: String): Unit = onSession { connector.forget(tvId) }
+
+    /** Changes [tvId]'s display name. Blank names are ignored. */
+    public fun rename(tvId: String, name: String): Unit = onSession {
+        name.trim().takeIf { it.isNotEmpty() }?.let { registry.rename(tvId, it) }
+    }
 
     // Buttons
 

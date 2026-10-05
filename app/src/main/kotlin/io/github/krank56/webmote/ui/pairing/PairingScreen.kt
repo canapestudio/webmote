@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material3.Button
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import io.github.krank56.webmote.R
 import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.ConnectionState
+import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvCandidate
 import io.github.krank56.webmote.core.TvState
 import io.github.krank56.webmote.ui.common.LocalHaptics
@@ -58,11 +60,17 @@ import kotlinx.coroutines.CancellationException
 
 /**
  * Finds TVs on the network (or takes an IP address) and pairs with one. It's the first screen when no
- * TV is saved.
+ * TV is saved ([onBack] null), and opens from Settings to add another TV, closing with [onPaired].
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PairingScreen(host: SessionHost, state: TvState) {
+fun PairingScreen(
+    host: SessionHost,
+    state: TvState,
+    tvs: List<SavedTv>,
+    onBack: (() -> Unit)?,
+    onPaired: () -> Unit,
+) {
     val session = host.session
     val haptics = LocalHaptics.current
 
@@ -97,6 +105,12 @@ fun PairingScreen(host: SessionHost, state: TvState) {
     }
 
     val attemptState = state.takeIf { attemptHost != null && it.host == attemptHost }
+    LaunchedEffect(attemptState?.connection) {
+        if (attemptState?.connection == ConnectionState.Connected) {
+            attemptHost = null
+            onPaired()
+        }
+    }
 
     val shownStatus: ConnectionState? = when {
         attemptHost != null -> attemptState?.connection ?: ConnectionState.Connecting
@@ -108,7 +122,14 @@ fun PairingScreen(host: SessionHost, state: TvState) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.pairing_title_first)) },
+                title = { Text(stringResource(if (onBack == null) R.string.pairing_title_first else R.string.pairing_title_add)) },
+                navigationIcon = {
+                    if (onBack != null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                        }
+                    }
+                },
                 actions = {
                     IconButton(onClick = { searchRun++ }, enabled = !searching) {
                         Icon(Icons.Rounded.Refresh, contentDescription = stringResource(R.string.pairing_refresh))
@@ -136,7 +157,7 @@ fun PairingScreen(host: SessionHost, state: TvState) {
                 }
                 if (shownStatus != null) {
                     item {
-                        val target = attemptName ?: attemptHost.orEmpty()
+                        val target = attemptName ?: attemptHost ?: tvs.firstOrNull { it.id == state.tvId }?.name.orEmpty()
                         PairingStatusCard(
                             connection = shownStatus,
                             target = target,
@@ -159,7 +180,12 @@ fun PairingScreen(host: SessionHost, state: TvState) {
                     }
                 }
                 items(candidates, key = { it.host }) { candidate ->
-                    CandidateRow(candidate = candidate, onClick = { connect(candidate.host, candidate.name) })
+                    val saved = tvs.firstOrNull { it.host == candidate.host }
+                    CandidateRow(
+                        candidate = candidate,
+                        saved = saved != null,
+                        onClick = { connect(candidate.host, candidate.name) },
+                    )
                 }
                 if (!searching && candidates.isEmpty()) {
                     item {
@@ -180,7 +206,7 @@ fun PairingScreen(host: SessionHost, state: TvState) {
 }
 
 @Composable
-private fun CandidateRow(candidate: TvCandidate, onClick: () -> Unit) {
+private fun CandidateRow(candidate: TvCandidate, saved: Boolean, onClick: () -> Unit) {
     Surface(
         shape = MaterialTheme.shapes.large,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -188,7 +214,11 @@ private fun CandidateRow(candidate: TvCandidate, onClick: () -> Unit) {
     ) {
         ListItem(
             headlineContent = { Text(candidate.name) },
-            supportingContent = { Text(candidate.host) },
+            supportingContent = {
+                Text(
+                    if (saved) stringResource(R.string.pairing_candidate_saved, candidate.host) else candidate.host,
+                )
+            },
             leadingContent = { Icon(Icons.Rounded.Tv, contentDescription = null) },
             colors = ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
             modifier = Modifier.clickable(

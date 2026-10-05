@@ -12,22 +12,33 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.Route
 
 /**
- * A screen about the active TV's state (off, connecting, pairing problems): the shared top bar with
- * the TV's name, over [content].
+ * A screen about the active TV's state (off, connecting, pairing problems): the shared top bar, so the
+ * user can still switch TVs or reach Settings, over [content].
  */
 @Composable
 fun TvScaffold(
     host: SessionHost,
     tvs: List<SavedTv>,
     state: TvState,
+    onOpen: (Route) -> Unit,
     bottomBar: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
     val registryActiveId by host.registry.activeTvId.collectAsStateWithLifecycle()
     Scaffold(
-        topBar = { TvTopBar(tvs = tvs, activeTvId = state.tvId ?: registryActiveId) },
+        topBar = {
+            TvTopBar(
+                tvs = tvs,
+                activeTvId = state.tvId ?: registryActiveId,
+                onSwitch = { id ->
+                    host.session.switchTo(id)
+                },
+                onSettings = { onOpen(Route.Settings) },
+            )
+        },
         bottomBar = bottomBar,
     ) { padding ->
         Box(Modifier.fillMaxSize().padding(padding).consumeWindowInsets(padding)) {

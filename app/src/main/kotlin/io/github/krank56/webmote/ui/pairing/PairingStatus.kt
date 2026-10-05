@@ -45,6 +45,7 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.Route
 import io.github.krank56.webmote.ui.common.LocalHaptics
 import io.github.krank56.webmote.ui.common.StatusLayout
 import io.github.krank56.webmote.ui.common.TvScaffold
@@ -179,9 +180,9 @@ fun PinEntry(onSubmit: (String) -> Unit, modifier: Modifier = Modifier) {
  * its PIN.
  */
 @Composable
-fun PairingProgressScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
+fun PairingProgressScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOpen: (Route) -> Unit) {
     val name = tvName(tvs, state.tvId)
-    TvScaffold(host, tvs, state) {
+    TvScaffold(host, tvs, state, onOpen) {
         if (state.connection == ConnectionState.AwaitingPin) {
             StatusLayout(
                 icon = Icons.Rounded.Password,

@@ -69,8 +69,19 @@ public class TvRegistry(directory: File) {
         tvs.map { if (it.id == id) change(it) else it } to active
     }
 
+    public fun rename(id: String, name: String): Unit = update(id) { it.copy(name = name) }
+
     public fun setActive(id: String?): Unit = mutate { tvs, active ->
         tvs to (if (id == null || tvs.any { it.id == id }) id else active)
+    }
+
+    /**
+     * Removes the TV with [id] and everything stored with it. If it was the active TV, the first
+     * remaining TV becomes active, or none if it was the last.
+     */
+    public fun forget(id: String): Unit = mutate { tvs, active ->
+        val remaining = tvs.filterNot { it.id == id }
+        remaining to (if (active == id) remaining.firstOrNull()?.id else active)
     }
 
     private fun mutate(change: (List<SavedTv>, String?) -> Pair<List<SavedTv>, String?>) {
