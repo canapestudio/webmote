@@ -22,7 +22,8 @@ resulting work.
 Third-party notices
 
 Webmote's protocol client is written from scratch, using these projects as references; parts of
-their protocol details (the pairing manifest's permission list) are ported from them:
+their protocol details (the pairing manifest's permission list, button names) are ported from
+them:
 
 - aiowebostv (Apache License 2.0), aiowebostv authors: Home Assistant Team
   https://github.com/home-assistant-libs/aiowebostv

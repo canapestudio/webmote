@@ -52,6 +52,7 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.TvCandidate
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.common.LocalHaptics
 import io.github.krank56.webmote.ui.common.SectionHeader
 import kotlinx.coroutines.CancellationException
 
@@ -63,6 +64,7 @@ import kotlinx.coroutines.CancellationException
 @Composable
 fun PairingScreen(host: SessionHost, state: TvState) {
     val session = host.session
+    val haptics = LocalHaptics.current
 
     // Discovery: each run collects the TVs that answer; Refresh starts another run.
     var searchRun by rememberSaveable { mutableIntStateOf(0) }
@@ -88,6 +90,7 @@ fun PairingScreen(host: SessionHost, state: TvState) {
     var attemptName by rememberSaveable { mutableStateOf<String?>(null) }
 
     val connect: (String, String?) -> Unit = { address, name ->
+        haptics.press()
         attemptHost = address
         attemptName = name
         session.connect(address, name)
@@ -139,7 +142,10 @@ fun PairingScreen(host: SessionHost, state: TvState) {
                             target = target,
                             onSubmitPin = { pin -> session.submitPin(pin) },
                             onRetry = { attemptHost?.let { connect(it, attemptName) } },
-                            onRepair = { session.repair() },
+                            onRepair = {
+                                haptics.press()
+                                session.repair()
+                            },
                             modifier = Modifier.padding(vertical = 8.dp),
                         )
                     }

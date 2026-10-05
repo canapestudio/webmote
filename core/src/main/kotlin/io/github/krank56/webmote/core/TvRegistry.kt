@@ -20,6 +20,13 @@ public data class SavedTv(
     val clientKey: String? = null,
     /** SHA-256 fingerprint of the TV's certificate, recorded at pairing (trust on first use). */
     val certificatePin: String? = null,
+    val capabilities: LearnedCapabilities = LearnedCapabilities(),
+)
+
+@Serializable
+public data class LearnedCapabilities(
+    val pointer: Capability = Capability.Unknown,
+    val volumeLevel: Capability = Capability.Unknown,
 )
 
 /**

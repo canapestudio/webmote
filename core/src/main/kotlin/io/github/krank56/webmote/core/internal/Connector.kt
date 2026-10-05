@@ -1,5 +1,6 @@
 package io.github.krank56.webmote.core.internal
 
+import io.github.krank56.webmote.core.Capabilities
 import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvInfo
@@ -90,6 +91,7 @@ internal class Connector(private val core: SessionCore) {
                 host = target.host,
                 connection = ConnectionState.Connecting,
                 info = TvInfo(saved?.model, saved?.webOsVersion),
+                capabilities = saved?.learnedCapabilities() ?: Capabilities(),
             )
         }
         val outcome = try {
@@ -142,7 +144,14 @@ internal class Connector(private val core: SessionCore) {
 
             val link = Link(id, target.host, webOsVersion, socket, client, core.scope)
             core.link = link
-            core.update { it.copy(tvId = id, connection = ConnectionState.Connected) }
+            core.update {
+                it.copy(
+                    tvId = id,
+                    connection = ConnectionState.Connected,
+                    capabilities = tv.learnedCapabilities(),
+                )
+            }
+            core.features.forEach { it.onConnected(link) }
             socket.closed.await()
             core.link = null
             link.scope.coroutineContext[Job]?.cancel()
@@ -283,6 +292,11 @@ internal suspend fun SessionCore.acceptsConnection(host: String, port: Int): Boo
         false
     }
 }
+
+internal fun SavedTv.learnedCapabilities() = Capabilities(
+    pointer = capabilities.pointer,
+    volumeLevel = capabilities.volumeLevel,
+)
 
 internal fun JsonObject.stringList(key: String): List<String> =
     (this[key] as? JsonArray)?.mapNotNull { runCatching { it.jsonPrimitive.contentOrNull }.getOrNull() }.orEmpty()

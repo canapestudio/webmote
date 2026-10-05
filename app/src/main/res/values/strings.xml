@@ -5,6 +5,7 @@
     <string name="action_try_again">Try again</string>
     <string name="action_repair">Re-pair</string>
     <string name="action_repair_trust">Re-pair and trust this TV</string>
+    <string name="tab_remote">Remote</string>
     <string name="connecting_title">Connecting to %1$s…</string>
     <string name="problem_needs_pairing_title">Pair again</string>
     <string name="problem_needs_pairing_body">%1$s no longer recognises Webmote, which can happen after a TV software update. Pair again to keep using it.</string>
@@ -39,6 +40,18 @@
     <string name="pairing_unreachable">Couldn’t reach %1$s. Check that the TV is on and connected to the same network as your phone.</string>
     <string name="pairing_certificate">This TV presented a different security certificate from the one saved for it. Re-pair only if you trust the change, for example after resetting the TV.</string>
     <string name="pairing_needs_pairing">This TV no longer recognises Webmote. Pair it again to continue.</string>
+    <string name="remote_pointer_unavailable">The TV won’t take button presses. Volume still works.</string>
+    <string name="remote_up">Up</string>
+    <string name="remote_down">Down</string>
+    <string name="remote_left">Left</string>
+    <string name="remote_right">Right</string>
+    <string name="remote_ok">OK</string>
+    <string name="remote_back">Back</string>
+    <string name="remote_home">Home</string>
+    <string name="remote_settings">Settings</string>
+    <string name="remote_settings_description">TV settings</string>
     <string name="remote_volume_down">Volume down</string>
     <string name="remote_volume_up">Volume up</string>
+    <string name="remote_mute">Mute</string>
+    <string name="remote_volume">Volume</string>
 </resources>

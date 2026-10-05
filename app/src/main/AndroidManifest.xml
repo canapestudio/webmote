@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Exactly the permissions the spec lists: no location, no nearby devices. -->
     <uses-permission android:name="android.permission.INTERNET" />
@@ -16,11 +17,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Webmote">
 
+        <!-- A remote in the hand stays in portrait. Android 16+ may ignore this on large screens;
+             the remote keeps its maximum width and centring there. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="adjustResize">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi,LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

@@ -9,11 +9,14 @@ import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.contentOrNull
+import kotlinx.serialization.json.int
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import kotlinx.serialization.json.putJsonArray
+import kotlinx.serialization.json.putJsonObject
 import mockwebserver3.Dispatcher
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -35,10 +38,10 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * A scriptable stand-in for a webOS TV on loopback: an encrypted SSAP WebSocket server with a
- * self-signed certificate, and an SSDP responder.
+ * self-signed certificate, the pointer socket it hands out, and an SSDP responder.
  *
  * Every behaviour is a property tests can change before or during a test. Everything the TV
- * receives is recorded in [requests] and [ssdpSearches].
+ * receives is recorded in [requests], [pointerMessages] and [ssdpSearches].
  *
  * A second TV for the same session runs on another loopback address with the same ports, since a
  * session uses one port for every TV: `FakeTv(host = "::1", port = first.port, legacyPort = first.legacyPort)`.
@@ -86,9 +89,21 @@ class FakeTv(
     /** The client keys this TV has issued. */
     val issuedKeys: MutableList<String> = CopyOnWriteArrayList()
 
+    // Volume
+
+    /** The level the TV reports, or null when it reports none (sound goes to a soundbar). */
+    @Volatile var volume: Int? = 12
+    @Volatile var muted: Boolean = false
+
+    // Pointer socket
+
+    /** Whether the pointer socket accepts connections. When false the upgrade is refused. */
+    @Volatile var pointerSocketAvailable: Boolean = true
+
     // Recording
 
     val requests: MutableList<Received> = CopyOnWriteArrayList()
+    val pointerMessages: MutableList<String> = CopyOnWriteArrayList()
 
     /** Received requests for [uri], in order. */
     fun requests(uri: String): List<Received> = requests.filter { it.uri == uri }
@@ -101,6 +116,7 @@ class FakeTv(
     private var legacyServer: ServerSocket? = null
     private val pendingPrompts = CopyOnWriteArrayList<() -> Unit>()
     private val pendingDeclines = CopyOnWriteArrayList<() -> Unit>()
+    private val pointerPath = "/resources/${UUID.randomUUID()}/netinput.pointer.sock"
 
     private val ssdpSocket = DatagramSocket(0, loopback)
     val ssdpPort: Int get() = ssdpSocket.localPort
@@ -120,7 +136,7 @@ class FakeTv(
 
     val isOn: Boolean get() = server != null || legacyServer != null
 
-    /** How many SSAP connections are open. */
+    /** How many SSAP connections are open (not counting pointer sockets). */
     val openConnections: Int get() = clients.size
 
     init {
@@ -152,8 +168,7 @@ class FakeTv(
         server = MockWebServer().apply {
             useHttps(HandshakeCertificates.Builder().heldCertificate(certificate).build().sslSocketFactory())
             dispatcher = object : Dispatcher() {
-                override fun dispatch(request: RecordedRequest): MockResponse =
-                    MockResponse.Builder().webSocketUpgrade(Client()).build()
+                override fun dispatch(request: RecordedRequest): MockResponse = route(request)
             }
             start(loopback, this@FakeTv.port)
         }
@@ -191,6 +206,18 @@ class FakeTv(
         handlers[uri] = handler
     }
 
+    /** Sends [payload] to every client subscribed to [uri]. */
+    fun push(uri: String, payload: JsonObject) {
+        clients.forEach { it.push(uri, payload) }
+    }
+
+    /** Changes the volume as the physical remote would, notifying subscribers. */
+    fun changeVolumeFromRemote(level: Int?, muted: Boolean = this.muted) {
+        volume = level
+        this.muted = muted
+        pushVolume()
+    }
+
     override fun close() {
         powerOff()
         ssdpSocket.close()
@@ -198,9 +225,20 @@ class FakeTv(
 
     // SSAP
 
+    private fun route(request: RecordedRequest): MockResponse {
+        val path = request.url.encodedPath
+        return when {
+            path == pointerPath && pointerSocketAvailable ->
+                MockResponse.Builder().webSocketUpgrade(PointerListener()).build()
+            path == pointerPath -> MockResponse.Builder().code(403).build()
+            else -> MockResponse.Builder().webSocketUpgrade(Client()).build()
+        }
+    }
+
     private inner class Client : WebSocketListener() {
         lateinit var socket: WebSocket
         @Volatile var registered = false
+        private val subscriptions = CopyOnWriteArrayList<Pair<String, String>>()
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
             socket = webSocket
@@ -220,7 +258,8 @@ class FakeTv(
                 // Firmware 33.20 and later ignores a hello without a payload key.
                 "hello" -> if ("payload" in message) send("hello", received.id, helloPayload())
                 "register" -> register(received)
-                "request" -> request(received)
+                "request", "subscribe" -> request(received)
+                "unsubscribe" -> subscriptions.removeIf { it.second == received.id }
             }
         }
 
@@ -231,6 +270,10 @@ class FakeTv(
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             clients -= this
+        }
+
+        fun push(uri: String, payload: JsonObject) {
+            subscriptions.filter { it.first == uri }.forEach { (_, id) -> send("response", id, payload) }
         }
 
         private fun register(received: Received) {
@@ -304,6 +347,7 @@ class FakeTv(
             if (registered && uri == SYSTEM_INFO) return sendError(received.id, "401 insufficient permissions")
             if (!registered && uri != SYSTEM_INFO) return sendError(received.id, "401 insufficient permissions (not registered)")
             val handler = handlers[uri] ?: return sendError(received.id, "404 no such service or method")
+            if (received.type == "subscribe" && received.id != null) subscriptions += uri to received.id
             try {
                 send("response", received.id, handler(received))
             } catch (e: TvError) {
@@ -333,6 +377,29 @@ class FakeTv(
         }
     }
 
+    private val pointerSockets = CopyOnWriteArrayList<WebSocket>()
+
+    /** Closes the open pointer sockets but keeps the main connections, as the TV sometimes does. */
+    fun dropPointerSocket() {
+        pointerSockets.forEach { it.close(1001, "going away") }
+        pointerSockets.clear()
+    }
+
+    private inner class PointerListener : WebSocketListener() {
+        override fun onOpen(webSocket: WebSocket, response: Response) {
+            pointerSockets += webSocket
+        }
+
+        override fun onMessage(webSocket: WebSocket, text: String) {
+            pointerMessages += text
+        }
+
+        override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            webSocket.close(1000, null)
+            pointerSockets -= webSocket
+        }
+    }
+
     private fun helloPayload() = buildJsonObject {
         put("protocolVersion", 1)
         put("deviceType", "tv")
@@ -350,8 +417,39 @@ class FakeTv(
     private fun installDefaultHandlers() {
         on(SYSTEM_INFO) { ok { put("modelName", model); put("receiverType", "dvb") } }
 
-        on("ssap://audio/volumeUp") { ok() }
-        on("ssap://audio/volumeDown") { ok() }
+        on("ssap://audio/volumeUp") { volume = volume?.let { (it + 1).coerceAtMost(100) }; pushVolume(); ok() }
+        on("ssap://audio/volumeDown") { volume = volume?.let { (it - 1).coerceAtLeast(0) }; pushVolume(); ok() }
+        on("ssap://audio/setVolume") { r ->
+            if (volume != null) volume = r.payload["volume"]!!.jsonPrimitive.int
+            pushVolume()
+            ok()
+        }
+        on("ssap://audio/setMute") { r ->
+            muted = r.payload["mute"]!!.jsonPrimitive.contentOrNull == "true"
+            pushVolume()
+            ok()
+        }
+        on(GET_VOLUME) { volumePayload() }
+        on("ssap://audio/getStatus") { volumePayload() }
+
+        on("ssap://com.webos.service.networkinput/getPointerInputSocket") {
+            ok { put("socketPath", "wss://$urlHost:$port$pointerPath") }
+        }
+    }
+
+    private fun pushVolume() = push(GET_VOLUME, volumePayload())
+
+    private fun volumePayload(): JsonObject = ok {
+        put("callerId", "secondscreen.client")
+        putJsonObject("volumeStatus") {
+            put("activeStatus", true)
+            put("adjustVolume", volume != null)
+            put("maxVolume", 100)
+            put("muteStatus", muted)
+            put("volume", volume ?: -1)
+            put("mode", "normal")
+            put("soundOutput", if (volume != null) "tv_speaker" else "external_arc")
+        }
     }
 
     // UDP: SSDP
@@ -426,6 +524,7 @@ class FakeTv(
     companion object {
         const val SYSTEM_INFO = "ssap://system/getSystemInfo"
         const val SET_PIN = "ssap://pairing/setPin"
+        const val GET_VOLUME = "ssap://audio/getVolume"
         const val SECOND_SCREEN = "urn:lge-com:service:webos-second-screen:1"
         const val MEDIA_RENDERER = "urn:schemas-upnp-org:device:MediaRenderer:1"
 
@@ -453,6 +552,7 @@ class FakeTv(
 /** A message the fake TV received on its SSAP socket. */
 data class Received(val type: String, val id: String?, val uri: String?, val payload: JsonObject) {
     fun string(key: String): String? = (payload[key] as? JsonPrimitive)?.contentOrNull
+    fun int(key: String): Int? = (payload[key] as? JsonPrimitive)?.intOrNull
     operator fun get(key: String): JsonElement? = payload[key]
 }
 

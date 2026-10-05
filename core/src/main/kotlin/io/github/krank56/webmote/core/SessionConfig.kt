@@ -3,6 +3,7 @@ package io.github.krank56.webmote.core
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 /**
@@ -14,6 +15,8 @@ public data class SessionConfig(
     val port: Int = 3001,
     /** The plain port only pre-2018 TVs rely on; used to tell them apart from TVs that are off. */
     val legacyPort: Int = 3000,
+    /** Volume slider writes are sent at most this often while dragging. */
+    val throttleInterval: Duration = 150.milliseconds,
     /** How long to wait for the TV to answer an SSAP request. */
     val requestTimeout: Duration = 10.seconds,
     /** Real-time socket timeout for TCP connections and probes to the TV. */

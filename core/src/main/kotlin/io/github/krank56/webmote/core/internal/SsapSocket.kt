@@ -3,6 +3,9 @@ package io.github.krank56.webmote.core.internal
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
@@ -21,6 +24,7 @@ import okhttp3.WebSocketListener
 import java.io.IOException
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.coroutines.resumeWithException
 import kotlin.time.Duration
 
 /** The TV answered a request with an `error` message, or with `returnValue: false`. */
@@ -68,6 +72,20 @@ internal class SsapSocket private constructor(private val requestTimeout: Durati
             val reply = withTimeout(requestTimeout) { channel.receive() }
             reply.throwIfError(uri)
             return reply.payload
+        } finally {
+            forget(id)
+        }
+    }
+
+    /** Subscribes to [uri]; each element is the payload of one update, starting with the current value. */
+    fun subscribe(uri: String, payload: JsonObject? = null): Flow<JsonObject> = flow {
+        val id = newId()
+        val channel = send("subscribe", uri, payload, id)
+        try {
+            for (reply in channel) {
+                reply.throwIfError(uri)
+                emit(reply.payload)
+            }
         } finally {
             forget(id)
         }
@@ -158,4 +176,49 @@ internal class SsapSocket private constructor(private val requestTimeout: Durati
 
 internal fun JsonObject.string(key: String): String? = (this[key] as? JsonPrimitive)?.contentOrNull
 
+internal fun JsonObject.obj(key: String): JsonObject? = this[key] as? JsonObject
+
 internal fun JsonObject.bool(key: String): Boolean? = (this[key] as? JsonPrimitive)?.booleanOrNull
+
+internal fun JsonObject.int(key: String): Int? = (this[key] as? JsonPrimitive)?.contentOrNull?.toIntOrNull()
+
+/** A plain-text WebSocket, used for the pointer socket. */
+internal class TextSocket private constructor() {
+    private lateinit var webSocket: WebSocket
+    val closed = CompletableDeferred<Unit>()
+
+    fun send(text: String): Boolean = webSocket.send(text)
+
+    fun close() {
+        webSocket.close(1000, null)
+        closed.complete(Unit)
+    }
+
+    companion object {
+        suspend fun open(client: OkHttpClient, url: String): TextSocket = suspendCancellableCoroutine { continuation ->
+            val socket = TextSocket()
+            val listener = object : WebSocketListener() {
+                override fun onOpen(webSocket: WebSocket, response: Response) {
+                    // If the caller was cancelled meanwhile, the socket it will never see is closed.
+                    if (continuation.isActive) continuation.resume(socket) { _, _, _ -> webSocket.cancel() }
+                }
+
+                override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+                    webSocket.close(1000, null)
+                    socket.closed.complete(Unit)
+                }
+
+                override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                    socket.closed.complete(Unit)
+                }
+
+                override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+                    socket.closed.complete(Unit)
+                    if (continuation.isActive) continuation.resumeWithException(t)
+                }
+            }
+            socket.webSocket = client.newWebSocket(Request.Builder().url(url).build(), listener)
+            continuation.invokeOnCancellation { socket.webSocket.cancel() }
+        }
+    }
+}

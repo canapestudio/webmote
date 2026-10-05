@@ -45,6 +45,7 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.common.LocalHaptics
 import io.github.krank56.webmote.ui.common.StatusLayout
 import io.github.krank56.webmote.ui.common.TvScaffold
 import io.github.krank56.webmote.ui.common.tvName
@@ -143,12 +144,14 @@ private fun RetryButton(label: Int, onClick: () -> Unit) {
 /** The PIN field and Submit button, with the phone's number keyboard. */
 @Composable
 fun PinEntry(onSubmit: (String) -> Unit, modifier: Modifier = Modifier) {
+    val haptics = LocalHaptics.current
     var pin by rememberSaveable { mutableStateOf("") }
     val focus = remember { FocusRequester() }
     LaunchedEffect(Unit) { focus.requestFocus() }
     val submit = {
         val value = pin.trim()
         if (value.isNotEmpty()) {
+            haptics.press()
             onSubmit(value)
             pin = ""
         }

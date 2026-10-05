@@ -5,6 +5,7 @@
     <string name="action_try_again">Réessayer</string>
     <string name="action_repair">Associer à nouveau</string>
     <string name="action_repair_trust">Associer à nouveau et faire confiance</string>
+    <string name="tab_remote">Télécommande</string>
     <string name="connecting_title">Connexion à %1$s…</string>
     <string name="problem_needs_pairing_title">Nouvelle association nécessaire</string>
     <string name="problem_needs_pairing_body">La TV « %1$s » ne reconnaît plus Webmote, ce qui peut arriver après une mise à jour logicielle. Associez-la à nouveau pour continuer à l’utiliser.</string>
@@ -38,6 +39,18 @@
     <string name="pairing_unreachable">Impossible de joindre %1$s. Vérifiez que la TV est allumée et connectée au même réseau que votre téléphone.</string>
     <string name="pairing_certificate">Cette TV a présenté un certificat de sécurité différent de celui enregistré. N’associez-la à nouveau que si vous faites confiance à ce changement, par exemple après une réinitialisation de la TV.</string>
     <string name="pairing_needs_pairing">Cette TV ne reconnaît plus Webmote. Associez-la à nouveau pour continuer.</string>
+    <string name="remote_pointer_unavailable">La TV refuse les touches. Le volume fonctionne toujours.</string>
+    <string name="remote_up">Haut</string>
+    <string name="remote_down">Bas</string>
+    <string name="remote_left">Gauche</string>
+    <string name="remote_right">Droite</string>
+    <string name="remote_ok">OK</string>
+    <string name="remote_back">Retour</string>
+    <string name="remote_home">Accueil</string>
+    <string name="remote_settings">Paramètres</string>
+    <string name="remote_settings_description">Paramètres de la TV</string>
     <string name="remote_volume_down">Baisser le volume</string>
     <string name="remote_volume_up">Monter le volume</string>
+    <string name="remote_mute">Muet</string>
+    <string name="remote_volume">Volume</string>
 </resources>

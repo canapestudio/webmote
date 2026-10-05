@@ -1,6 +1,7 @@
 package io.github.krank56.webmote.core
 
 import io.github.krank56.webmote.core.internal.Connector
+import io.github.krank56.webmote.core.internal.PointerControl
 import io.github.krank56.webmote.core.internal.SessionCore
 import io.github.krank56.webmote.core.internal.VolumeControl
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,11 @@ public class TvSession(
     private val core = SessionCore(registry, scope, config)
     private val connector = Connector(core)
     private val volume = VolumeControl(core)
+    private val pointer = PointerControl(core)
+
+    init {
+        core.features += listOf(volume, pointer)
+    }
 
     public val state: StateFlow<TvState> = core.state.asStateFlow()
 
@@ -45,11 +51,22 @@ public class TvSession(
     /** Discards the session's TV's client key and certificate pin, and pairs with it again. */
     public fun repair(): Unit = onSession { connector.repair() }
 
+    // Buttons
+
+    public fun press(button: RemoteButton): Unit = onSession { pointer.press(button) }
+
     // Volume
 
     public fun volumeUp(): Unit = onSession { volume.up() }
 
     public fun volumeDown(): Unit = onSession { volume.down() }
+
+    /** A volume slider value while dragging. Throttled; follow it with [setVolume] on release. */
+    public fun dragVolume(level: Int): Unit = onSession { volume.drag(level) }
+
+    public fun setVolume(level: Int): Unit = onSession { volume.set(level) }
+
+    public fun setMute(muted: Boolean): Unit = onSession { volume.setMute(muted) }
 
     /** Closes the connection and stops the session for good. */
     override fun close(): Unit = core.close()

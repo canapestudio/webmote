@@ -37,6 +37,9 @@ internal class SessionCore(
     /** The live connection, while the session is connected. */
     var link: Link? = null
 
+    /** The features to start on every new link, in order. */
+    val features = mutableListOf<Feature>()
+
     /** The base HTTP client. Each TV gets a pinned client derived from it. */
     val http: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(config.connectTimeout.inWholeMilliseconds, TimeUnit.MILLISECONDS)
@@ -84,4 +87,13 @@ internal class Link(
         scope.cancel()
         socket.close()
     }
+}
+
+/** A part of the session that needs to set itself up on every new connection. */
+internal interface Feature {
+    /**
+     * Called on the session's dispatcher once a link reaches the connected state. Work launched in
+     * [Link.scope] stops when the link closes.
+     */
+    fun onConnected(link: Link)
 }

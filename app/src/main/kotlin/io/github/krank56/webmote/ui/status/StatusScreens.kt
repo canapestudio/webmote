@@ -25,6 +25,7 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.common.LocalHaptics
 import io.github.krank56.webmote.ui.common.StatusLayout
 import io.github.krank56.webmote.ui.common.TvScaffold
 import io.github.krank56.webmote.ui.common.tvName
@@ -65,8 +66,12 @@ fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
  */
 @Composable
 fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState) {
+    val haptics = LocalHaptics.current
     val name = tvName(tvs, state.tvId)
-    val repair = { host.session.repair() }
+    val repair = {
+        haptics.press()
+        host.session.repair()
+    }
     val buttonModifier = Modifier.widthIn(min = 200.dp)
     TvScaffold(host, tvs, state) {
         when (state.connection) {

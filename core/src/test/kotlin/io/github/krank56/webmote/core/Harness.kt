@@ -17,9 +17,10 @@ import kotlin.time.TimeSource
 /**
  * A [TvSession] wired to a [FakeTv] and a real [TvRegistry] in [directory].
  *
- * The session runs on a coroutine test scheduler, so its own work only runs when a test lets it.
- * Network I/O is real, so tests wait for its effects with [eventually], which runs the session's
- * pending work while polling in real time.
+ * Virtual time: the session runs on a coroutine test scheduler that only moves when a test calls
+ * [advance], so throttling is deterministic. Network I/O is real,
+ * so tests wait for its effects with [eventually], which runs the session's pending work while
+ * polling in real time.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class Harness(
@@ -73,6 +74,12 @@ class Harness(
             scheduler.runCurrent()
             Thread.sleep(2)
         }
+    }
+
+    /** Moves virtual time forward by [duration], running everything that comes due. */
+    fun advance(duration: Duration) {
+        scheduler.advanceTimeBy(duration.inWholeMilliseconds)
+        scheduler.runCurrent()
     }
 
     /** Powers the fake TV on, pairs with it by prompt, and waits until connected. */
