@@ -9,6 +9,8 @@ public data class TvState(
     val connection: ConnectionState = ConnectionState.Disconnected,
     /** The address of the TV the session is reaching, or last reached; null before the first attempt. */
     val host: String? = null,
+    /** Whether a [TvSession.wake] is waiting for the TV to answer (the state is then [ConnectionState.Connecting]). */
+    val waking: Boolean = false,
     val info: TvInfo = TvInfo(),
     val volume: Volume = Volume(),
     val capabilities: Capabilities = Capabilities(),
@@ -18,7 +20,7 @@ public enum class ConnectionState {
     /** No connection is open or wanted (no active TV, or [TvSession.disconnect] was called). */
     Disconnected,
 
-    /** Opening the connection. */
+    /** Opening the connection, or waiting for the TV to come up after a wake. */
     Connecting,
 
     /** The TV shows "Allow this device?" and is waiting for the user to accept it with the remote. */
@@ -43,6 +45,9 @@ public enum class ConnectionState {
 
     /** The TV refused or didn't answer the connection: it's off or unreachable. */
     Off,
+
+    /** A wake was sent but the TV didn't respond within [SessionConfig.wakeTimeout]. */
+    WakeFailed,
 }
 
 public data class TvInfo(

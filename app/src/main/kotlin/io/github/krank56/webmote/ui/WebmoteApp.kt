@@ -26,6 +26,7 @@ import io.github.krank56.webmote.core.TvState
 import io.github.krank56.webmote.ui.common.ProvideHaptics
 import io.github.krank56.webmote.ui.main.MainScreen
 import io.github.krank56.webmote.ui.main.MainTab
+import io.github.krank56.webmote.ui.off.TvOffScreen
 import io.github.krank56.webmote.ui.pairing.PairingProgressScreen
 import io.github.krank56.webmote.ui.pairing.PairingScreen
 import io.github.krank56.webmote.ui.settings.SettingsScreen
@@ -42,6 +43,7 @@ private sealed interface Screen {
     data object Main : Screen
     data object Connecting : Screen
     data object Pairing : Screen
+    data object Off : Screen
     data object Problem : Screen
 }
 
@@ -52,6 +54,7 @@ fun WebmoteApp(host: SessionHost) {
     val tvs by host.registry.tvs.collectAsStateWithLifecycle()
     val state by session.state.collectAsStateWithLifecycle()
     val backStack = rememberBackStack()
+    val lastOffTvId = rememberLastOffTvId(state)
     var mainTab by rememberSaveable { mutableStateOf(MainTab.Remote) }
 
     // Forgetting the last TV leaves nothing to manage: go back to pairing.
@@ -64,7 +67,7 @@ fun WebmoteApp(host: SessionHost) {
     val back: () -> Unit = { if (backStack.isNotEmpty()) backStack.removeAt(backStack.lastIndex) }
     val home: () -> Unit = { backStack.clear() }
 
-    val screen = backStack.lastOrNull()?.let(Screen::Opened) ?: stateScreen(tvs, state)
+    val screen = backStack.lastOrNull()?.let(Screen::Opened) ?: stateScreen(tvs, state, lastOffTvId)
 
     ProvideHaptics {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -107,24 +110,47 @@ fun WebmoteApp(host: SessionHost) {
                     Screen.Connecting -> ConnectingScreen(host = host, tvs = tvs, state = state, onOpen = open)
                     Screen.Pairing -> PairingProgressScreen(host = host, tvs = tvs, state = state, onOpen = open)
                     Screen.Problem -> ProblemScreen(host = host, tvs = tvs, state = state, onOpen = open)
+                    Screen.Off -> TvOffScreen(
+                        host = host,
+                        tvs = tvs,
+                        state = state,
+                        waking = state.waking,
+                        onOpen = open,
+                    )
                 }
             }
         }
     }
 }
 
-private fun stateScreen(tvs: List<SavedTv>, state: TvState): Screen {
+private fun stateScreen(tvs: List<SavedTv>, state: TvState, lastOffTvId: String?): Screen {
     if (tvs.isEmpty()) return Screen.FirstPairing
     return when (state.connection) {
         ConnectionState.Connected -> Screen.Main
-        ConnectionState.Connecting, ConnectionState.Disconnected -> Screen.Connecting
+        ConnectionState.Off, ConnectionState.WakeFailed -> Screen.Off
+        // A TV that was off stays on its off screen while the session probes for it or wakes it.
+        ConnectionState.Connecting -> if (state.waking || (lastOffTvId != null && lastOffTvId == state.tvId)) Screen.Off else Screen.Connecting
+        ConnectionState.Disconnected -> Screen.Connecting
         ConnectionState.AwaitingPrompt, ConnectionState.AwaitingPin -> Screen.Pairing
-        ConnectionState.Off,
         ConnectionState.NeedsPairing,
         ConnectionState.CertificateMismatch,
         ConnectionState.PairingDeclined,
         ConnectionState.Unsupported -> Screen.Problem
     }
+}
+
+/** The TV last seen off, until it's seen in any state but off or connecting. */
+@Composable
+private fun rememberLastOffTvId(state: TvState): String? {
+    var lastOff by rememberSaveable { mutableStateOf<String?>(null) }
+    LaunchedEffect(state.connection, state.tvId) {
+        when (state.connection) {
+            ConnectionState.Off, ConnectionState.WakeFailed -> lastOff = state.tvId
+            ConnectionState.Connecting -> Unit
+            else -> lastOff = null
+        }
+    }
+    return lastOff
 }
 
 @Composable

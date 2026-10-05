@@ -8,12 +8,14 @@ No account, no analytics: Webmote talks only to your TVs, on your own network.
 
 - **Remote:** D-pad with OK, Back, Home, Settings and Mute around it, and a volume slider that
   follows the TV.
-- **Several TVs**, English and French.
+- **Turn the TV on** with Wake-on-LAN, **several TVs**, English and French.
 
 ## Requirements
 
 - An LG TV with webOS 4 or later (2018 onwards), on the same Wi-Fi network as the phone.
 - Android 8.0 or later.
+- To turn the TV on from the phone: "Turn on via Wi-Fi" (Settings → General → Mobile TV On) or, on
+  2025 models and later, Wake on LAN (Support → IP control settings).
 
 ## Building
 
@@ -27,7 +29,8 @@ You need JDK 17 and the Android SDK (set `sdk.dir` in `local.properties`, or `AN
 The project has two modules:
 
 - `core`: the TV session (pairing, the encrypted SSAP connection, certificate pinning, the pointer
-  socket, discovery). Plain Kotlin with no Android dependencies, tested against a fake TV.
+  socket, Wake-on-LAN, discovery). Plain Kotlin with no Android dependencies, tested against a fake
+  TV.
 - `app`: the Compose UI.
 
 To try the app without a TV, run the fake TV on your computer and point the emulator at it:

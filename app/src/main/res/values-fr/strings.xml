@@ -9,6 +9,9 @@
     <string name="action_repair">Associer à nouveau</string>
     <string name="action_repair_trust">Associer à nouveau et faire confiance</string>
     <string name="action_add_another_tv">Ajouter une autre TV</string>
+    <string name="action_got_it">J’ai compris</string>
+    <string name="power_off">Éteindre la TV</string>
+    <string name="power_on">Allumer la TV</string>
     <string name="switch_tv_description">%1$s. Changer de TV</string>
     <string name="switch_tv_active">TV active</string>
     <string name="tab_remote">Télécommande</string>
@@ -22,7 +25,12 @@
     <string name="problem_unsupported_title">TV non prise en charge</string>
     <string name="problem_unsupported_body">La TV « %1$s » fonctionne sous webOS 1, 2 ou 3 (modèles antérieurs à 2018). Webmote prend en charge les TV LG à partir de 2018 (webOS 4 et versions ultérieures).</string>
     <string name="off_title">La TV « %1$s » est éteinte</string>
-    <string name="off_body">Allumez-la, puis réessayez.</string>
+    <string name="off_body">Allumez-la et Webmote se connectera dès qu’elle répondra.</string>
+    <string name="off_waking_title">Allumage de la TV « %1$s »…</string>
+    <string name="off_waking_body">En attente de la réponse de la TV. Cela peut prendre quelques instants.</string>
+    <string name="off_wake_failed_body">La TV ne s’est pas allumée. Webmote continue de la chercher tant que cet écran est ouvert.</string>
+    <string name="off_turn_on">Allumer</string>
+    <string name="off_wake_hint">Si la TV ne s’allume pas depuis votre téléphone, activez ce réglage sur la TV : Paramètres → Général → Mobile TV On → Allumer via le Wi-Fi. Sur les modèles 2025 et plus récents : Assistance → Paramètres de contrôle IP → Wake on LAN.</string>
     <string name="pairing_title_first">Connecter votre TV</string>
     <string name="pairing_title_add">Ajouter une TV</string>
     <string name="pairing_intro">Vérifiez que la TV est allumée et connectée au même réseau Wi-Fi que votre téléphone.</string>
@@ -47,7 +55,7 @@
     <string name="pairing_unreachable">Impossible de joindre %1$s. Vérifiez que la TV est allumée et connectée au même réseau que votre téléphone.</string>
     <string name="pairing_certificate">Cette TV a présenté un certificat de sécurité différent de celui enregistré. N’associez-la à nouveau que si vous faites confiance à ce changement, par exemple après une réinitialisation de la TV.</string>
     <string name="pairing_needs_pairing">Cette TV ne reconnaît plus Webmote. Associez-la à nouveau pour continuer.</string>
-    <string name="remote_pointer_unavailable">La TV refuse les touches. Le volume fonctionne toujours.</string>
+    <string name="remote_pointer_unavailable">La TV refuse les touches. Le volume et la mise en marche fonctionnent toujours.</string>
     <string name="remote_up">Haut</string>
     <string name="remote_down">Bas</string>
     <string name="remote_left">Gauche</string>

@@ -9,6 +9,9 @@
     <string name="action_repair">Re-pair</string>
     <string name="action_repair_trust">Re-pair and trust this TV</string>
     <string name="action_add_another_tv">Add another TV</string>
+    <string name="action_got_it">Got it</string>
+    <string name="power_off">Turn off the TV</string>
+    <string name="power_on">Turn on the TV</string>
     <string name="switch_tv_description">%1$s. Switch TV</string>
     <string name="switch_tv_active">Active TV</string>
     <string name="tab_remote">Remote</string>
@@ -22,7 +25,12 @@
     <string name="problem_unsupported_title">TV not supported</string>
     <string name="problem_unsupported_body">%1$s runs webOS 1, 2 or 3 (models from before 2018). Webmote works with LG TVs from 2018 onwards (webOS 4 and later).</string>
     <string name="off_title">%1$s is off</string>
-    <string name="off_body">Turn it on, then try again.</string>
+    <string name="off_body">Turn it on and Webmote connects as soon as it answers.</string>
+    <string name="off_waking_title">Turning on %1$s…</string>
+    <string name="off_waking_body">Waiting for the TV to answer. This can take a little while.</string>
+    <string name="off_wake_failed_body">The TV didn’t turn on. Webmote keeps looking for it while this screen is open.</string>
+    <string name="off_turn_on">Turn on</string>
+    <string name="off_wake_hint">If the TV doesn’t turn on from your phone, enable this setting on the TV: Settings → General → Mobile TV On → Turn On Via Wi-Fi. On 2025 and later models: Support → IP control settings → Wake on LAN.</string>
     <string name="pairing_title_first">Connect your TV</string>
     <string name="pairing_title_add">Add a TV</string>
     <string name="pairing_intro">Make sure the TV is on and connected to the same Wi-Fi network as your phone.</string>
@@ -48,7 +56,7 @@
     <string name="pairing_unreachable">Couldn’t reach %1$s. Check that the TV is on and connected to the same network as your phone.</string>
     <string name="pairing_certificate">This TV presented a different security certificate from the one saved for it. Re-pair only if you trust the change, for example after resetting the TV.</string>
     <string name="pairing_needs_pairing">This TV no longer recognises Webmote. Pair it again to continue.</string>
-    <string name="remote_pointer_unavailable">The TV won’t take button presses. Volume still works.</string>
+    <string name="remote_pointer_unavailable">The TV won’t take button presses. Volume and power still work.</string>
     <string name="remote_up">Up</string>
     <string name="remote_down">Down</string>
     <string name="remote_left">Left</string>

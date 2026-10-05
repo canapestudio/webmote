@@ -68,6 +68,7 @@ fun PairingStatusCard(
         ConnectionState.PairingDeclined,
         ConnectionState.Unsupported,
         ConnectionState.Off,
+        ConnectionState.WakeFailed,
         ConnectionState.CertificateMismatch,
         ConnectionState.NeedsPairing,
     )
@@ -101,7 +102,7 @@ fun PairingStatusCard(
                     stringResource(R.string.pairing_unsupported),
                     body = null,
                 )
-                ConnectionState.Off -> {
+                ConnectionState.Off, ConnectionState.WakeFailed -> {
                     StatusRow(Icons.Rounded.ErrorOutline, stringResource(R.string.pairing_unreachable, target), body = null)
                     RetryButton(R.string.action_try_again, onRetry)
                 }

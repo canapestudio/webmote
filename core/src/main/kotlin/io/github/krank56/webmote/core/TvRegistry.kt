@@ -20,7 +20,11 @@ public data class SavedTv(
     val clientKey: String? = null,
     /** SHA-256 fingerprint of the TV's certificate, recorded at pairing (trust on first use). */
     val certificatePin: String? = null,
+    val wiredMac: String? = null,
+    val wifiMac: String? = null,
     val capabilities: LearnedCapabilities = LearnedCapabilities(),
+    /** Which screen-off method worked on this TV, once one has. */
+    val screenOffMethod: String? = null,
 )
 
 @Serializable

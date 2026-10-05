@@ -63,8 +63,8 @@ fun ConnectingScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOp
 }
 
 /**
- * The active TV can't be used until the user acts: it's off, rejected the saved key, presented
- * another certificate, declined pairing, or is too old.
+ * The active TV can't be used until the user acts: it rejected the saved key, presented another
+ * certificate, declined pairing, or is too old.
  */
 @Composable
 fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOpen: (Route) -> Unit) {
@@ -77,15 +77,6 @@ fun ProblemScreen(host: SessionHost, tvs: List<SavedTv>, state: TvState, onOpen:
     val buttonModifier = Modifier.widthIn(min = 200.dp)
     TvScaffold(host, tvs, state, onOpen) {
         when (state.connection) {
-            ConnectionState.Off -> StatusLayout(
-                icon = Icons.Rounded.TvOff,
-                title = stringResource(R.string.off_title, name),
-                body = stringResource(R.string.off_body),
-            ) {
-                Button(onClick = { host.session.connect() }, modifier = buttonModifier) {
-                    Text(stringResource(R.string.action_try_again))
-                }
-            }
             ConnectionState.CertificateMismatch -> StatusLayout(
                 icon = Icons.Rounded.GppMaybe,
                 title = stringResource(R.string.problem_certificate_title),

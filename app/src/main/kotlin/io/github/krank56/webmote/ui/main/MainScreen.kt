@@ -16,6 +16,7 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
 import io.github.krank56.webmote.ui.Route
+import io.github.krank56.webmote.ui.common.PowerAction
 import io.github.krank56.webmote.ui.common.TvScaffold
 import io.github.krank56.webmote.ui.remote.RemoteTab
 
@@ -45,6 +46,7 @@ fun MainScreen(
         tvs = tvs,
         state = state,
         onOpen = onOpen,
+        power = PowerAction(turnsOn = false, onClick = session::powerOff),
         bottomBar = {
             NavigationBar {
                 MainTab.entries.forEach { item ->

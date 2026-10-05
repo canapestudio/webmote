@@ -20,6 +20,7 @@ class SessionHost(private val context: Context) {
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val registry = TvRegistry(File(context.filesDir, "tvs"))
     val session = TvSession(registry, scope)
+    val settings = AppSettings(context)
     private val discovery = Discovery()
 
     /** Searches the Wi-Fi network for TVs, holding a multicast lock while it does. */

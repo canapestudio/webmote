@@ -38,10 +38,11 @@ import kotlin.time.Duration.Companion.seconds
 
 /**
  * A scriptable stand-in for a webOS TV on loopback: an encrypted SSAP WebSocket server with a
- * self-signed certificate, the pointer socket it hands out, and an SSDP responder.
+ * self-signed certificate, the pointer socket it hands out, a UDP listener that captures magic
+ * packets, and an SSDP responder.
  *
  * Every behaviour is a property tests can change before or during a test. Everything the TV
- * receives is recorded in [requests], [pointerMessages] and [ssdpSearches].
+ * receives is recorded in [requests], [pointerMessages], [magicPackets] and [ssdpSearches].
  *
  * A second TV for the same session runs on another loopback address with the same ports, since a
  * session uses one port for every TV: `FakeTv(host = "::1", port = first.port, legacyPort = first.legacyPort)`.
@@ -64,6 +65,8 @@ class FakeTv(
     @Volatile var model: String = "OLED55C6LA"
     /** The hello's `deviceOSReleaseVersion`; webOS 26 reports 11.x. */
     @Volatile var osVersion: String = "11.2.0"
+    @Volatile var wiredMac: String? = "a8:23:fe:00:00:01"
+    @Volatile var wifiMac: String? = "a8:23:fe:00:00:02"
     @Volatile var certificate: HeldCertificate = newCertificate()
 
     /** Only the plain port answers, as on webOS 1–3. */
@@ -100,10 +103,21 @@ class FakeTv(
     /** Whether the pointer socket accepts connections. When false the upgrade is refused. */
     @Volatile var pointerSocketAvailable: Boolean = true
 
+    // Screen off
+
+    /** The screen-off/on URIs this TV implements; the others answer with an error. */
+    @Volatile var screenOffUris: Set<String> = ScreenOffUris.all
+
+    // Wake-on-LAN
+
+    /** Whether a magic packet for one of this TV's MACs powers it on. */
+    @Volatile var wakesOnMagicPacket: Boolean = true
+
     // Recording
 
     val requests: MutableList<Received> = CopyOnWriteArrayList()
     val pointerMessages: MutableList<String> = CopyOnWriteArrayList()
+    val magicPackets: MutableList<ByteArray> = CopyOnWriteArrayList()
 
     /** Received requests for [uri], in order. */
     fun requests(uri: String): List<Received> = requests.filter { it.uri == uri }
@@ -117,6 +131,9 @@ class FakeTv(
     private val pendingPrompts = CopyOnWriteArrayList<() -> Unit>()
     private val pendingDeclines = CopyOnWriteArrayList<() -> Unit>()
     private val pointerPath = "/resources/${UUID.randomUUID()}/netinput.pointer.sock"
+
+    private val wakeSocket = DatagramSocket(0, loopback)
+    val wakePort: Int get() = wakeSocket.localPort
 
     private val ssdpSocket = DatagramSocket(0, loopback)
     val ssdpPort: Int get() = ssdpSocket.localPort
@@ -141,6 +158,7 @@ class FakeTv(
 
     init {
         installDefaultHandlers()
+        thread(isDaemon = true, name = "fake-tv-wol") { receiveMagicPackets() }
         thread(isDaemon = true, name = "fake-tv-ssdp") { answerSsdp() }
     }
 
@@ -148,6 +166,10 @@ class FakeTv(
     fun sessionConfig(): SessionConfig = SessionConfig(
         port = port,
         legacyPort = legacyPort,
+        wakeAddress = host,
+        wakePort = wakePort,
+        // The phone's real networks have nothing to do with a TV on loopback.
+        localNetworks = { emptyList() },
         connectTimeout = 2.seconds,
         ioDispatcher = Dispatchers.IO,
     )
@@ -185,6 +207,12 @@ class FakeTv(
         legacyServer = null
     }
 
+    /** Closes every open connection but keeps listening. */
+    fun dropConnections() {
+        clients.forEach { it.socket.close(1001, "going away") }
+        clients.clear()
+    }
+
     // Pairing prompt
 
     fun acceptPrompt() {
@@ -220,6 +248,7 @@ class FakeTv(
 
     override fun close() {
         powerOff()
+        wakeSocket.close()
         ssdpSocket.close()
     }
 
@@ -432,6 +461,17 @@ class FakeTv(
         on(GET_VOLUME) { volumePayload() }
         on("ssap://audio/getStatus") { volumePayload() }
 
+        on("ssap://system/turnOff") { ok().also { thread(isDaemon = true) { Thread.sleep(50); powerOff() } } }
+        ScreenOffUris.all.forEach { uri ->
+            on(uri) { if (uri in screenOffUris) ok() else throw TvError("404 no such service or method") }
+        }
+
+        on("ssap://com.webos.service.connectionmanager/getinfo") {
+            ok {
+                wiredMac?.let { putJsonObject("wiredInfo") { put("macAddress", it) } }
+                wifiMac?.let { putJsonObject("wifiInfo") { put("macAddress", it) } }
+            }
+        }
         on("ssap://com.webos.service.networkinput/getPointerInputSocket") {
             ok { put("socketPath", "wss://$urlHost:$port$pointerPath") }
         }
@@ -452,7 +492,23 @@ class FakeTv(
         }
     }
 
-    // UDP: SSDP
+    // UDP: Wake-on-LAN and SSDP
+
+    private fun receiveMagicPackets() {
+        val buffer = ByteArray(1024)
+        while (!wakeSocket.isClosed) {
+            val packet = DatagramPacket(buffer, buffer.size)
+            try {
+                wakeSocket.receive(packet)
+            } catch (_: SocketException) {
+                return
+            }
+            val bytes = packet.data.copyOf(packet.length)
+            magicPackets += bytes
+            val macs = listOfNotNull(wiredMac, wifiMac).map(::macBytes)
+            if (wakesOnMagicPacket && macs.any { isMagicPacketFor(bytes, it) }) powerOn()
+        }
+    }
 
     private fun answerSsdp() {
         val buffer = ByteArray(2048)
@@ -541,6 +597,13 @@ class FakeTv(
 
         private fun reservePort(): Int = ServerSocket(0).use { it.localPort }
 
+        fun macBytes(mac: String): ByteArray = mac.split(':', '-').map { it.toInt(16).toByte() }.toByteArray()
+
+        fun isMagicPacketFor(packet: ByteArray, mac: ByteArray): Boolean =
+            packet.size == 102 &&
+                (0 until 6).all { packet[it] == 0xFF.toByte() } &&
+                (0 until 16).all { rep -> (0 until 6).all { packet[6 + rep * 6 + it] == mac[it] } }
+
         /** A successful reply payload. */
         fun ok(build: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit = {}): JsonObject = buildJsonObject {
             put("returnValue", true)
@@ -581,4 +644,13 @@ enum class KeyPolicy {
 
     /** The TV ignores the stored key and shows the pairing prompt again. */
     Prompt,
+}
+
+object ScreenOffUris {
+    const val PANEL = "ssap://com.webos.service.panelcontroller/setScreenOnOff"
+    const val TVPOWER_OFF = "ssap://com.webos.service.tvpower/power/turnOffScreen"
+    const val TVPOWER_ON = "ssap://com.webos.service.tvpower/power/turnOnScreen"
+    const val WEBOS4_OFF = "ssap://com.webos.service.tv.power/turnOffScreen"
+    const val WEBOS4_ON = "ssap://com.webos.service.tv.power/turnOnScreen"
+    val all: Set<String> = setOf(PANEL, TVPOWER_OFF, TVPOWER_ON, WEBOS4_OFF, WEBOS4_ON)
 }

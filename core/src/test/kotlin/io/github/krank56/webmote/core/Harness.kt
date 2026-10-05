@@ -18,7 +18,7 @@ import kotlin.time.TimeSource
  * A [TvSession] wired to a [FakeTv] and a real [TvRegistry] in [directory].
  *
  * Virtual time: the session runs on a coroutine test scheduler that only moves when a test calls
- * [advance], so throttling is deterministic. Network I/O is real,
+ * [advance], so throttling and wake timeouts are deterministic. Network I/O is real,
  * so tests wait for its effects with [eventually], which runs the session's pending work while
  * polling in real time.
  */

@@ -7,12 +7,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Text
@@ -38,9 +40,12 @@ import io.github.krank56.webmote.core.SavedTv
 fun tvName(tvs: List<SavedTv>, id: String?): String =
     tvs.firstOrNull { it.id == id }?.name ?: stringResource(R.string.tv_generic_name)
 
+/** What the top bar's power button does, or null to hide it. */
+data class PowerAction(val turnsOn: Boolean, val onClick: () -> Unit)
+
 /**
  * The top bar shared by the remote and the TV's state screens: the active TV's name, a switcher when
- * more than one TV is saved, and Settings.
+ * more than one TV is saved, power and Settings.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,10 +54,24 @@ fun TvTopBar(
     activeTvId: String?,
     onSwitch: (String) -> Unit,
     onSettings: () -> Unit,
+    power: PowerAction? = null,
 ) {
+    val haptics = LocalHaptics.current
     TopAppBar(
         title = { TvSwitcher(tvs, activeTvId, onSwitch) },
         actions = {
+            if (power != null) {
+                val description = stringResource(if (power.turnsOn) R.string.power_on else R.string.power_off)
+                IconButton(
+                    onClick = {
+                        haptics.press()
+                        power.onClick()
+                    },
+                    colors = IconButtonDefaults.iconButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                ) {
+                    Icon(Icons.Rounded.PowerSettingsNew, contentDescription = description)
+                }
+            }
             IconButton(onClick = onSettings) {
                 Icon(Icons.Rounded.Settings, contentDescription = stringResource(R.string.settings_title))
             }

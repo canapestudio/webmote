@@ -24,6 +24,7 @@ fun TvScaffold(
     tvs: List<SavedTv>,
     state: TvState,
     onOpen: (Route) -> Unit,
+    power: PowerAction? = null,
     bottomBar: @Composable () -> Unit = {},
     content: @Composable () -> Unit,
 ) {
@@ -37,6 +38,7 @@ fun TvScaffold(
                     host.session.switchTo(id)
                 },
                 onSettings = { onOpen(Route.Settings) },
+                power = power,
             )
         },
         bottomBar = bottomBar,

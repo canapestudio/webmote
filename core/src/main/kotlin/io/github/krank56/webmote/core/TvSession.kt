@@ -2,6 +2,7 @@ package io.github.krank56.webmote.core
 
 import io.github.krank56.webmote.core.internal.Connector
 import io.github.krank56.webmote.core.internal.PointerControl
+import io.github.krank56.webmote.core.internal.PowerControl
 import io.github.krank56.webmote.core.internal.SessionCore
 import io.github.krank56.webmote.core.internal.VolumeControl
 import kotlinx.coroutines.CoroutineScope
@@ -25,9 +26,10 @@ public class TvSession(
     private val connector = Connector(core)
     private val volume = VolumeControl(core)
     private val pointer = PointerControl(core)
+    private val power = PowerControl(core, connector)
 
     init {
-        core.features += listOf(volume, pointer)
+        core.features += listOf(power, volume, pointer)
     }
 
     public val state: StateFlow<TvState> = core.state.asStateFlow()
@@ -58,8 +60,8 @@ public class TvSession(
     public fun switchTo(tvId: String): Unit = onSession { connector.switchTo(tvId) }
 
     /**
-     * Forgets [tvId] with its key and pin. If it was the active TV, another saved TV becomes active
-     * and the session connects to it.
+     * Forgets [tvId] with its key, pin and MACs. If it was the active TV, another saved TV becomes
+     * active and the session connects to it.
      */
     public fun forget(tvId: String): Unit = onSession { connector.forget(tvId) }
 
@@ -67,6 +69,11 @@ public class TvSession(
     public fun rename(tvId: String, name: String): Unit = onSession {
         name.trim().takeIf { it.isNotEmpty() }?.let { registry.rename(tvId, it) }
     }
+
+    /** While the TV is off, keep probing for it and connect as soon as it answers, until [stopOffPolling]. */
+    public fun startOffPolling(): Unit = onSession { power.startOffPolling() }
+
+    public fun stopOffPolling(): Unit = onSession { power.stopOffPolling() }
 
     // Buttons
 
@@ -84,6 +91,18 @@ public class TvSession(
     public fun setVolume(level: Int): Unit = onSession { volume.set(level) }
 
     public fun setMute(muted: Boolean): Unit = onSession { volume.setMute(muted) }
+
+    // Power
+
+    public fun powerOff(): Unit = onSession { power.powerOff() }
+
+    /** Sends a Wake-on-LAN packet to each of the active TV's MACs and connects once it answers. */
+    public fun wake(): Unit = onSession { power.wake() }
+
+    /** Turns the picture off; the sound keeps playing. */
+    public fun screenOff(): Unit = onSession { power.screenOff() }
+
+    public fun screenOn(): Unit = onSession { power.screenOn() }
 
     /** Closes the connection and stops the session for good. */
     override fun close(): Unit = core.close()

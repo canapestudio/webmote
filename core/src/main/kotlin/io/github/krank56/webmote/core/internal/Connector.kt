@@ -21,9 +21,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import java.io.IOException
 import java.net.ConnectException
-import java.net.InetSocketAddress
 import java.net.NoRouteToHostException
-import java.net.Socket
 import java.net.SocketTimeoutException
 
 /** Opens, pairs and registers the connection to a TV, and follows it until it closes. */
@@ -38,6 +36,9 @@ internal class Connector(private val core: SessionCore) {
 
     /** A TV to reach at [host]. [tvId] is the saved TV meant there, if any; [name] names a new TV. */
     private class Target(val host: String, val name: String?, val tvId: String? = null)
+
+    /** How an attempt that finds the TV with this ID off reports it. Liveness keeps a failed wake's state with it. */
+    var offStateOf: (tvId: String?) -> ConnectionState = { ConnectionState.Off }
 
     /** Connects to the active TV. Does nothing if it's already connected or connecting. */
     fun connect() {
@@ -97,11 +98,28 @@ internal class Connector(private val core: SessionCore) {
         }
     }
 
-    fun disconnect() {
+    fun disconnect() = stop(ConnectionState.Disconnected)
+
+    /** Closes the connection on purpose, without reconnecting, and reports [state] (power off, TV unreachable). */
+    fun stop(state: ConnectionState) {
         job?.cancel()
         job = null
         closeLink()
-        core.update { it.copy(connection = ConnectionState.Disconnected) }
+        core.update { it.copy(connection = state, waking = false) }
+    }
+
+    /**
+     * Connects to the active TV once [ready] returns true, or gives up if it returns false. Until then
+     * the session counts as connecting to that TV: [connect] leaves it alone, while [disconnect] and
+     * connecting elsewhere cancel it.
+     */
+    fun connectWhen(ready: suspend () -> Boolean) {
+        val tv = core.registry.activeTv ?: return
+        job?.cancel()
+        closeLink()
+        val target = Target(tv.host, name = null, tvId = tv.id)
+        this.target = target
+        job = core.scope.launch { if (ready()) follow(target) }
     }
 
     private fun start(target: Target, restart: Boolean) {
@@ -110,11 +128,20 @@ internal class Connector(private val core: SessionCore) {
         job?.cancel()
         closeLink()
         this.target = target
-        job = core.scope.launch { run(target) }
+        job = core.scope.launch { follow(target) }
     }
 
-    /** Connects to [target] and follows the link until it ends. */
-    private suspend fun run(target: Target) {
+    /**
+     * Connects to [target] and follows the link. A connected link the TV closed by itself gets one
+     * reconnect, straight away: if the TV still accepts connections it's back, otherwise that attempt
+     * reports it off.
+     */
+    private suspend fun follow(target: Target) {
+        while (run(target)) Unit
+    }
+
+    /** Connects to [target] and follows the link until it ends. Returns true if the TV dropped a connected link. */
+    private suspend fun run(target: Target): Boolean {
         val saved = target.tvId?.let { core.registry[it] } ?: core.registry.findByHost(target.host)
         core.update {
             TvState(
@@ -129,16 +156,22 @@ internal class Connector(private val core: SessionCore) {
             attempt(target, saved)
         } catch (e: CancellationException) {
             throw e
+        } catch (e: LinkDroppedException) {
+            return true
         } catch (e: Exception) {
             failureState(e, target, saved)
         }
         if (outcome != ConnectionState.Connected) {
             closeLink()
-            core.update { it.copy(connection = outcome) }
+            core.update { it.copy(connection = if (outcome == ConnectionState.Off) offStateOf(it.tvId) else outcome) }
         }
+        return false
     }
 
-    /** Runs one connection attempt to the end: returns the state it ended in. */
+    /**
+     * Runs one connection attempt to the end: returns the state it ended in, or throws
+     * [LinkDroppedException] if it connected and the TV then closed the link.
+     */
     private suspend fun attempt(target: Target, saved: SavedTv?): ConnectionState {
         val pin = saved?.certificatePin ?: captureCertificate(target.host)
         val client = PinnedTls.pinnedClient(core.http, pin)
@@ -186,7 +219,7 @@ internal class Connector(private val core: SessionCore) {
             socket.closed.await()
             core.link = null
             link.scope.coroutineContext[Job]?.cancel()
-            return ConnectionState.Off
+            throw LinkDroppedException()
         } catch (e: Throwable) {
             socket.close()
             throw e
@@ -308,21 +341,11 @@ internal class Connector(private val core: SessionCore) {
     }
 }
 
+/** The TV closed a connected link without the session asking for it. */
+private class LinkDroppedException : Exception("The TV closed the connection")
+
 /** [host] as it goes in a URL: an IPv6 address goes in brackets, as in `wss://[fe80::1]:3001/`. */
 internal fun urlHost(host: String): String = if (':' in host && !host.startsWith("[")) "[$host]" else host
-
-/**
- * Whether [host] accepts a TCP connection on [port] within the connect timeout. A cheap probe that
- * sends nothing, so it doesn't disturb the TV or the reported state. Runs on the IO dispatcher.
- */
-internal suspend fun SessionCore.acceptsConnection(host: String, port: Int): Boolean = withContext(config.ioDispatcher) {
-    try {
-        Socket().use { it.connect(InetSocketAddress(host, port), config.connectTimeout.inWholeMilliseconds.toInt()) }
-        true
-    } catch (e: IOException) {
-        false
-    }
-}
 
 internal fun SavedTv.learnedCapabilities() = Capabilities(
     pointer = capabilities.pointer,
