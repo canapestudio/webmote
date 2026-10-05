@@ -22,6 +22,8 @@ public data class SavedTv(
     val certificatePin: String? = null,
     val wiredMac: String? = null,
     val wifiMac: String? = null,
+    /** Pinned app IDs, in the order they were pinned. */
+    val favourites: List<String> = emptyList(),
     val capabilities: LearnedCapabilities = LearnedCapabilities(),
     /** Which screen-off method worked on this TV, once one has. */
     val screenOffMethod: String? = null,
@@ -89,6 +91,11 @@ public class TvRegistry(directory: File) {
     public fun forget(id: String): Unit = mutate { tvs, active ->
         val remaining = tvs.filterNot { it.id == id }
         remaining to (if (active == id) remaining.firstOrNull()?.id else active)
+    }
+
+    /** Pins [appId] for the TV with [id] if it isn't pinned, or unpins it if it is. */
+    public fun toggleFavourite(id: String, appId: String): Unit = update(id) { tv ->
+        tv.copy(favourites = if (appId in tv.favourites) tv.favourites - appId else tv.favourites + appId)
     }
 
     private fun mutate(change: (List<SavedTv>, String?) -> Pair<List<SavedTv>, String?>) {

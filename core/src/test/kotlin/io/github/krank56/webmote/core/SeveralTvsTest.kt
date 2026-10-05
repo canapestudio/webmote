@@ -99,6 +99,7 @@ class SeveralTvsTest {
     @Test
     fun `forgetting the active TV removes all its data and connects to the remaining one`() {
         pairBoth()
+        h.registry.toggleFavourite(second.uuid, "netflix")
 
         h.session.forget(second.uuid)
         awaitTv(h.tv.uuid)

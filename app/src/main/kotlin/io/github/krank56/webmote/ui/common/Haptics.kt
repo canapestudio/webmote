@@ -14,6 +14,11 @@ class Haptics internal constructor(private val feedback: HapticFeedback?) {
     fun press() {
         feedback?.performHapticFeedback(HapticFeedbackType.VirtualKey)
     }
+
+    /** A firmer buzz for a long press. */
+    fun longPress() {
+        feedback?.performHapticFeedback(HapticFeedbackType.LongPress)
+    }
 }
 
 val LocalHaptics = staticCompositionLocalOf { Haptics(feedback = null) }

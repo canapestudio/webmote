@@ -15,6 +15,8 @@ public data class TvState(
     val volume: Volume = Volume(),
     val picture: PictureValues = PictureValues(),
     val inputs: List<TvInput> = emptyList(),
+    /** The TV's apps, pinned favourites first. */
+    val apps: List<TvApp> = emptyList(),
     val capabilities: Capabilities = Capabilities(),
 )
 
@@ -97,11 +99,18 @@ public enum class EnergySaving(internal val key: String) {
 
 public data class TvInput(val id: String, val label: String)
 
+public data class TvApp(
+    val id: String,
+    val title: String,
+    val iconUrl: String?,
+    val pinned: Boolean,
+)
+
 /** What the TV has been found to support. [Capability.Unknown] until the session learns otherwise. */
 public data class Capabilities(
     /** Whether picture writes through the alert workaround take effect. */
     val pictureWrites: Capability = Capability.Unknown,
-    /** Whether the pointer socket (D-pad and buttons) can be opened. */
+    /** Whether the pointer socket (D-pad, buttons, touchpad) can be opened. */
     val pointer: Capability = Capability.Unknown,
     /** Whether the TV reports a volume level. */
     val volumeLevel: Capability = Capability.Unknown,

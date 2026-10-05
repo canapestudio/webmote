@@ -81,6 +81,8 @@ class RemoteButtonsTest {
         h.eventually { h.state.capabilities.pointer == Capability.Unavailable }
 
         h.session.press(RemoteButton.Ok)
+        h.session.movePointer(5.0, 5.0)
+        h.session.click()
         h.session.volumeUp()
 
         h.awaitRequests("ssap://audio/volumeUp")

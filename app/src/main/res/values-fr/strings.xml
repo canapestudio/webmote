@@ -15,6 +15,8 @@
     <string name="switch_tv_description">%1$s. Changer de TV</string>
     <string name="switch_tv_active">TV active</string>
     <string name="tab_remote">Télécommande</string>
+    <string name="tab_touchpad">Pavé tactile</string>
+    <string name="tab_apps">Applis</string>
     <string name="connecting_title">Connexion à %1$s…</string>
     <string name="problem_needs_pairing_title">Nouvelle association nécessaire</string>
     <string name="problem_needs_pairing_body">La TV « %1$s » ne reconnaît plus Webmote, ce qui peut arriver après une mise à jour logicielle. Associez-la à nouveau pour continuer à l’utiliser.</string>
@@ -107,6 +109,16 @@
     <string name="keyboard_enter">Entrée</string>
     <string name="inputs_title">Entrées</string>
     <string name="inputs_empty">La TV n’a pas encore indiqué ses entrées.</string>
+    <string name="touchpad_unavailable">La TV a refusé la connexion du pointeur de Webmote : le pavé tactile ne fonctionne pas sur cette TV.</string>
+    <string name="touchpad_description">Pavé tactile</string>
+    <string name="touchpad_click">Cliquer</string>
+    <string name="touchpad_hint">Faites glisser pour déplacer le pointeur\nTouchez pour cliquer\nFaites glisser à deux doigts pour faire défiler</string>
+    <string name="apps_loading">Chargement des applis de la TV…</string>
+    <string name="apps_hint">Appuyez longuement sur une appli pour l’épingler en haut.</string>
+    <string name="apps_launch">Ouvrir</string>
+    <string name="apps_pin">Épingler</string>
+    <string name="apps_unpin">Désépingler</string>
+    <string name="apps_pinned">Épinglée</string>
     <string name="settings_title">Paramètres</string>
     <string name="settings_tvs">TV</string>
     <string name="settings_tv_active">Active</string>
@@ -119,5 +131,5 @@
     <string name="settings_rename_title">Renommer la TV</string>
     <string name="settings_rename_label">Nom</string>
     <string name="settings_forget_title">Oublier « %1$s » ?</string>
-    <string name="settings_forget_body">Webmote supprime son association et tout ce qu’il a appris sur cette TV. Vous devrez l’associer à nouveau pour l’utiliser.</string>
+    <string name="settings_forget_body">Webmote supprime son association, ses applis favorites et tout ce qu’il a appris sur cette TV. Vous devrez l’associer à nouveau pour l’utiliser.</string>
 </resources>

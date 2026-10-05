@@ -11,6 +11,8 @@ No account, no analytics: Webmote talks only to your TVs, on your own network.
   a live keyboard.
 - **Picture:** brightness, contrast, colour and energy saving. If a TV ignores picture changes,
   Webmote greys the controls out instead of pretending they work.
+- **Touchpad and apps:** a Magic Remote-style touchpad and a grid of the TV's apps with pinned
+  favourites.
 - **Turn the TV on** with Wake-on-LAN, **several TVs**, English and French.
 
 ## Requirements

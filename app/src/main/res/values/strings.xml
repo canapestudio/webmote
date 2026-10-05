@@ -15,6 +15,8 @@
     <string name="switch_tv_description">%1$s. Switch TV</string>
     <string name="switch_tv_active">Active TV</string>
     <string name="tab_remote">Remote</string>
+    <string name="tab_touchpad">Touchpad</string>
+    <string name="tab_apps">Apps</string>
     <string name="connecting_title">Connecting to %1$s…</string>
     <string name="problem_needs_pairing_title">Pair again</string>
     <string name="problem_needs_pairing_body">%1$s no longer recognises Webmote, which can happen after a TV software update. Pair again to keep using it.</string>
@@ -108,6 +110,16 @@
     <string name="keyboard_enter">Enter</string>
     <string name="inputs_title">Inputs</string>
     <string name="inputs_empty">The TV hasn’t listed its inputs yet.</string>
+    <string name="touchpad_unavailable">The TV refused Webmote’s pointer connection, so the touchpad doesn’t work on this TV.</string>
+    <string name="touchpad_description">Touchpad</string>
+    <string name="touchpad_click">Click</string>
+    <string name="touchpad_hint">Drag to move the pointer\nTap to click\nDrag with two fingers to scroll</string>
+    <string name="apps_loading">Loading the TV’s apps…</string>
+    <string name="apps_hint">Long-press an app to pin it to the top.</string>
+    <string name="apps_launch">Open</string>
+    <string name="apps_pin">Pin</string>
+    <string name="apps_unpin">Unpin</string>
+    <string name="apps_pinned">Pinned</string>
     <string name="settings_title">Settings</string>
     <string name="settings_tvs">TVs</string>
     <string name="settings_tv_active">Active</string>
@@ -120,5 +132,5 @@
     <string name="settings_rename_title">Rename TV</string>
     <string name="settings_rename_label">Name</string>
     <string name="settings_forget_title">Forget %1$s?</string>
-    <string name="settings_forget_body">Webmote removes its pairing and everything it learned about this TV. You’ll need to pair it again to use it.</string>
+    <string name="settings_forget_body">Webmote removes its pairing, its favourite apps and everything it learned about this TV. You’ll need to pair it again to use it.</string>
 </resources>

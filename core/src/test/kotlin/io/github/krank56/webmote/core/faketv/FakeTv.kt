@@ -124,6 +124,11 @@ class FakeTv(
     // Catalog
 
     @Volatile var inputs: List<Pair<String, String>> = listOf("HDMI_1" to "HDMI 1", "HDMI_2" to "HDMI 2", "HDMI_3" to "HDMI 3")
+    @Volatile var apps: List<Pair<String, String>> = listOf(
+        "netflix" to "Netflix",
+        "youtube.leanback.v4" to "YouTube",
+        "com.webos.app.livetv" to "Live TV",
+    )
 
     // Wake-on-LAN
 
@@ -271,12 +276,32 @@ class FakeTv(
 
     // SSAP
 
+    /** The paths of the HTTP requests other than WebSocket upgrades that the TV answered, such as app icons. */
+    val httpRequests: MutableList<String> = CopyOnWriteArrayList()
+
+    /** The bytes the TV serves as the icon of [appId], at `/resources/icons/<appId>.png`. */
+    fun icon(appId: String): ByteArray {
+        // A real, small PNG in a colour derived from the app ID, so the app can show it when run by hand.
+        val image = java.awt.image.BufferedImage(48, 48, java.awt.image.BufferedImage.TYPE_INT_RGB)
+        val graphics = image.createGraphics()
+        graphics.color = java.awt.Color(appId.hashCode() or 0x404040)
+        graphics.fillRect(0, 0, 48, 48)
+        graphics.dispose()
+        return java.io.ByteArrayOutputStream().also { javax.imageio.ImageIO.write(image, "png", it) }.toByteArray()
+    }
+
     private fun route(request: RecordedRequest): MockResponse {
         val path = request.url.encodedPath
         return when {
             path == pointerPath && pointerSocketAvailable ->
                 MockResponse.Builder().webSocketUpgrade(PointerListener()).build()
             path == pointerPath -> MockResponse.Builder().code(403).build()
+            path.startsWith("/resources/icons/") -> {
+                httpRequests += path
+                val appId = path.removePrefix("/resources/icons/").removeSuffix(".png")
+                if (apps.none { it.first == appId }) return MockResponse.Builder().code(404).build()
+                MockResponse.Builder().addHeader("Content-Type", "image/png").body(okio.Buffer().write(icon(appId))).build()
+            }
             else -> MockResponse.Builder().webSocketUpgrade(Client()).build()
         }
     }
@@ -495,6 +520,22 @@ class FakeTv(
             }
         }
         on("ssap://tv/switchInput") { ok() }
+        on("ssap://com.webos.applicationManager/listLaunchPoints") {
+            ok {
+                putJsonArray("launchPoints") {
+                    apps.forEach { (id, title) ->
+                        add(
+                            buildJsonObject {
+                                put("id", id)
+                                put("title", title)
+                                put("icon", "https://$urlHost:$port/resources/icons/$id.png")
+                            },
+                        )
+                    }
+                }
+            }
+        }
+        on("ssap://system.launcher/launch") { ok() }
         listOf("play", "pause", "stop", "rewind", "fastForward").forEach { on("ssap://media.controls/$it") { ok() } }
         listOf("insertText", "deleteCharacters", "sendEnterKey").forEach { on("ssap://com.webos.service.ime/$it") { ok() } }
 

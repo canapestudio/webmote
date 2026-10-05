@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * The app's one interface to its TVs: it owns a single connection to the active TV, and reports
@@ -66,8 +67,8 @@ public class TvSession(
     public fun switchTo(tvId: String): Unit = onSession { connector.switchTo(tvId) }
 
     /**
-     * Forgets [tvId] with its key, pin and MACs. If it was the active TV, another saved TV becomes
-     * active and the session connects to it.
+     * Forgets [tvId] with its key, pin, MACs and favourites. If it was the active TV, another saved TV
+     * becomes active and the session connects to it.
      */
     public fun forget(tvId: String): Unit = onSession { connector.forget(tvId) }
 
@@ -81,9 +82,15 @@ public class TvSession(
 
     public fun stopOffPolling(): Unit = onSession { power.stopOffPolling() }
 
-    // Buttons
+    // Buttons and pointer
 
     public fun press(button: RemoteButton): Unit = onSession { pointer.press(button) }
+
+    public fun movePointer(dx: Double, dy: Double): Unit = onSession { pointer.move(dx, dy) }
+
+    public fun click(): Unit = onSession { pointer.click() }
+
+    public fun scroll(dx: Double, dy: Double): Unit = onSession { pointer.scroll(dx, dy) }
 
     // Volume
 
@@ -107,7 +114,7 @@ public class TvSession(
 
     public fun setEnergySaving(mode: EnergySaving): Unit = onSession { picture.setEnergySaving(mode) }
 
-    // Media, channels, inputs and text
+    // Media, channels, inputs, apps and text
 
     public fun media(key: MediaKey): Unit = onSession { commands.media(key) }
 
@@ -119,6 +126,14 @@ public class TvSession(
     public fun channelDown(): Unit = onSession { commands.channelDown() }
 
     public fun switchInput(inputId: String): Unit = onSession { catalog.switchInput(inputId) }
+
+    public fun launchApp(appId: String): Unit = onSession { catalog.launchApp(appId) }
+
+    /** Pins or unpins [appId] for the active TV. */
+    public fun toggleFavourite(appId: String): Unit = onSession { catalog.toggleFavourite(appId) }
+
+    /** Fetches an app icon from the TV, trusting only its pinned certificate. Null if it can't be loaded. */
+    public suspend fun loadIcon(url: String): ByteArray? = withContext(core.dispatcher) { catalog.loadIcon(url) }
 
     /** Types [text] into the TV's focused text field. */
     public fun insertText(text: String): Unit = onSession { commands.insertText(text) }

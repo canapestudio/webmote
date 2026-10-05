@@ -6,15 +6,18 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeout
+import kotlin.math.roundToInt
 
 /**
- * The pointer socket: remote buttons.
+ * The pointer socket: remote buttons, pointer movement, clicks and scrolling.
  *
  * Messages are only sent while the socket is open; anything sent before it opens, or after the TV
  * refused it, is dropped.
  */
 internal class PointerControl(private val core: SessionCore) : Feature {
     private var open: OpenSocket? = null
+    private val pointer = Accumulator()
+    private val wheel = Accumulator()
 
     private class OpenSocket(val link: Link, val socket: TextSocket)
 
@@ -24,6 +27,22 @@ internal class PointerControl(private val core: SessionCore) : Feature {
 
     fun press(button: RemoteButton) {
         current()?.send("type:button\nname:${button.wireName}\n\n")
+    }
+
+    fun move(dx: Double, dy: Double) {
+        val socket = current() ?: return
+        val (x, y) = pointer.take(dx, dy) ?: return
+        socket.send("type:move\ndx:$x\ndy:$y\ndown:0\n\n")
+    }
+
+    fun click() {
+        current()?.send("type:click\n\n")
+    }
+
+    fun scroll(dx: Double, dy: Double) {
+        val socket = current() ?: return
+        val (x, y) = wheel.take(dx, dy) ?: return
+        socket.send("type:scroll\ndx:$x\ndy:$y\n\n")
     }
 
     /** The open pointer socket, if it belongs to the live link. */
@@ -37,6 +56,8 @@ internal class PointerControl(private val core: SessionCore) : Feature {
         while (true) {
             val socket = open(link) ?: return
             open = OpenSocket(link, socket)
+            pointer.reset()
+            wheel.reset()
             learn(link, Capability.Available)
             try {
                 socket.closed.await()
@@ -74,5 +95,32 @@ internal class PointerControl(private val core: SessionCore) : Feature {
 
     private companion object {
         const val GET_POINTER_SOCKET = "ssap://com.webos.service.networkinput/getPointerInputSocket"
+    }
+}
+
+/**
+ * Turns fractional deltas into the whole numbers the pointer socket is sent, carrying the remainder
+ * over so that slow drags still add up to movement.
+ */
+private class Accumulator {
+    private var x = 0.0
+    private var y = 0.0
+
+    /** Adds a delta and returns the whole part to send, or null while it's still under one unit. */
+    fun take(dx: Double, dy: Double): Pair<Int, Int>? {
+        if (!dx.isFinite() || !dy.isFinite()) return null
+        x += dx
+        y += dy
+        val wholeX = x.roundToInt()
+        val wholeY = y.roundToInt()
+        if (wholeX == 0 && wholeY == 0) return null
+        x -= wholeX
+        y -= wholeY
+        return wholeX to wholeY
+    }
+
+    fun reset() {
+        x = 0.0
+        y = 0.0
     }
 }
