@@ -24,17 +24,19 @@ import io.github.krank56.webmote.core.ConnectionState
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
 import io.github.krank56.webmote.ui.common.ProvideHaptics
+import io.github.krank56.webmote.ui.licences.LicencesScreen
 import io.github.krank56.webmote.ui.main.MainScreen
 import io.github.krank56.webmote.ui.main.MainTab
 import io.github.krank56.webmote.ui.off.TvOffScreen
 import io.github.krank56.webmote.ui.pairing.PairingProgressScreen
 import io.github.krank56.webmote.ui.pairing.PairingScreen
+import io.github.krank56.webmote.ui.settings.DiagnosticsScreen
 import io.github.krank56.webmote.ui.settings.SettingsScreen
 import io.github.krank56.webmote.ui.status.ConnectingScreen
 import io.github.krank56.webmote.ui.status.ProblemScreen
 
 /** Screens opened on top of the TV's state screen, kept on a small back stack. */
-enum class Route { Settings, AddTv }
+enum class Route { Settings, AddTv, Diagnostics, Licences }
 
 /** What fills the window: an opened [Route], or the screen the active TV's state calls for. */
 private sealed interface Screen {
@@ -53,6 +55,7 @@ fun WebmoteApp(host: SessionHost) {
     val session = host.session
     val tvs by host.registry.tvs.collectAsStateWithLifecycle()
     val state by session.state.collectAsStateWithLifecycle()
+    val haptics by host.settings.haptics.collectAsStateWithLifecycle()
     val backStack = rememberBackStack()
     val lastOffTvId = rememberLastOffTvId(state)
     var mainTab by rememberSaveable { mutableStateOf(MainTab.Remote) }
@@ -69,7 +72,7 @@ fun WebmoteApp(host: SessionHost) {
 
     val screen = backStack.lastOrNull()?.let(Screen::Opened) ?: stateScreen(tvs, state, lastOffTvId)
 
-    ProvideHaptics {
+    ProvideHaptics(haptics) {
         Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
             AnimatedContent(
                 targetState = screen,
@@ -97,6 +100,8 @@ fun WebmoteApp(host: SessionHost) {
                             },
                             onPaired = home,
                         )
+                        Route.Diagnostics -> DiagnosticsScreen(tvs = tvs, state = state, onBack = back)
+                        Route.Licences -> LicencesScreen(onBack = back)
                     }
                     Screen.FirstPairing -> PairingScreen(host = host, state = state, tvs = tvs, onBack = null, onPaired = {})
                     Screen.Main -> MainScreen(

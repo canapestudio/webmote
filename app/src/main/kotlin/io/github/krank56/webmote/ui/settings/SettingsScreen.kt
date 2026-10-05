@@ -2,21 +2,28 @@ package io.github.krank56.webmote.ui.settings
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
+import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Mouse
 import androidx.compose.material.icons.rounded.Tv
+import androidx.compose.material.icons.rounded.Vibration
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -26,11 +33,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -38,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
@@ -49,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.krank56.webmote.AppSettings
 import io.github.krank56.webmote.R
 import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.SavedTv
@@ -58,8 +70,8 @@ import io.github.krank56.webmote.ui.common.BackScaffold
 import io.github.krank56.webmote.ui.common.SectionHeader
 
 /**
- * Settings: manage the saved TVs (use, rename, re-pair, forget, add). [onDone] returns to the remote,
- * e.g. to show a re-pair.
+ * Settings: manage the saved TVs (use, rename, re-pair, forget, add), the remote's preferences, and
+ * the way to Diagnostics and the licences. [onDone] returns to the remote, e.g. to show a re-pair.
  */
 @Composable
 fun SettingsScreen(
@@ -71,6 +83,10 @@ fun SettingsScreen(
     onOpen: (Route) -> Unit,
 ) {
     val session = host.session
+    val settings = host.settings
+    val haptics by settings.haptics.collectAsStateWithLifecycle()
+    val volumeKeys by settings.volumeKeys.collectAsStateWithLifecycle()
+    val sensitivity by settings.touchpadSensitivity.collectAsStateWithLifecycle()
     val registryActiveId by host.registry.activeTvId.collectAsStateWithLifecycle()
     val activeId = state.tvId ?: registryActiveId
     var renamingId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -106,6 +122,45 @@ fun SettingsScreen(
                     headlineContent = { Text(stringResource(R.string.settings_add_tv)) },
                     leadingContent = { Icon(Icons.Rounded.Add, contentDescription = null) },
                     modifier = Modifier.clickable(role = Role.Button) { onOpen(Route.AddTv) },
+                )
+            }
+
+            item { Header(stringResource(R.string.settings_remote)) }
+            item {
+                SwitchRow(
+                    icon = Icons.Rounded.Vibration,
+                    title = stringResource(R.string.settings_haptics),
+                    summary = stringResource(R.string.settings_haptics_summary),
+                    checked = haptics,
+                    onChange = settings::setHaptics,
+                )
+            }
+            item {
+                SwitchRow(
+                    icon = Icons.AutoMirrored.Rounded.VolumeUp,
+                    title = stringResource(R.string.settings_volume_keys),
+                    summary = stringResource(R.string.settings_volume_keys_summary),
+                    checked = volumeKeys,
+                    onChange = settings::setVolumeKeys,
+                )
+            }
+            item { SensitivityRow(sensitivity = sensitivity, onChange = settings::setTouchpadSensitivity) }
+
+            item { Header(stringResource(R.string.settings_about)) }
+            item {
+                LinkRow(
+                    icon = Icons.Rounded.BugReport,
+                    title = stringResource(R.string.diagnostics_title),
+                    summary = stringResource(R.string.settings_diagnostics_summary),
+                    onClick = { onOpen(Route.Diagnostics) },
+                )
+            }
+            item {
+                LinkRow(
+                    icon = Icons.Rounded.Gavel,
+                    title = stringResource(R.string.licences_title),
+                    summary = stringResource(R.string.settings_licences_summary),
+                    onClick = { onOpen(Route.Licences) },
                 )
             }
         }
@@ -208,6 +263,56 @@ private fun TvRow(
             }
         },
         modifier = Modifier.semantics { if (active) stateDescription = activeLabel },
+    )
+}
+
+@Composable
+private fun SwitchRow(
+    icon: ImageVector,
+    title: String,
+    summary: String?,
+    checked: Boolean,
+    onChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = summary?.let { { Text(it) } },
+        leadingContent = { Icon(icon, contentDescription = null) },
+        trailingContent = { Switch(checked = checked, onCheckedChange = null) },
+        modifier = Modifier.toggleable(value = checked, role = Role.Switch, onValueChange = onChange),
+    )
+}
+
+@Composable
+private fun LinkRow(icon: ImageVector, title: String, summary: String?, onClick: () -> Unit) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = summary?.let { { Text(it) } },
+        leadingContent = { Icon(icon, contentDescription = null) },
+        modifier = Modifier.clickable(role = Role.Button, onClick = onClick),
+    )
+}
+
+@Composable
+private fun SensitivityRow(sensitivity: Float, onChange: (Float) -> Unit) {
+    var value by remember { mutableFloatStateOf(sensitivity) }
+    LaunchedEffect(sensitivity) { value = sensitivity }
+    val title = stringResource(R.string.settings_sensitivity)
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = {
+            Column {
+                Text(stringResource(R.string.settings_sensitivity_value, value))
+                Slider(
+                    value = value,
+                    onValueChange = { value = it },
+                    onValueChangeFinished = { onChange(value) },
+                    valueRange = AppSettings.MIN_SENSITIVITY..AppSettings.MAX_SENSITIVITY,
+                    modifier = Modifier.semantics { contentDescription = title },
+                )
+            }
+        },
+        leadingContent = { Icon(Icons.Rounded.Mouse, contentDescription = null) },
     )
 }
 

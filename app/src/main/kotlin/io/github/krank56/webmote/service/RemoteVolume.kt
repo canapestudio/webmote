@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 /** Routes the phone's volume keys to the TV through the keep-alive service's MediaSession. */
 object RemoteVolume {
-    /** The service's remote-volume session, while the TV is connected. */
+    /** The service's remote-volume session, while the TV is connected and the volume-keys setting is on. */
     private val token = MutableStateFlow<MediaSession.Token?>(null)
 
     internal fun publish(session: MediaSession.Token?) {

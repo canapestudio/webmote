@@ -35,7 +35,8 @@ picture settings, button names) are ported from them:
   https://github.com/hobbyquaker/lgtv2
 
 The app's libraries (Kotlin and kotlinx, OkHttp and Okio, AndroidX, Jetpack Compose, Glance and
-Material Components, Guava's ListenableFuture, JSpecify) are under the Apache License 2.0.
+Material Components, Guava's ListenableFuture, JSpecify) are under the Apache License 2.0. The full
+notices are shown in the app, under Settings → Open-source licences.
 
 LG and webOS are trademarks of LG Electronics Inc. Webmote is an independent app, not affiliated
 with, endorsed or sponsored by LG Electronics.

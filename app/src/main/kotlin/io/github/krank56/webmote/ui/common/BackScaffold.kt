@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import io.github.krank56.webmote.R
 
-/** A secondary screen (Settings): a collapsing title with a back arrow. */
+/** A secondary screen (Settings, Diagnostics, Licences): a collapsing title with a back arrow. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BackScaffold(

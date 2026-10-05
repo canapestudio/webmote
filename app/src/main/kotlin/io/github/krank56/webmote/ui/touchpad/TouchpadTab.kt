@@ -33,6 +33,8 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import io.github.krank56.webmote.AppSettings
 import io.github.krank56.webmote.R
 import io.github.krank56.webmote.core.Capability
 import io.github.krank56.webmote.core.RemoteButton
@@ -43,18 +45,16 @@ import io.github.krank56.webmote.ui.common.Notice
 import io.github.krank56.webmote.ui.common.RemoteIconButton
 import kotlin.math.max
 
-/** Multiplies touchpad drags into pointer movement. */
-private const val SENSITIVITY = 1.5f
-
 /** The Magic Remote-style touchpad: drag moves the TV's pointer, tap clicks, two fingers scroll. */
 @Composable
-fun TouchpadTab(session: TvSession, state: TvState) {
+fun TouchpadTab(session: TvSession, settings: AppSettings, state: TvState) {
+    val sensitivity by settings.touchpadSensitivity.collectAsStateWithLifecycle()
     val pointerOk = state.capabilities.pointer != Capability.Unavailable
     Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         if (!pointerOk) Notice(stringResource(R.string.touchpad_unavailable))
         Touchpad(
             enabled = pointerOk,
-            sensitivity = SENSITIVITY,
+            sensitivity = sensitivity,
             onMove = session::movePointer,
             onTap = session::click,
             onScroll = session::scroll,

@@ -8,25 +8,25 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 
-/** The haptic ticks buttons give. */
-class Haptics internal constructor(private val feedback: HapticFeedback?) {
+/** The haptic ticks buttons give, honouring the user's haptics setting. */
+class Haptics internal constructor(private val feedback: HapticFeedback?, private val enabled: Boolean) {
     /** A short tick for a button press. */
     fun press() {
-        feedback?.performHapticFeedback(HapticFeedbackType.VirtualKey)
+        if (enabled) feedback?.performHapticFeedback(HapticFeedbackType.VirtualKey)
     }
 
     /** A firmer buzz for a long press. */
     fun longPress() {
-        feedback?.performHapticFeedback(HapticFeedbackType.LongPress)
+        if (enabled) feedback?.performHapticFeedback(HapticFeedbackType.LongPress)
     }
 }
 
-val LocalHaptics = staticCompositionLocalOf { Haptics(feedback = null) }
+val LocalHaptics = staticCompositionLocalOf { Haptics(feedback = null, enabled = false) }
 
-/** Provides [LocalHaptics] to [content]. */
+/** Provides [LocalHaptics] to [content]; [enabled] is the user's haptics setting. */
 @Composable
-fun ProvideHaptics(content: @Composable () -> Unit) {
+fun ProvideHaptics(enabled: Boolean, content: @Composable () -> Unit) {
     val feedback = LocalHapticFeedback.current
-    val haptics = remember(feedback) { Haptics(feedback) }
+    val haptics = remember(feedback, enabled) { Haptics(feedback, enabled) }
     CompositionLocalProvider(LocalHaptics provides haptics, content = content)
 }

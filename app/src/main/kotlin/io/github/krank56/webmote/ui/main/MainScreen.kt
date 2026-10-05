@@ -68,7 +68,7 @@ fun MainScreen(
     ) {
         when (tab) {
             MainTab.Remote -> RemoteTab(session, state)
-            MainTab.Touchpad -> TouchpadTab(session, state)
+            MainTab.Touchpad -> TouchpadTab(session, host.settings, state)
             MainTab.Apps -> AppsTab(session, state)
         }
     }

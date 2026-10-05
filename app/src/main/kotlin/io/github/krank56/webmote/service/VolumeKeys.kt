@@ -25,9 +25,9 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * While the TV is connected, holds a MediaSession with a remote volume provider: Android then sends
- * the phone's volume keys and the system volume panel to the TV, with the app closed or the phone
- * locked. Releasing it gives the keys back to the phone.
+ * While the TV is connected and the volume-keys setting is on, holds a MediaSession with a remote
+ * volume provider: Android then sends the phone's volume keys and the system volume panel to the TV,
+ * with the app closed or the phone locked. Releasing it gives the keys back to the phone.
  */
 internal class VolumeKeys(private val context: Context, private val host: SessionHost) {
 
@@ -36,8 +36,8 @@ internal class VolumeKeys(private val context: Context, private val host: Sessio
         val connected = host.session.state.map { it.connection == ConnectionState.Connected }.distinctUntilChanged()
         // A TV that reports no level (sound on a soundbar) gets ± only: the panel shows no level it can't know.
         val levelReported = host.session.state.map { it.capabilities.volumeLevel != Capability.Unavailable }.distinctUntilChanged()
-        combine(connected, levelReported) { isConnected, absolute ->
-            if (isConnected) absolute else null
+        combine(connected, host.settings.volumeKeys, levelReported) { isConnected, enabled, absolute ->
+            if (isConnected && enabled) absolute else null
         }
             .distinctUntilChanged()
             .collectLatest { absolute -> if (absolute != null) routeToTv(absolute) }
