@@ -52,7 +52,8 @@ adb reverse tcp:3001 tcp:3001      # then pair with 127.0.0.1 in the app
 ## Privacy
 
 Webmote has no account, no analytics, no crash reporting and no ads SDK. It connects only to your
-TVs on your local network, over an encrypted connection pinned to each TV's certificate.
+TVs on your local network, over an encrypted connection pinned to each TV's certificate. The privacy
+policy is in [docs/privacy-policy.md](docs/privacy-policy.md).
 
 ## Contributing
 

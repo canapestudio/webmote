@@ -8,7 +8,9 @@ android {
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "io.github.krank56.webmote"
+        // Permanent once on Google Play: Canapé Studio's domain (canapestudio.app). The Kotlin
+        // packages keep the original io.github.krank56.webmote namespace.
+        applicationId = "app.canapestudio.webmote"
         minSdk = 26
         // Google Play requires API 36 for new apps and updates from 31 August 2026.
         targetSdk = 36
@@ -16,8 +18,24 @@ android {
         versionName = "0.1.0"
     }
 
+    // The Play upload key lives outside the repository: its path and passwords come from the
+    // WEBMOTE_UPLOAD_KEY* environment variables. Without them the release build is left unsigned.
+    val uploadKeystore = providers.environmentVariable("WEBMOTE_UPLOAD_KEYSTORE").orNull
+    signingConfigs {
+        if (uploadKeystore != null) {
+            create("upload") {
+                storeFile = file(uploadKeystore)
+                storePassword = providers.environmentVariable("WEBMOTE_UPLOAD_KEYSTORE_PASSWORD").get()
+                keyAlias = providers.environmentVariable("WEBMOTE_UPLOAD_KEY_ALIAS").getOrElse("upload")
+                keyPassword = providers.environmentVariable("WEBMOTE_UPLOAD_KEY_PASSWORD")
+                    .orElse(providers.environmentVariable("WEBMOTE_UPLOAD_KEYSTORE_PASSWORD")).get()
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (uploadKeystore != null) signingConfig = signingConfigs.getByName("upload")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -55,6 +73,8 @@ dependencies {
     implementation(libs.androidx.media)
     implementation(libs.androidx.glance.appwidget)
     implementation(libs.androidx.glance.material3)
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.work.runtime.ktx)
 
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)

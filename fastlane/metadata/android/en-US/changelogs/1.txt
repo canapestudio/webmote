@@ -1,0 +1,1 @@
+First release: remote, touchpad, apps, picture settings, Wake-on-LAN, Quick Settings tiles, widgets and phone volume keys.

@@ -1,0 +1,1 @@
+Première version : télécommande, pavé tactile, applis, réglages de l’image, allumage à distance, tuiles de réglages rapides, widgets et touches de volume du téléphone.
