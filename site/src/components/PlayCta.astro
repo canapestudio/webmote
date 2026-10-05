@@ -1,0 +1,144 @@
+---
+/**
+ * The Google Play call to action. Driven by GOOGLE_PLAY in src/config.ts:
+ * - live: false → "Coming soon to Google Play", plus an invitation to join the closed test;
+ * - live: true  → Google's official "Get it on Google Play" badge, linking to the listing.
+ * Once OPEN_SOURCE.fdroid.live is true, a link to the F-Droid listing follows it.
+ */
+import { Image } from 'astro:assets';
+import { CONTACT_EMAIL, GOOGLE_PLAY, OPEN_SOURCE, TEST_EMAIL_SUBJECT } from '../config';
+import { useTranslations, type Lang } from '../i18n';
+import Icon from './Icon.astro';
+import badgeEn from '../assets/brand/google-play-badge-en.png';
+import badgeFr from '../assets/brand/google-play-badge-fr.png';
+
+interface Props {
+  lang: Lang;
+  align?: 'start' | 'center';
+}
+
+const { lang, align = 'start' } = Astro.props;
+const t = useTranslations(lang);
+const badge = lang === 'fr' ? badgeFr : badgeEn;
+const testMail = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(TEST_EMAIL_SUBJECT[lang])}`;
+---
+
+<div class:list={['play', `play--${align}`]} data-play-live={String(GOOGLE_PLAY.live)}>
+  {
+    GOOGLE_PLAY.live ? (
+      <a class="play__badge" href={GOOGLE_PLAY.url}>
+        <Image src={badge} alt={t.play.badgeAlt} height={64} densities={[1, 2, 3]} />
+      </a>
+    ) : (
+      <>
+        <p class="play__soon">
+          <span class="play__dot" aria-hidden="true" />
+          {t.play.soon}
+        </p>
+        <a class="button button--primary play__test" href={testMail}>
+          {t.play.joinTest}
+          <Icon name="arrow" class="icon-arrow" />
+        </a>
+      </>
+    )
+  }
+  {
+    OPEN_SOURCE.fdroid.live && (
+      <a class="button button--quiet play__fdroid" href={OPEN_SOURCE.fdroid.url}>
+        {t.play.fdroid}
+        <Icon name="arrow" class="icon-arrow" />
+      </a>
+    )
+  }
+</div>
+
+<style>
+  .play {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.875rem;
+  }
+
+  .play--center {
+    justify-content: center;
+  }
+
+  @media (max-width: 479px) {
+    .play__soon,
+    .play__test {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* A status, not a button: it says where Webmote will be, and isn't clickable. */
+  .play__soon {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 3.5rem;
+    padding: 0.875rem 1.25rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius);
+    color: var(--ink);
+    font-size: 1.0625rem;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .play__dot {
+    position: relative;
+    flex: none;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: #2f9e64;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .play__dot::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: inherit;
+      animation: ping 2.4s var(--ease-out) infinite;
+    }
+  }
+
+  @keyframes ping {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    70%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+
+  .play__badge {
+    display: inline-block;
+    /* Google asks for clear space of a quarter of the badge's height around it. */
+    margin: 16px;
+    margin-inline-start: 0;
+    border-radius: 10px;
+  }
+
+  .play--center .play__badge {
+    margin-inline: 16px;
+  }
+
+  .play__badge :global(img) {
+    width: auto;
+    height: 64px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .play__dot {
+      background: #5fd394;
+    }
+  }
+</style>

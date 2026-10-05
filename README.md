@@ -6,6 +6,8 @@ Open it and press a button, or don't open it at all: use a Quick Settings tile, 
 or your phone's volume keys. No account, no analytics: Webmote talks only to your TVs, on your own
 network.
 
+Website: <https://webmote.canapestudio.app>
+
 ## Features
 
 - **Remote:** D-pad with OK, Back, Home, Settings and Mute around it, a volume slider that follows
@@ -49,11 +51,14 @@ To try the app without a TV, run the fake TV on your computer and point the emul
 adb reverse tcp:3001 tcp:3001      # then pair with 127.0.0.1 in the app
 ```
 
+The website lives in `site/` (Astro); see [site/README.md](site/README.md).
+
 ## Privacy
 
 Webmote has no account, no analytics, no crash reporting and no ads SDK. It connects only to your
 TVs on your local network, over an encrypted connection pinned to each TV's certificate. The privacy
-policy is in [docs/privacy-policy.md](docs/privacy-policy.md).
+policy is in [docs/privacy-policy.md](docs/privacy-policy.md) and at
+<https://webmote.canapestudio.app/privacy/>.
 
 ## Contributing
 

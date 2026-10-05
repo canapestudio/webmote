@@ -1,0 +1,191 @@
+---
+import { useTranslations, type Lang } from '../../i18n';
+import { screens } from '../../screens';
+import Phone from '../Phone.astro';
+import PlayCta from '../PlayCta.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const s = screens[lang];
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__copy">
+    <p class="kicker hero__in hero__in--1">{t.hero.kicker}</p>
+    <h1 id="hero-title" class="display hero__title hero__in hero__in--2">
+      <span>{t.hero.titleA}</span>{' '}<span class="hero__title-soft">{t.hero.titleB}</span>
+    </h1>
+    <p class="lead hero__lead hero__in hero__in--3">{t.hero.lead}</p>
+    <div class="hero__cta hero__in hero__in--4">
+      <PlayCta lang={lang} />
+    </div>
+    <ul class="hero__facts hero__in hero__in--4">
+      {t.hero.facts.map((fact) => <li>{fact}</li>)}
+    </ul>
+  </div>
+
+  <div class="container hero__stage-wrap">
+    <div class="hero__stage hero__in hero__in--5">
+      <Phone
+        class="hero__phone hero__phone--side hero__phone--left"
+        src={s.remoteMedia}
+        alt={t.shots.remoteMedia}
+        sizes="(min-width: 1280px) 270px, (min-width: 760px) 21vw, 190px"
+      />
+      <Phone
+        class="hero__phone hero__phone--main"
+        src={s.remote}
+        alt={t.shots.remote}
+        sizes="(min-width: 1280px) 320px, (min-width: 760px) 25vw, 230px"
+        priority
+      />
+      <Phone
+        class="hero__phone hero__phone--side hero__phone--right"
+        src={s.tvOff}
+        alt={t.shots.tvOff}
+        sizes="(min-width: 1280px) 270px, (min-width: 760px) 21vw, 190px"
+      />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: clamp(3rem, 1.5rem + 6vw, 7.5rem);
+  }
+
+  .hero__copy {
+    max-width: calc(64rem + 2 * var(--gutter));
+  }
+
+  .hero__title span {
+    display: block;
+  }
+
+  .hero__title-soft {
+    color: var(--title-soft);
+  }
+
+  .hero__lead {
+    max-width: 38rem;
+  }
+
+  .hero__cta {
+    margin-top: 2.25rem;
+  }
+
+  .hero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+    margin-top: 1.5rem;
+    list-style: none;
+    color: var(--muted);
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+
+  .hero__facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero__facts li::before {
+    content: '';
+    width: 1rem;
+    height: 1rem;
+    background: currentColor;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+  }
+
+  /* ---------- Stage ---------- */
+  .hero__stage-wrap {
+    margin-top: clamp(3rem, 2rem + 4vw, 5.5rem);
+  }
+
+  .hero__stage {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: clamp(1.25rem, 3.5vw, 3.5rem);
+    height: clamp(400px, 46vw, 600px);
+    padding-top: clamp(2.5rem, 5vw, 4.5rem);
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(60% 75% at 50% 0%, rgb(120 146 220 / 0.32), transparent 70%),
+      linear-gradient(180deg, var(--navy-2) 0%, var(--navy) 55%, var(--navy-deep) 100%);
+    isolation: isolate;
+  }
+
+  /* Faint concentric rings behind the phones, like a D-pad seen from above. */
+  .hero__stage::before {
+    content: '';
+    position: absolute;
+    inset: auto -20% -60% -20%;
+    height: 140%;
+    z-index: -1;
+    background: repeating-radial-gradient(
+      circle at 50% 50%,
+      rgb(255 255 255 / 0.055) 0 1px,
+      transparent 1px 72px
+    );
+    mask: radial-gradient(closest-side, black 30%, transparent);
+  }
+
+  .hero__stage :global(.hero__phone--main) {
+    --pw: clamp(230px, 25vw, 320px);
+    z-index: 2;
+  }
+
+  .hero__stage :global(.hero__phone--side) {
+    --pw: clamp(200px, 21vw, 270px);
+    margin-top: clamp(3rem, 7vw, 6rem);
+    opacity: 0.96;
+  }
+
+  @media (max-width: 759px) {
+    .hero__stage {
+      height: 420px;
+      padding-top: 2.25rem;
+    }
+    /* One phone on small screens: lazy images that aren't displayed are never downloaded. */
+    .hero__stage :global(.hero__phone--side) {
+      display: none;
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .hero__stage {
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+    }
+  }
+
+  /* ---------- Entrance ---------- */
+  @media (prefers-reduced-motion: no-preference) {
+    .hero__in {
+      animation: rise 0.8s var(--ease-out) both;
+    }
+    .hero__in--2 {
+      animation-name: rise-tilt;
+      animation-delay: 0.06s;
+    }
+    .hero__in--3 {
+      animation-delay: 0.14s;
+    }
+    .hero__in--4 {
+      animation-delay: 0.22s;
+    }
+    .hero__in--5 {
+      animation-duration: 1s;
+      animation-delay: 0.3s;
+    }
+  }
+</style>

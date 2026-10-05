@@ -1,0 +1,95 @@
+---
+/** A feature told in two halves: a framed screenshot and its story. The body goes in the default slot. */
+import Phone from '../Phone.astro';
+
+interface Props {
+  id: string;
+  kicker: string;
+  /** A "\n" in the title is a line break. */
+  title: string;
+  shot: ImageMetadata;
+  shotAlt: string;
+  /** Put the phone on the right on wide screens. */
+  phoneEnd?: boolean;
+}
+
+const { id, kicker, title, shot, shotAlt, phoneEnd = false } = Astro.props;
+---
+
+<section class="section" id={id} aria-labelledby={`${id}-title`}>
+  <div class:list={['container', 'split', { 'split--phone-end': phoneEnd }]}>
+    <div class="split__media reveal">
+      <Phone class="split__phone" src={shot} alt={shotAlt} sizes="(min-width: 960px) 300px, 260px" />
+    </div>
+    <div class="split__copy reveal">
+      <p class="kicker">{kicker}</p>
+      <h2 id={`${id}-title`} class="h2">
+        {
+          title.split('\n').map((line, i) => (
+            <>
+              {i > 0 && (
+                <>
+                  {' '}
+                  <br />
+                </>
+              )}
+              {line}
+            </>
+          ))
+        }
+      </h2>
+      <div class="split__body">
+        <slot />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .split {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    align-items: center;
+    gap: clamp(2.5rem, 6vw, 6rem);
+  }
+
+  .split--phone-end .split__media {
+    order: 2;
+  }
+
+  .split__media {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(70% 60% at 50% 40%, color-mix(in srgb, var(--accent-soft) 90%, transparent), transparent 75%),
+      var(--bg-tint);
+  }
+
+  .split__media :global(.split__phone) {
+    --pw: clamp(240px, 24vw, 300px);
+  }
+
+  .split__body {
+    display: grid;
+    gap: 1.25rem;
+    max-width: 38rem;
+    margin-top: 1.5rem;
+    font-size: clamp(1.0625rem, 1rem + 0.25vw, 1.1875rem);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 859px) {
+    .split {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .split--phone-end .split__media {
+      order: 0;
+    }
+    .split__copy {
+      order: -1;
+    }
+  }
+</style>

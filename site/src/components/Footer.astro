@@ -1,0 +1,117 @@
+---
+import { CONTACT_EMAIL, GOOGLE_PLAY, OPEN_SOURCE } from '../config';
+import { htmlLang, otherLang, pagePath, useTranslations, type Lang, type PageKey } from '../i18n';
+import Logo from './Logo.astro';
+
+interface Props {
+  lang: Lang;
+  page?: PageKey;
+}
+
+const { lang, page } = Astro.props;
+const t = useTranslations(lang);
+const other = otherLang(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer__top">
+      <a class="footer__brand" href={pagePath(lang, '')}>
+        <Logo size={40} />
+        <span>
+          <strong>Webmote</strong>
+          <span class="footer__by">{t.footer.by}</span>
+        </span>
+      </a>
+      <ul class="footer__links">
+        <li><a href={pagePath(lang, 'privacy')}>{t.footer.privacy}</a></li>
+        <li><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></li>
+        {OPEN_SOURCE.public && <li><a href={OPEN_SOURCE.sourceUrl}>{t.footer.source}</a></li>}
+        {OPEN_SOURCE.public && <li><a href={OPEN_SOURCE.liberapayUrl}>{t.footer.donate}</a></li>}
+        <li>
+          <a href={pagePath(other, page ?? '')} hreflang={htmlLang[other]} lang={htmlLang[other]}>{t.nav.switchTo}</a>
+        </li>
+      </ul>
+    </div>
+    <div class="footer__legal">
+      <p>{t.footer.disclaimer}</p>
+      {OPEN_SOURCE.public && <p>{t.footer.licence}</p>}
+      {GOOGLE_PLAY.live && <p>{t.play.attribution}</p>}
+      <p>© {year} {t.footer.copyright}</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    margin-top: var(--section-space);
+    padding-block: 3rem 3.5rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.9375rem;
+  }
+
+  .footer__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem 2rem;
+  }
+
+  .footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.875rem;
+    border-radius: 14px;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .footer__brand strong {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .footer__by {
+    display: block;
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  .footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1.5rem;
+    list-style: none;
+  }
+
+  .footer__links a {
+    display: inline-block;
+    padding-block: 0.625rem;
+    color: var(--ink);
+    font-weight: 560;
+    text-decoration: none;
+  }
+
+  .footer__links a:hover {
+    text-decoration: underline;
+  }
+
+  .footer__legal p {
+    max-width: 46rem;
+  }
+
+  .footer__legal {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 2rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+</style>

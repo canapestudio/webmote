@@ -1,0 +1,113 @@
+---
+/**
+ * The privacy policy, in either language. Its text comes from docs/privacy-policy.md through the
+ * `privacy` content collection (src/content.config.ts). Google Play links to /privacy/.
+ */
+import { getEntry, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import { pagePath, useTranslations, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const policy = await getEntry('privacy', lang);
+if (!policy) throw new Error(`No privacy policy for "${lang}"`);
+const { Content } = await render(policy);
+---
+
+<Base lang={lang} title={t.meta.privacyTitle} description={t.meta.privacyDescription} page="privacy">
+  <article class="policy container container--narrow">
+    <header class="policy__head">
+      <p class="kicker">{t.privacyPage.kicker}</p>
+      <h1 class="h2">{policy.data.title}</h1>
+      <p class="policy__date">{policy.data.effective}</p>
+    </header>
+    <div class="prose">
+      <Content />
+    </div>
+    <p class="policy__back">
+      <a href={pagePath(lang, '')}>
+        <Icon name="back" />
+        {t.privacyPage.back}
+      </a>
+    </p>
+  </article>
+</Base>
+
+<style>
+  .policy {
+    padding-top: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+
+  .policy__head {
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .policy__date {
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .prose {
+    max-width: 42rem;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .prose :global(> p:first-child) {
+    margin-top: 2rem;
+    color: var(--ink);
+    font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3125rem);
+    line-height: 1.55;
+  }
+
+  .prose :global(h2) {
+    margin-top: 2.75rem;
+    font-size: 1.375rem;
+    font-weight: 680;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .prose :global(p),
+  .prose :global(ul) {
+    margin-top: 1rem;
+  }
+
+  .prose :global(ul) {
+    display: grid;
+    gap: 0.625rem;
+    padding-inline-start: 1.25rem;
+  }
+
+  .prose :global(li::marker) {
+    color: var(--accent);
+  }
+
+  .prose :global(strong) {
+    color: var(--ink);
+    font-weight: 650;
+  }
+
+  .policy__back {
+    margin-top: 3.5rem;
+  }
+
+  .policy__back a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .policy__back :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+  }
+</style>

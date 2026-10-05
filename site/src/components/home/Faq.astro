@@ -1,0 +1,107 @@
+---
+import { CONTACT_EMAIL, GOOGLE_PLAY, TEST_EMAIL_SUBJECT } from '../../config';
+import { useTranslations, type Lang } from '../../i18n';
+import Icon from '../Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const testMail = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(TEST_EMAIL_SUBJECT[lang])}`;
+---
+
+<section class="section" id="faq" aria-labelledby="faq-title">
+  <div class="container container--narrow">
+    <div class="section-head reveal">
+      <p class="kicker">{t.faq.kicker}</p>
+      <h2 id="faq-title" class="h2">{t.faq.title}</h2>
+    </div>
+    <div class="faq">
+      {
+        !GOOGLE_PLAY.live && (
+          <details class="faq__item" name="faq">
+            <summary>
+              <span>{t.faq.whenItem.q}</span>
+              <Icon name="plus" class="faq__icon" />
+            </summary>
+            <p>
+              {t.faq.whenItem.a} <a href={testMail}>{CONTACT_EMAIL}</a>.
+            </p>
+          </details>
+        )
+      }
+      {
+        t.faq.items.map((item) => (
+          <details class="faq__item" name="faq">
+            <summary>
+              <span>{item.q}</span>
+              <Icon name="plus" class="faq__icon" />
+            </summary>
+            <p>{item.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq {
+    margin-top: clamp(2rem, 1.5rem + 2vw, 3rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .faq__item {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .faq__item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1.375rem 0.25rem;
+    color: var(--ink);
+    font-size: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);
+    font-weight: 620;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__item summary:hover {
+    color: var(--accent);
+  }
+
+  .faq__item summary :global(.faq__icon) {
+    flex: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    color: var(--muted);
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .faq__item[open] summary :global(.faq__icon) {
+    transform: rotate(45deg);
+  }
+
+  .faq__item p {
+    max-width: 42rem;
+    padding: 0 0.25rem 1.5rem;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .faq__item[open] p {
+      animation: rise 0.4s var(--ease-out);
+    }
+  }
+</style>

@@ -1,0 +1,535 @@
+---
+/** "Use it without opening it": tiles, widgets, volume keys and the notification, each with a small drawn illustration. */
+import { useTranslations, type Lang } from '../../i18n';
+import Icon from '../Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const a = t.anywhere;
+const tileIcons = ['power', 'mute', 'screen-off', 'remote'] as const;
+---
+
+<section class="section" id="anywhere" aria-labelledby="anywhere-title">
+  <div class="container">
+    <div class="section-head reveal">
+      <p class="kicker">{a.kicker}</p>
+      <h2 id="anywhere-title" class="h2">{a.title}</h2>
+      <p class="lead">{a.lead}</p>
+    </div>
+
+    <ul class="anywhere">
+      <li class="card anywhere__card reveal">
+        <div class="art art--tiles" aria-hidden="true">
+          <div class="qs">
+            {
+              a.tiles.labels.map((label, i) => (
+                <div class:list={['qs__tile', { 'is-on': i === 0 || i === 3 }]}>
+                  <span class="qs__icon">
+                    <Icon name={tileIcons[i]!} />
+                  </span>
+                  <span class="qs__text">
+                    <span class="qs__label">{label}</span>
+                    <span class="qs__state">{a.tiles.states[i]}</span>
+                  </span>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <h3 class="h3">{a.tiles.title}</h3>
+        <p>{a.tiles.text}</p>
+      </li>
+
+      <li class="card anywhere__card reveal">
+        <div class="art art--widgets" aria-hidden="true">
+          <div class="widget widget--strip">
+            <span class="wbtn"><Icon name="power" /></span>
+            <span class="wbtn"><Icon name="volume-down" /></span>
+            <span class="wbtn"><Icon name="mute" /></span>
+            <span class="wbtn"><Icon name="volume-up" /></span>
+          </div>
+          <div class="widget widget--remote">
+            <div class="widget__keys">
+              <span class="wbtn"><Icon name="back" /></span>
+              <span class="wbtn"><Icon name="home" /></span>
+              <span class="wbtn"><Icon name="volume-down" /></span>
+              <span class="wbtn"><Icon name="volume-up" /></span>
+            </div>
+            <div class="widget__dpad">
+              <span class="dpad__arrow dpad__arrow--up"></span>
+              <span class="dpad__arrow dpad__arrow--right"></span>
+              <span class="dpad__arrow dpad__arrow--down"></span>
+              <span class="dpad__arrow dpad__arrow--left"></span>
+              <span class="dpad__ok">OK</span>
+            </div>
+          </div>
+        </div>
+        <h3 class="h3">{a.widgets.title}</h3>
+        <p>{a.widgets.text}</p>
+      </li>
+
+      <li class="card anywhere__card reveal">
+        <div class="art art--keys" aria-hidden="true">
+          <div class="keys__phone">
+            <span class="keys__key keys__key--up"></span>
+            <span class="keys__key keys__key--down"></span>
+            <div class="keys__lock">9:41</div>
+            <div class="keys__slider">
+              <span class="keys__fill"></span>
+              <span class="keys__tv"><Icon name="tv" /></span>
+            </div>
+            <div class="keys__label">{a.keys.tv} · 12</div>
+          </div>
+        </div>
+        <h3 class="h3">{a.keys.title}</h3>
+        <p>{a.keys.text}</p>
+      </li>
+
+      <li class="card anywhere__card reveal">
+        <div class="art art--notif" aria-hidden="true">
+          <div class="notif">
+            <div class="notif__head">
+              <span class="notif__app"><Icon name="remote" /></span>
+              <span>Webmote</span>
+            </div>
+            <div class="notif__title">{a.notification.tv}</div>
+            <div class="notif__state">{a.notification.state}</div>
+            <div class="notif__actions">
+              {a.notification.actions.map((action) => <span>{action}</span>)}
+            </div>
+          </div>
+        </div>
+        <h3 class="h3">{a.notification.title}</h3>
+        <p>{a.notification.text}</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<style>
+  .anywhere {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+    list-style: none;
+  }
+
+  .anywhere__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.75rem 0.75rem 1.75rem;
+  }
+
+  .anywhere__card h3,
+  .anywhere__card p {
+    padding-inline: 1rem;
+  }
+
+  .anywhere__card h3 {
+    margin-top: 1rem;
+  }
+
+  .anywhere__card p {
+    color: var(--text);
+  }
+
+  /* ---------- Illustration canvas ---------- */
+  .art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 15rem;
+    overflow: hidden;
+    border-radius: calc(var(--radius-lg) - 0.75rem + 2px);
+    background:
+      radial-gradient(120% 100% at 0% 0%, color-mix(in srgb, var(--accent-soft) 85%, transparent), transparent 60%),
+      var(--bg-tint);
+    color: var(--ink);
+    user-select: none;
+  }
+
+  .art :global(svg) {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  /* Quick Settings tiles */
+  .qs {
+    display: grid;
+    grid-template-columns: repeat(2, 11rem);
+    gap: 0.625rem;
+  }
+
+  .qs__tile {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    min-width: 0;
+    padding: 0.75rem;
+    border-radius: 1.25rem;
+    background: var(--bg-raised);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .qs__tile.is-on {
+    background: var(--navy);
+    color: #fff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .qs__tile {
+      background: var(--bg-tint-2);
+    }
+    .qs__tile.is-on {
+      background: #b9c8f6;
+      color: #16213c;
+    }
+  }
+
+  .qs__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, currentColor 12%, transparent);
+  }
+
+  .qs__text {
+    display: grid;
+    min-width: 0;
+    line-height: 1.25;
+  }
+
+  .qs__label {
+    overflow: hidden;
+    font-size: 0.8125rem;
+    font-weight: 650;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .qs__state {
+    font-size: 0.75rem;
+    opacity: 0.75;
+  }
+
+  /* Widgets on a bit of home screen */
+  .art--widgets {
+    align-content: center;
+    gap: 0.75rem;
+    background: linear-gradient(150deg, #c9d3f4 0%, #e9d9ef 55%, #f6e2d6 100%);
+  }
+
+  .widget {
+    border-radius: 1.5rem;
+    background: rgb(255 255 255 / 0.88);
+    box-shadow: 0 10px 24px -14px rgb(30 42 68 / 0.5);
+    color: var(--navy);
+  }
+
+  .widget--strip {
+    display: grid;
+    grid-template-columns: repeat(4, 2.5rem);
+    gap: 0.625rem;
+    padding: 0.625rem 0.875rem;
+  }
+
+  .widget--remote {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0.875rem 1.25rem;
+  }
+
+  .widget__keys {
+    display: grid;
+    grid-template-columns: repeat(2, 2.5rem);
+    gap: 0.5rem;
+  }
+
+  .wbtn {
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    background: #dce1f9;
+  }
+
+  .widget__dpad {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 5.75rem;
+    height: 5.75rem;
+    border-radius: 50%;
+    background: #dce1f9;
+  }
+
+  /* Four small chevrons around OK. */
+  .dpad__arrow {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid var(--navy);
+    border-left: 2px solid var(--navy);
+    opacity: 0.75;
+  }
+
+  .dpad__arrow--up {
+    top: 0.7rem;
+    left: calc(50% - 3.5px);
+    rotate: 45deg;
+  }
+
+  .dpad__arrow--right {
+    right: 0.7rem;
+    top: calc(50% - 3.5px);
+    rotate: 135deg;
+  }
+
+  .dpad__arrow--down {
+    bottom: 0.7rem;
+    left: calc(50% - 3.5px);
+    rotate: 225deg;
+  }
+
+  .dpad__arrow--left {
+    left: 0.7rem;
+    top: calc(50% - 3.5px);
+    rotate: -45deg;
+  }
+
+  .dpad__ok {
+    display: grid;
+    place-items: center;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .art--widgets {
+      background: linear-gradient(150deg, #27325a 0%, #3a2f52 55%, #4a3a3a 100%);
+    }
+  }
+
+  /* Volume keys: the edge of a locked phone and its volume panel */
+  .art--keys {
+    place-items: center end;
+  }
+
+  .keys__phone {
+    position: relative;
+    width: 15rem;
+    height: 19rem;
+    margin-right: 3.5rem;
+    margin-top: 3.5rem;
+    border-radius: 2.25rem;
+    background: linear-gradient(170deg, #2e406b, #1e2a44 60%);
+    box-shadow:
+      inset 0 0 0 6px #0b0f1b,
+      inset 0 0 0 7px rgb(255 255 255 / 0.12),
+      0 20px 40px -20px rgb(15 22 40 / 0.6);
+    color: #fff;
+  }
+
+  .keys__lock {
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    font-size: 2.25rem;
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    opacity: 0.9;
+  }
+
+  .keys__key {
+    position: absolute;
+    right: -4px;
+    width: 4px;
+    border-radius: 0 3px 3px 0;
+    background: #0b0f1b;
+  }
+
+  .keys__key--up {
+    top: 2.5rem;
+    height: 2.75rem;
+  }
+
+  .keys__key--down {
+    top: 5.5rem;
+    height: 2.75rem;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .keys__key--down {
+      animation: press 2.8s ease-in-out infinite;
+    }
+    .keys__fill {
+      animation: level 2.8s ease-in-out infinite;
+    }
+  }
+
+  @keyframes press {
+    0%,
+    30%,
+    100% {
+      transform: none;
+    }
+    38%,
+    48% {
+      transform: translateX(-2px);
+      background: var(--accent);
+    }
+  }
+
+  @keyframes level {
+    0%,
+    36% {
+      height: 52%;
+    }
+    50%,
+    90% {
+      height: 40%;
+    }
+    100% {
+      height: 52%;
+    }
+  }
+
+  .keys__slider {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.25rem;
+    width: 3rem;
+    height: 8.75rem;
+    overflow: hidden;
+    border-radius: 1.5rem;
+    background: rgb(255 255 255 / 0.18);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+
+  .keys__fill {
+    position: absolute;
+    inset: auto 0 0;
+    height: 52%;
+    background: #dce1f9;
+  }
+
+  .keys__tv {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    translate: -50% 0;
+    color: var(--navy);
+  }
+
+  .keys__label {
+    position: absolute;
+    top: 5.25rem;
+    left: 1.5rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.16);
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  /* Notification */
+  .notif {
+    width: min(20rem, 86%);
+    padding: 1rem 1.125rem 0.875rem;
+    border-radius: 1.5rem;
+    background: var(--bg-raised);
+    box-shadow: var(--shadow-md);
+  }
+
+  .notif__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  .notif__app {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--navy);
+    color: #fff;
+  }
+
+  .notif__app :global(svg) {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+
+  .notif__title {
+    margin-top: 0.625rem;
+    font-size: 0.9375rem;
+    font-weight: 650;
+  }
+
+  .notif__state {
+    color: var(--muted);
+    font-size: 0.8125rem;
+  }
+
+  .notif__actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-top: 0.875rem;
+    color: var(--accent);
+    font-size: 0.8125rem;
+    font-weight: 650;
+  }
+
+  .notif__actions span {
+    padding: 0.375rem 0.625rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    white-space: nowrap;
+  }
+
+  /* On narrow screens, plain text actions, as Android draws them. */
+  @media (max-width: 400px) {
+    .notif__actions span {
+      padding: 0.25rem 0;
+      background: none;
+      color: var(--accent);
+    }
+  }
+
+  @media (min-width: 760px) {
+    .anywhere {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 420px) {
+    .qs {
+      grid-template-columns: repeat(2, minmax(0, 9.5rem));
+    }
+  }
+</style>

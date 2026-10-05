@@ -1,0 +1,154 @@
+---
+import { pagePath, useTranslations, type Lang } from '../../i18n';
+import Icon, { type IconName } from '../Icon.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const p = t.privacy;
+---
+
+<section class="section" id="privacy" aria-labelledby="privacy-title">
+  <div class="container">
+    <div class="band reveal">
+      <div class="band__head">
+        <p class="kicker band__kicker">{p.kicker}</p>
+        <h2 id="privacy-title" class="h2 band__title">{p.title}</h2>
+        <p class="lead band__lead">{p.lead}</p>
+      </div>
+      <ul class="band__points">
+        {
+          p.points.map((point) => (
+            <li>
+              <span class="band__icon">
+                <Icon name={point.icon as IconName} />
+              </span>
+              <h3 class="h3">{point.title}</h3>
+              <p>{point.text}</p>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="band__foot">
+        <a class="button band__button" href={pagePath(lang, 'privacy')}>
+          {p.policyLink}
+          <Icon name="arrow" class="icon-arrow" />
+        </a>
+        <p class="band__note">{p.siteNote}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .band {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(2.5rem, 2rem + 4vw, 5.5rem) clamp(1.5rem, 1rem + 4vw, 5rem);
+    border-radius: var(--radius-xl);
+    background:
+      radial-gradient(80% 90% at 100% 0%, rgb(120 146 220 / 0.25), transparent 60%),
+      linear-gradient(160deg, var(--navy-2) 0%, var(--navy) 45%, var(--navy-deep) 100%);
+    color: var(--on-navy-muted);
+    isolation: isolate;
+  }
+
+  .band::after {
+    content: '';
+    position: absolute;
+    right: -12rem;
+    bottom: -14rem;
+    z-index: -1;
+    width: 34rem;
+    height: 34rem;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 48px);
+  }
+
+  .band__head {
+    max-width: 46rem;
+  }
+
+  .band__kicker {
+    color: #c7d2f5;
+  }
+
+  .band__title {
+    color: #fff;
+  }
+
+  .band__lead {
+    color: var(--on-navy-muted);
+  }
+
+  .band__points {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 2rem;
+    margin-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+    list-style: none;
+  }
+
+  .band__points h3 {
+    margin-top: 1rem;
+    color: #fff;
+  }
+
+  .band__points p {
+    margin-top: 0.375rem;
+    line-height: 1.55;
+  }
+
+  .band__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.1);
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+    color: #fff;
+  }
+
+  .band__icon :global(svg) {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .band__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem 1.75rem;
+    margin-top: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    padding-top: 2rem;
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+
+  .band__button {
+    background: #fff;
+    color: var(--navy);
+  }
+
+  .band__button:hover {
+    transform: translateY(-1px);
+  }
+
+  .band__note {
+    max-width: 32rem;
+    font-size: 0.9375rem;
+  }
+
+  .band :global(:focus-visible) {
+    outline-color: #fff;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .band {
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.07);
+    }
+  }
+</style>

@@ -1,0 +1,19 @@
+// Cloudflare Worker that serves the built site (dist/) as static assets at
+// webmote.canapestudio.app. Workers Builds runs `npm run build`, then `npx wrangler deploy`,
+// on every push to main; see README.md.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "webmote-site",
+  "compatibility_date": "2026-10-05",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  },
+  // The zone is on the same Cloudflare account, so deploying creates the DNS record and certificate.
+  "routes": [
+    { "pattern": "webmote.canapestudio.app", "custom_domain": true }
+  ],
+  // The workers.dev address would be a second copy of the site.
+  "workers_dev": false,
+  "preview_urls": false
+}

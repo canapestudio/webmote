@@ -1,0 +1,42 @@
+---
+// Served by most static hosts for unknown URLs. English first, with the French right below.
+import Base from '../layouts/Base.astro';
+import { pagePath, useTranslations } from '../i18n';
+
+const en = useTranslations('en');
+const fr = useTranslations('fr');
+---
+
+<Base lang="en" title={en.meta.notFoundTitle} description={en.notFound.text} noindex>
+  <section class="not-found container">
+    <p class="kicker">404</p>
+    <h1 class="h2">{en.notFound.title}</h1>
+    <p class="lead">{en.notFound.text}</p>
+    <p class="not-found__link"><a href={pagePath('en', '')}>{en.notFound.home}</a></p>
+    <div lang="fr" class="not-found__fr">
+      <p class="h3">{fr.notFound.title}</p>
+      <p>{fr.notFound.text} <a href={pagePath('fr', '')}>{fr.notFound.home}</a></p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .not-found {
+    max-width: calc(46rem + 2 * var(--gutter));
+    padding-top: clamp(4rem, 3rem + 6vw, 9rem);
+  }
+
+  .not-found__link {
+    margin-top: 1.5rem;
+    font-weight: 600;
+  }
+
+  .not-found__fr {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+    color: var(--muted);
+  }
+</style>

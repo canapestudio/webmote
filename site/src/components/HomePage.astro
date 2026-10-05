@@ -1,0 +1,29 @@
+---
+/** The landing page, in either language. src/pages/index.astro and src/pages/fr/index.astro render it. */
+import Base from '../layouts/Base.astro';
+import { useTranslations, type Lang } from '../i18n';
+import Hero from './home/Hero.astro';
+import Anywhere from './home/Anywhere.astro';
+import Features from './home/Features.astro';
+import Privacy from './home/Privacy.astro';
+import Requirements from './home/Requirements.astro';
+import Faq from './home/Faq.astro';
+import Closing from './home/Closing.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<Base lang={lang} title={t.meta.homeTitle} description={t.meta.homeDescription} page="">
+  <Hero lang={lang} />
+  <Anywhere lang={lang} />
+  <Features lang={lang} />
+  <Privacy lang={lang} />
+  <Requirements lang={lang} />
+  <Faq lang={lang} />
+  <Closing lang={lang} />
+</Base>

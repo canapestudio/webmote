@@ -1,0 +1,27 @@
+---
+/** Webmote's mark: the launcher icon's remote (app/src/main/res/drawable/ic_launcher_foreground.xml) on brand navy. */
+interface Props {
+  size?: number;
+  class?: string;
+}
+const { size = 32, class: className } = Astro.props;
+---
+
+<svg class:list={['logo', className]} width={size} height={size} viewBox="18 18 72 72" aria-hidden="true" focusable="false">
+  <rect x="18" y="18" width="72" height="72" rx="17" fill="#1E2A44"></rect>
+  <path fill="#fff" d="M44 26h20a6 6 0 0 1 6 6v44a6 6 0 0 1-6 6H44a6 6 0 0 1-6-6V32a6 6 0 0 1 6-6z"></path>
+  <circle cx="54" cy="36" r="7" fill="#1E2A44"></circle>
+  <path fill="#1E2A44" d="M47 52h4v4h-4zm10 0h4v4h-4zm-10 8h4v4h-4zm10 0h4v4h-4zm-10 8h4v4h-4zm10 0h4v4h-4z"></path>
+</svg>
+
+<style>
+  .logo {
+    flex: none;
+    border-radius: 24%;
+  }
+  @media (prefers-color-scheme: dark) {
+    .logo {
+      box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12), 0 0 0 1px rgb(255 255 255 / 0.1);
+    }
+  }
+</style>

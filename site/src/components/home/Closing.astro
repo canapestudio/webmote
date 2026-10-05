@@ -1,0 +1,67 @@
+---
+import { Image } from 'astro:assets';
+import { useTranslations, type Lang } from '../../i18n';
+import PlayCta from '../PlayCta.astro';
+import icon from '../../assets/brand/icon.png';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section class="section closing" aria-labelledby="closing-title">
+  <div class="container closing__inner reveal">
+    <Image class="closing__icon" src={icon} alt="" width={112} densities={[1, 2]} />
+    <h2 id="closing-title" class="h2">{t.closing.title}</h2>
+    <div class="closing__cta">
+      <PlayCta lang={lang} align="center" />
+    </div>
+    <ul class="closing__facts">
+      {t.hero.facts.map((fact) => <li>{fact}</li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .closing__inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .closing__inner h2 {
+    max-width: 16ch;
+  }
+
+  .closing__inner :global(.closing__icon) {
+    width: 112px;
+    height: 112px;
+    margin-bottom: 2rem;
+    border-radius: 26px;
+    box-shadow: 0 1px 1px rgb(15 22 40 / 0.2), 0 24px 40px -18px rgb(30 42 68 / 0.6);
+  }
+
+  .closing__cta {
+    margin-top: 2.25rem;
+  }
+
+  .closing__facts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.25rem 0.75rem;
+    margin-top: 1.5rem;
+    list-style: none;
+    color: var(--muted);
+    font-size: 0.9375rem;
+  }
+
+  .closing__facts li + li::before {
+    content: '·';
+    margin-inline-end: 0.75rem;
+  }
+</style>

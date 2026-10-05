@@ -1,0 +1,13 @@
+# Response headers for every file the Cloudflare Worker serves (see wrangler.jsonc).
+# Each page already carries its Content-Security-Policy in a meta tag, written by Astro.
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()
+  Strict-Transport-Security: max-age=63072000; includeSubDomains
+
+# Astro fingerprints these file names, so they never change in place.
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable

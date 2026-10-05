@@ -6,6 +6,11 @@ local.properties
 .idea/
 .DS_Store
 captures/
+# Website (site/): dependencies and build output.
+site/node_modules/
+site/dist/
+site/.astro/
+site/.wrangler/
 # Signing keys and their passwords never go in the repository.
 *.jks
 *.keystore

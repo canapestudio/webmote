@@ -1,0 +1,293 @@
+---
+/** The remote, picture, touchpad and power stories, each beside its screenshot. */
+import { useTranslations, type Lang } from '../../i18n';
+import { screens } from '../../screens';
+import Icon, { type IconName } from '../Icon.astro';
+import Phone from '../Phone.astro';
+import Split from './Split.astro';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const s = screens[lang];
+---
+
+<div id="features">
+  <Split id="remote" kicker={t.remote.kicker} title={t.remote.title} shot={s.remoteMedia} shotAlt={t.shots.remoteMedia}>
+    <p>{t.remote.lead}</p>
+    <ul class="features">
+      {
+        t.remote.features.map((feature) => (
+          <li>
+            <span class="icon-tile">
+              <Icon name={feature.icon as IconName} />
+            </span>
+            <span>
+              <strong>{feature.title}</strong>
+              <span>{feature.text}</span>
+            </span>
+          </li>
+        ))
+      }
+    </ul>
+  </Split>
+
+  <div class="section">
+    <div class="container duo">
+      <section class="card duo__card reveal" id="picture" aria-labelledby="picture-title">
+        <div class="duo__copy">
+          <p class="kicker">{t.picture.kicker}</p>
+          <h2 id="picture-title" class="duo__title">{t.picture.title}</h2>
+          <p>{t.picture.text}</p>
+          <p class="note">
+            <Icon name="info" />
+            <span>{t.picture.honest}</span>
+          </p>
+        </div>
+        <div class="duo__media">
+          <Phone class="duo__phone" src={s.picture} alt={t.shots.picture} sizes="(min-width: 960px) 280px, 250px" />
+        </div>
+      </section>
+
+      <section class="card duo__card reveal" id="touchpad" aria-labelledby="touchpad-title">
+        <div class="duo__copy">
+          <p class="kicker">{t.touchpad.kicker}</p>
+          <h2 id="touchpad-title" class="duo__title">{t.touchpad.title}</h2>
+          <p class="with-icon">
+            <span class="icon-tile"><Icon name="touch" /></span>
+            <span>{t.touchpad.text}</span>
+          </p>
+          <p class="with-icon">
+            <span class="icon-tile"><Icon name="apps" /></span>
+            <span>{t.touchpad.apps}</span>
+          </p>
+        </div>
+        <div class="duo__media">
+          <Phone class="duo__phone" src={s.touchpad} alt={t.shots.touchpad} sizes="(min-width: 960px) 280px, 250px" />
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <Split id="power" kicker={t.power.kicker} title={t.power.title} shot={s.tvOff} shotAlt={t.shots.tvOff} phoneEnd>
+    <p>{t.power.text}</p>
+    <p>
+      <a class="arrow-link" href="#requirements">
+        {t.power.howTo}
+        <Icon name="arrow" />
+      </a>
+    </p>
+    <div class="card tvs">
+      <div class="tvs__copy">
+        <h3 class="h3">{t.tvs.title}</h3>
+        <p>{t.tvs.text}</p>
+      </div>
+      <ul class="tvs__list" aria-hidden="true">
+        {
+          t.tvs.list.map((name, i) => (
+            <li class:list={{ 'is-active': i === 0 }}>
+              <Icon name="tv" />
+              <span>{name}</span>
+              {i === 0 && <Icon name="check" class="tvs__check" />}
+            </li>
+          ))
+        }
+        <li class="tvs__add">
+          <Icon name="plus" />
+          <span>{t.tvs.add}</span>
+        </li>
+      </ul>
+    </div>
+  </Split>
+</div>
+
+<style>
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 1.5rem 1.75rem;
+    margin-top: 0.75rem;
+    list-style: none;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .features li {
+    display: flex;
+    gap: 0.875rem;
+    align-items: flex-start;
+  }
+
+  .features strong {
+    display: block;
+    margin-bottom: 0.125rem;
+    color: var(--ink);
+    font-weight: 650;
+  }
+
+  .features li > span:last-child > span {
+    color: var(--muted);
+  }
+
+  /* Picture and touchpad, side by side */
+  .duo {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1rem, 2vw, 1.5rem);
+  }
+
+  @media (min-width: 860px) {
+    .duo {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .duo__card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .duo__copy {
+    display: grid;
+    align-content: start;
+    gap: 1.125rem;
+    padding: clamp(1.75rem, 1.25rem + 2vw, 3rem) clamp(1.5rem, 1rem + 2vw, 3rem) 2.5rem;
+    font-size: 1.0625rem;
+  }
+
+  .duo__copy .kicker {
+    margin-bottom: 0;
+  }
+
+  .duo__title {
+    font-size: clamp(1.75rem, 1.3rem + 1.5vw, 2.5rem);
+    font-weight: 730;
+    line-height: 1.08;
+    letter-spacing: -0.028em;
+  }
+
+  .duo__media {
+    display: flex;
+    justify-content: center;
+    height: clamp(22rem, 30vw, 27rem);
+    margin: auto 0.75rem 0.75rem;
+    padding-top: 2.5rem;
+    overflow: hidden;
+    border-radius: calc(var(--radius-lg) - 0.75rem + 2px);
+    background:
+      radial-gradient(70% 60% at 50% 30%, color-mix(in srgb, var(--accent-soft) 90%, transparent), transparent 75%),
+      var(--bg-tint);
+  }
+
+  .duo__media :global(.duo__phone) {
+    --pw: clamp(250px, 21vw, 280px);
+  }
+
+  .note {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1.125rem 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--bg-raised);
+    font-size: 1rem;
+  }
+
+  .note :global(svg) {
+    flex: none;
+    width: 1.375rem;
+    height: 1.375rem;
+    margin-top: 0.1rem;
+    color: var(--accent);
+  }
+
+  .with-icon {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .arrow-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+  }
+
+  .arrow-link :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .arrow-link:hover :global(svg) {
+    transform: translateX(3px);
+  }
+
+  /* Several TVs */
+  .tvs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding: 1.5rem;
+    font-size: 1rem;
+  }
+
+  .tvs__copy p {
+    margin-top: 0.375rem;
+    color: var(--muted);
+  }
+
+  .tvs__list {
+    display: grid;
+    gap: 0.375rem;
+    min-width: 12rem;
+    padding: 0.5rem;
+    border-radius: var(--radius);
+    background: var(--bg-tint);
+    list-style: none;
+    font-size: 0.9375rem;
+    font-weight: 560;
+    color: var(--ink);
+  }
+
+  .tvs__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+  }
+
+  .tvs__list li.is-active {
+    background: var(--bg-raised);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .tvs__list :global(svg) {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--muted);
+  }
+
+  .tvs__list :global(.tvs__check) {
+    margin-inline-start: auto;
+    color: var(--accent);
+  }
+
+  .tvs__add {
+    color: var(--accent);
+  }
+
+  @media (max-width: 520px) {
+    .tvs {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>
