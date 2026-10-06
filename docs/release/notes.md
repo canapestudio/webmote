@@ -21,3 +21,9 @@ its findings here.
   picture control work. Wake-on-LAN failed while the phone ran a VPN (NordVPN), which routes
   255.255.255.255 into its tunnel; fixed by also sending to the TV network's broadcast address.
 - The TV keeps accepting TCP on port 3001 while it's off (standby).
+- 2026-10-06, same phone and TV, the **release build** (R8-minified, as F-Droid builds it), installed
+  over the debug build:
+  - It starts with no crash, and the saved TVs are kept.
+  - It connects, and the D-pad, volume slider, media keys, phone volume keys and a Quick Settings
+    tile all work. The licences screen shows Webmote's GPLv3 notice.
+  - InStart opens LG's code prompt; no code was entered.
