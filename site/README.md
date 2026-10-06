@@ -31,7 +31,7 @@ site/
 ├── astro.config.mjs      site URL, i18n (en default, fr under /fr/), sitemap, CSP
 ├── public/               copied as is: robots.txt, favicons
 └── src/
-    ├── config.ts         Google Play switch, contact email
+    ├── config.ts         Google Play switch, contact email, links to the studio's site
     ├── i18n/en.ts        all the English copy
     ├── i18n/fr.ts        all the French copy (TypeScript checks it has the same keys as en.ts)
     ├── content.config.ts loads the privacy policy from ../docs/privacy-policy.md

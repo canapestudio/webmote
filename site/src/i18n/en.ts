@@ -210,6 +210,7 @@ export const en = {
 
   footer: {
     by: 'A Canapé Studio app',
+    legal: 'Legal notice',
     privacy: 'Privacy policy',
     contact: 'Contact',
     disclaimer:

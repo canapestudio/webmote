@@ -209,6 +209,7 @@ export const fr: Dictionary = {
 
   footer: {
     by: 'Une appli Canapé Studio',
+    legal: 'Mentions légales',
     privacy: 'Politique de confidentialité',
     contact: 'Contact',
     disclaimer:

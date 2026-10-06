@@ -38,6 +38,15 @@ export const OPEN_SOURCE = {
 
 export const CONTACT_EMAIL = 'hello@canapestudio.app';
 
+/**
+ * The studio's site, which the footer links to. Its legal notice also covers this site: same
+ * publisher, same host.
+ */
+export const STUDIO = {
+  home: { en: 'https://canapestudio.app/', fr: 'https://canapestudio.app/fr/' },
+  legal: { en: 'https://canapestudio.app/legal/', fr: 'https://canapestudio.app/fr/mentions-legales/' },
+} as const;
+
 /** Subject line of the "join the closed test" email, per language. */
 export const TEST_EMAIL_SUBJECT = {
   en: 'Webmote closed test',
