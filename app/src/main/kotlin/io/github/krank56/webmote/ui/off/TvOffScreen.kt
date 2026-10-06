@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -44,7 +45,8 @@ import io.github.krank56.webmote.ui.common.tvName
 
 /**
  * The active TV is off or unreachable: one big Turn on button. While this screen is visible the session
- * keeps probing for the TV and connects as soon as it answers.
+ * keeps probing for the TV and connects as soon as it answers. [large] gives Simple mode's larger text
+ * and button.
  */
 @Composable
 fun TvOffScreen(
@@ -53,6 +55,7 @@ fun TvOffScreen(
     state: TvState,
     waking: Boolean,
     onOpen: (Route) -> Unit,
+    large: Boolean = false,
 ) {
     val session = host.session
     val haptics = LocalHaptics.current
@@ -84,21 +87,29 @@ fun TvOffScreen(
                 },
             ),
             modifier = Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+            large = large,
         ) {
             Button(
                 onClick = wake,
                 enabled = !waking,
-                modifier = Modifier.widthIn(min = 240.dp).height(64.dp),
+                // In Simple mode it grows with a large font's label instead of cutting it off.
+                modifier = Modifier
+                    .widthIn(min = 240.dp)
+                    .then(if (large) Modifier.heightIn(min = 88.dp) else Modifier.height(64.dp)),
                 shape = MaterialTheme.shapes.extraLarge,
             ) {
+                val iconSize = if (large) 36.dp else 28.dp
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (waking) {
-                        CircularProgressIndicator(Modifier.size(24.dp), strokeWidth = 3.dp)
+                        CircularProgressIndicator(Modifier.size(iconSize - 4.dp), strokeWidth = 3.dp)
                     } else {
-                        Icon(Icons.Rounded.PowerSettingsNew, contentDescription = null, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Rounded.PowerSettingsNew, contentDescription = null, modifier = Modifier.size(iconSize))
                     }
                     Spacer(Modifier.width(12.dp))
-                    Text(stringResource(R.string.off_turn_on), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        stringResource(R.string.off_turn_on),
+                        style = if (large) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.titleMedium,
+                    )
                 }
             }
             if (wakeFailed && !hintDismissed) {

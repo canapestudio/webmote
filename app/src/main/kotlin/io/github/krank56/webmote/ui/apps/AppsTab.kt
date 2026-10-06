@@ -42,6 +42,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.krank56.webmote.R
 import io.github.krank56.webmote.core.TvApp
@@ -147,24 +148,25 @@ private fun AppTile(app: TvApp, session: TvSession, modifier: Modifier = Modifie
 
 /** The app's icon from the TV, or its initial while loading or if it has none. */
 @Composable
-private fun AppIcon(app: TvApp, session: TvSession) {
+fun AppIcon(app: TvApp, session: TvSession, size: Dp = IconSize) {
     val url = app.iconUrl
+    // Decoded for the grid at any size: the cache keeps one bitmap per URL.
     val targetPx = with(LocalDensity.current) { IconSize.roundToPx() }
     val bitmap by produceState(initialValue = url?.let(AppIconCache::cached), url) {
         value = url?.let { AppIconCache.cached(it) ?: AppIconCache.get(it, targetPx, session::loadIcon) }
     }
-    val shape = RoundedCornerShape(16.dp)
+    val shape = RoundedCornerShape(size / 4)
     val image = bitmap
     if (image != null) {
         Image(
             bitmap = image.asImageBitmap(),
             contentDescription = null,
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(IconSize).clip(shape),
+            modifier = Modifier.size(size).clip(shape),
         )
     } else {
         Box(
-            Modifier.size(IconSize).clip(shape).background(MaterialTheme.colorScheme.secondaryContainer),
+            Modifier.size(size).clip(shape).background(MaterialTheme.colorScheme.secondaryContainer),
             contentAlignment = Alignment.Center,
         ) {
             Text(

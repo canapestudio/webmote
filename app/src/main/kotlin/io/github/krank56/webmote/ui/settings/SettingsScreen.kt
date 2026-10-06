@@ -18,9 +18,11 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Gavel
+import androidx.compose.material.icons.rounded.GridView
 import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Mouse
+import androidx.compose.material.icons.rounded.OpenWith
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
@@ -87,10 +89,13 @@ fun SettingsScreen(
     val haptics by settings.haptics.collectAsStateWithLifecycle()
     val volumeKeys by settings.volumeKeys.collectAsStateWithLifecycle()
     val sensitivity by settings.touchpadSensitivity.collectAsStateWithLifecycle()
+    val simpleMode by settings.simpleMode.collectAsStateWithLifecycle()
+    val showArrows by settings.showArrows.collectAsStateWithLifecycle()
     val registryActiveId by host.registry.activeTvId.collectAsStateWithLifecycle()
     val activeId = state.tvId ?: registryActiveId
     var renamingId by rememberSaveable { mutableStateOf<String?>(null) }
     var forgettingId by rememberSaveable { mutableStateOf<String?>(null) }
+    var explainingSimpleMode by rememberSaveable { mutableStateOf(false) }
 
     BackScaffold(title = stringResource(R.string.settings_title), onBack = onBack) { padding ->
         LazyColumn(
@@ -146,6 +151,27 @@ fun SettingsScreen(
             }
             item { SensitivityRow(sensitivity = sensitivity, onChange = settings::setTouchpadSensitivity) }
 
+            item { Header(stringResource(R.string.simple_mode)) }
+            item {
+                SwitchRow(
+                    icon = Icons.Rounded.GridView,
+                    title = stringResource(R.string.simple_mode_use),
+                    summary = stringResource(R.string.simple_mode_summary),
+                    checked = simpleMode,
+                    // Say how to come back before the gear is the only way here.
+                    onChange = { on -> if (on) explainingSimpleMode = true else settings.setSimpleMode(false) },
+                )
+            }
+            item {
+                SwitchRow(
+                    icon = Icons.Rounded.OpenWith,
+                    title = stringResource(R.string.simple_show_arrows),
+                    summary = stringResource(R.string.simple_show_arrows_summary),
+                    checked = showArrows,
+                    onChange = settings::setShowArrows,
+                )
+            }
+
             item { Header(stringResource(R.string.settings_about)) }
             item {
                 LinkRow(
@@ -184,6 +210,15 @@ fun SettingsScreen(
             onForget = {
                 forgettingId = null
                 session.forget(tv.id)
+            },
+        )
+    }
+    if (explainingSimpleMode) {
+        SimpleModeDialog(
+            onDismiss = { explainingSimpleMode = false },
+            onTurnOn = {
+                explainingSimpleMode = false
+                settings.setSimpleMode(true)
             },
         )
     }
@@ -357,6 +392,23 @@ private fun ForgetDialog(name: String, onDismiss: () -> Unit, onForget: () -> Un
                 onClick = onForget,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
             ) { Text(stringResource(R.string.settings_tv_forget)) }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }
+        },
+    )
+}
+
+/** Explains, before Simple mode is turned on, that Settings will then open only by holding the gear. */
+@Composable
+private fun SimpleModeDialog(onDismiss: () -> Unit, onTurnOn: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = { Icon(Icons.Rounded.GridView, contentDescription = null) },
+        title = { Text(stringResource(R.string.simple_mode_dialog_title)) },
+        text = { Text(stringResource(R.string.simple_mode_dialog_body)) },
+        confirmButton = {
+            TextButton(onClick = onTurnOn) { Text(stringResource(R.string.simple_mode_turn_on)) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text(stringResource(R.string.action_cancel)) }

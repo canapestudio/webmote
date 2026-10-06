@@ -60,7 +60,7 @@ fun Notice(
 
 /**
  * A full-screen state with a large icon, a title, an explanation and actions: the TV is off, pairing
- * is needed, connecting…
+ * is needed, connecting… [large] is Simple mode's version, with larger, higher-contrast text.
  */
 @Composable
 fun StatusLayout(
@@ -71,6 +71,7 @@ fun StatusLayout(
     iconContainer: Color = MaterialTheme.colorScheme.secondaryContainer,
     iconContent: Color = MaterialTheme.colorScheme.onSecondaryContainer,
     progress: Boolean = false,
+    large: Boolean = false,
     actions: @Composable ColumnScope.() -> Unit = {},
 ) {
     Box(modifier.fillMaxSize().verticalScroll(rememberScrollState()), contentAlignment = Alignment.Center) {
@@ -86,7 +87,7 @@ fun StatusLayout(
             Spacer(Modifier.height(24.dp))
             Text(
                 title,
-                style = MaterialTheme.typography.headlineSmall,
+                style = if (large) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.semantics { heading() },
             )
@@ -94,8 +95,8 @@ fun StatusLayout(
                 Spacer(Modifier.height(12.dp))
                 Text(
                     body,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = if (large) MaterialTheme.typography.titleLarge else MaterialTheme.typography.bodyLarge,
+                    color = if (large) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                 )
             }

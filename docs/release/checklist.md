@@ -31,7 +31,7 @@ TV model / firmware tested: ________  Phone / Android version: ________  Date: _
 | ☐ | Mute (top left of the D-pad) toggles mute and shows when the sound is off, with a haptic tick; TalkBack reads whether it's on. | |
 | ☐ | With sound on a soundbar / external output (if available): − and + take the slider's place, step the volume and repeat while held; Mute still works. | |
 | ☐ | The tab doesn't scroll. On a small phone (about 360 × 640 dp, like the emulator's Small Phone) and a large one, at the default font size and at 200%, in English and French: the D-pad and its four keys, both sliders, the media row and the shortcuts all show at once, with nothing overlapping and no label cut off. It may scroll only in split screen, or on a small phone while a notice shows (button connection refused, picture changes ignored). **If it scrolls otherwise, note the phone, font size and navigation mode (gestures or buttons).** | |
-| ☐ | When the TV refuses the button connection, the Remote tab and the 123 sheet show a short notice ("The TV won't take button presses…"), and the buttons around it keep a usable size on a small phone. | |
+| ☐ | When the TV refuses the button connection, the Remote tab, the Simple screen and both number pads show a short notice ("The TV won't take button presses…"), and the buttons around it keep a usable size on a small phone. | |
 | ☐ | The D-pad is no larger than before (about 78% of the width, at most 280 dp). On a short screen it shrinks, and the four keys stay in the corners around it without touching the circle. | |
 | ☐ | Developer options → Force RTL layout direction: Mute stays top left, Settings top right, Back bottom left and Home bottom right, like the arrows. | |
 | ☐ | With auto-rotate on, turning the phone sideways keeps the app in portrait. | |
@@ -155,6 +155,32 @@ details were never captured on webOS 26 with an unsigned key. Note what you see;
 | ☐ | MAC capture: `connectionmanager/getinfo` answers with the unsigned manifest (Diagnostics shows both MACs). | |
 | ☐ | Tiles: a tap with the app fully closed starts the service (relies on SystemUI's tile-click allow-list, not a documented API). | |
 | ☐ | Volume keys: the phone routes keys to the remote MediaSession (some phones may require a media route). | |
+
+## Simple mode
+
+| ✓ | Check | Notes |
+|---|---|---|
+| ☐ | Settings → Use Simple mode: a dialog explains that holding the gear for two seconds comes back to Settings; Cancel leaves it off. | |
+| ☐ | Turn on, then Back: the Simple screen shows, with no tabs, sliders or TV-name bar. Close and reopen the app, then restart the phone: it opens on the Simple screen both times. | |
+| ☐ | Turn off turns the TV off at once, with no confirmation. | |
+| ☐ | Mute toggles mute and the button shows when sound is off. Volume + / − step the volume (and repeat while held); Channel + / − change channel once per press. | |
+| ☐ | Every button gives a haptic tick and visibly flashes, even on a quick tap; with haptics off in Settings, no tick. | |
+| ☐ | A short tap on the gear does nothing. Holding it fills the ring and opens Settings after about two seconds; letting go early empties the ring. | |
+| ☐ | Back on the Simple screen leaves the app; the tabs never appear. Turning Simple mode off brings the tabs back. | |
+| ☐ | On a small phone (about 360 × 640 dp) and a large one, with Show arrows on and four apps pinned: the Simple screen fits without scrolling, at the default font size and at 200% with display size at maximum. The rows share the height equally, two buttons to a row (three in the arrow cross). | |
+| ☐ | TalkBack reads every button by its label (Volume up, Channel down…) and whether Mute is on; double-tap and hold on the gear opens Settings. | |
+| ☐ | In French, light and dark theme: every label is in French, text is high-contrast, and the Turn off button stays red. | |
+| ☐ | Under the channel buttons, Up, Down, Left, Right and OK move and select in the TV's menus (e.g. Netflix), and Back goes back. | |
+| ☐ | Settings → Show arrows off: the arrows, OK and Back disappear and 123 takes a full-width row of its own; on again brings the cross back, with 123 in its bottom-left corner. | |
+| ☐ | 123, in the arrow cross's bottom-left corner, opens a full-screen pad of large digits that fits without scrolling, also at 200% font size: on live TV, typing 2 changes to channel 2. Close and the phone's Back both return to the Simple screen. | |
+| ☐ | With no app pinned, there's no row of app tiles. Pin one in the Apps tab (Simple mode off), turn Simple mode back on: its tile shows with its icon and name and opens the app. Unpinning it removes the tile. | |
+| ☐ | With five or more apps pinned, only the first four show, side by side in one row, in the Apps tab's order. | |
+| ☐ | At 200% font size the labels shrink to fit their buttons instead of the layout reflowing: the arrows stay a cross, and no arrow, 123, digit or app name is split mid-word or clipped. Only an app name too long for its tile even at the smallest size ends in "…". | |
+| ☐ | TalkBack reads the arrows, OK, Back, 123 ("Channel numbers"), each digit, Close and each tile's app name. | |
+| ☐ | With the TV off: the TV-is-off screen shows with larger text, the hold-to-open gear and no power button in the bar. Turn on wakes the TV and the Simple screen comes back by itself. | |
+| ☐ | After forcing a re-pair (remove Webmote from the TV's connected devices, then reopen the app): only "Webmote needs setting up again. Ask the person who set it up." and the gear show. Holding the gear and re-pairing from Settings fixes it; with Simple mode off, the usual Pair again screen shows instead. | |
+| ☐ | With one TV saved there are no TV buttons. With two saved, both names show as large buttons at the top, the active one highlighted, on the Simple, off and problem screens; tapping the other switches to it. | |
+| ☐ | At 200% font size the TV buttons stay two to a row with their names shrinking to fit, the buttons below still fit without scrolling, and the off and problem screens' text isn't cut off. TalkBack reads each TV's name and which one is selected; in French the problem sentence is in French. | |
 
 ## Throughout
 

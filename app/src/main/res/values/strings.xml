@@ -190,4 +190,24 @@
     <string name="licences_usage_aiowebostv">The connection handshake and the webOS 26 unsigned pairing manifest</string>
     <string name="licences_usage_lgtvcompanion">The current unsigned pairing manifest and the hidden-alert workaround</string>
     <string name="licences_usage_lgtv2">Wake-on-LAN to both of the TV’s network adapters</string>
+    <!-- Simple mode -->
+    <string name="simple_mode">Simple mode</string>
+    <string name="simple_mode_use">Use Simple mode</string>
+    <string name="simple_mode_summary">One screen of large, labelled buttons instead of the tabs</string>
+    <string name="simple_mode_dialog_title">Turn on Simple mode?</string>
+    <string name="simple_mode_dialog_body">Webmote will open on one screen of large buttons. To come back to Settings, hold the gear at the top of the screen for about two seconds; a short tap does nothing.</string>
+    <string name="simple_mode_turn_on">Turn on</string>
+    <string name="simple_settings_hold">Open Settings</string>
+    <string name="simple_power">Turn off</string>
+    <string name="simple_mute">Mute</string>
+    <string name="simple_volume_up">Volume +</string>
+    <string name="simple_volume_down">Volume −</string>
+    <string name="simple_channel_up">Channel +</string>
+    <string name="simple_channel_down">Channel −</string>
+    <string name="simple_show_arrows">Show arrows</string>
+    <string name="simple_show_arrows_summary">Up, down, left, right, OK and Back on the Simple screen</string>
+    <string name="simple_numbers_description">Channel numbers</string>
+    <string name="simple_numbers_title">Type the channel number</string>
+    <string name="simple_close">Close</string>
+    <string name="simple_problem">Webmote needs setting up again. Ask the person who set it up.</string>
 </resources>

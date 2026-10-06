@@ -32,6 +32,8 @@ import io.github.krank56.webmote.ui.pairing.PairingProgressScreen
 import io.github.krank56.webmote.ui.pairing.PairingScreen
 import io.github.krank56.webmote.ui.settings.DiagnosticsScreen
 import io.github.krank56.webmote.ui.settings.SettingsScreen
+import io.github.krank56.webmote.ui.simple.SimpleProblemScreen
+import io.github.krank56.webmote.ui.simple.SimpleScreen
 import io.github.krank56.webmote.ui.status.ConnectingScreen
 import io.github.krank56.webmote.ui.status.ProblemScreen
 
@@ -49,13 +51,17 @@ private sealed interface Screen {
     data object Problem : Screen
 }
 
-/** The app's root: picks the screen from the saved TVs, the session's state and the back stack. */
+/**
+ * The app's root: picks the screen from the saved TVs, the session's state and the back stack, and
+ * shows Simple mode's screens when it's on.
+ */
 @Composable
 fun WebmoteApp(host: SessionHost) {
     val session = host.session
     val tvs by host.registry.tvs.collectAsStateWithLifecycle()
     val state by session.state.collectAsStateWithLifecycle()
     val haptics by host.settings.haptics.collectAsStateWithLifecycle()
+    val simpleMode by host.settings.simpleMode.collectAsStateWithLifecycle()
     val backStack = rememberBackStack()
     val lastOffTvId = rememberLastOffTvId(state)
     var mainTab by rememberSaveable { mutableStateOf(MainTab.Remote) }
@@ -104,23 +110,32 @@ fun WebmoteApp(host: SessionHost) {
                         Route.Licences -> LicencesScreen(onBack = back)
                     }
                     Screen.FirstPairing -> PairingScreen(host = host, state = state, tvs = tvs, onBack = null, onPaired = {})
-                    Screen.Main -> MainScreen(
-                        host = host,
-                        tvs = tvs,
-                        state = state,
-                        tab = mainTab,
-                        onTabChange = { mainTab = it },
-                        onOpen = open,
-                    )
+                    Screen.Main -> if (simpleMode) {
+                        SimpleScreen(host = host, tvs = tvs, state = state, onOpen = open)
+                    } else {
+                        MainScreen(
+                            host = host,
+                            tvs = tvs,
+                            state = state,
+                            tab = mainTab,
+                            onTabChange = { mainTab = it },
+                            onOpen = open,
+                        )
+                    }
                     Screen.Connecting -> ConnectingScreen(host = host, tvs = tvs, state = state, onOpen = open)
                     Screen.Pairing -> PairingProgressScreen(host = host, tvs = tvs, state = state, onOpen = open)
-                    Screen.Problem -> ProblemScreen(host = host, tvs = tvs, state = state, onOpen = open)
+                    Screen.Problem -> if (simpleMode) {
+                        SimpleProblemScreen(host = host, tvs = tvs, state = state, onOpen = open)
+                    } else {
+                        ProblemScreen(host = host, tvs = tvs, state = state, onOpen = open)
+                    }
                     Screen.Off -> TvOffScreen(
                         host = host,
                         tvs = tvs,
                         state = state,
                         waking = state.waking,
                         onOpen = open,
+                        large = simpleMode,
                     )
                 }
             }

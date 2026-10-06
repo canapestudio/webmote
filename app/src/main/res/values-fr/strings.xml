@@ -189,4 +189,24 @@
     <string name="licences_usage_aiowebostv">L’établissement de la connexion et le manifeste d’association non signé de webOS 26</string>
     <string name="licences_usage_lgtvcompanion">Le manifeste d’association non signé actuel et l’astuce de l’alerte masquée</string>
     <string name="licences_usage_lgtv2">Le Wake-on-LAN vers les deux cartes réseau de la TV</string>
+    <!-- Simple mode -->
+    <string name="simple_mode">Mode simplifié</string>
+    <string name="simple_mode_use">Utiliser le mode simplifié</string>
+    <string name="simple_mode_summary">Un seul écran de grands boutons légendés, à la place des onglets</string>
+    <string name="simple_mode_dialog_title">Activer le mode simplifié ?</string>
+    <string name="simple_mode_dialog_body">Webmote s’ouvrira sur un seul écran de grands boutons. Pour revenir aux paramètres, maintenez l’engrenage en haut de l’écran pendant environ deux secondes ; un appui bref ne fait rien.</string>
+    <string name="simple_mode_turn_on">Activer</string>
+    <string name="simple_settings_hold">Ouvrir les paramètres</string>
+    <string name="simple_power">Éteindre</string>
+    <string name="simple_mute">Muet</string>
+    <string name="simple_volume_up">Volume +</string>
+    <string name="simple_volume_down">Volume −</string>
+    <string name="simple_channel_up">Chaîne +</string>
+    <string name="simple_channel_down">Chaîne −</string>
+    <string name="simple_show_arrows">Afficher les flèches</string>
+    <string name="simple_show_arrows_summary">Haut, bas, gauche, droite, OK et Retour sur l’écran simplifié</string>
+    <string name="simple_numbers_description">Numéros de chaîne</string>
+    <string name="simple_numbers_title">Tapez le numéro de la chaîne</string>
+    <string name="simple_close">Fermer</string>
+    <string name="simple_problem">Webmote doit être configuré à nouveau. Demandez à la personne qui l’a installé.</string>
 </resources>

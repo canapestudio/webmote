@@ -13,10 +13,12 @@ import io.github.krank56.webmote.SessionHost
 import io.github.krank56.webmote.core.SavedTv
 import io.github.krank56.webmote.core.TvState
 import io.github.krank56.webmote.ui.Route
+import io.github.krank56.webmote.ui.simple.SimpleTopBar
 
 /**
  * A screen about the active TV's state (off, connecting, pairing problems): the shared top bar, so the
- * user can still switch TVs or reach Settings, over [content].
+ * user can still switch TVs or reach Settings, over [content]. In Simple mode the bar is
+ * [SimpleTopBar]: large TV buttons, and a Settings gear that has to be held.
  */
 @Composable
 fun TvScaffold(
@@ -29,18 +31,25 @@ fun TvScaffold(
     content: @Composable () -> Unit,
 ) {
     val registryActiveId by host.registry.activeTvId.collectAsStateWithLifecycle()
+    val simpleMode by host.settings.simpleMode.collectAsStateWithLifecycle()
+    val activeTvId = state.tvId ?: registryActiveId
+    val switchTo: (String) -> Unit = { id ->
+        host.onUserInteraction()
+        host.session.switchTo(id)
+    }
     Scaffold(
         topBar = {
-            TvTopBar(
-                tvs = tvs,
-                activeTvId = state.tvId ?: registryActiveId,
-                onSwitch = { id ->
-                    host.onUserInteraction()
-                    host.session.switchTo(id)
-                },
-                onSettings = { onOpen(Route.Settings) },
-                power = power,
-            )
+            if (simpleMode) {
+                SimpleTopBar(tvs, activeTvId, onSwitch = switchTo, onSettings = { onOpen(Route.Settings) })
+            } else {
+                TvTopBar(
+                    tvs = tvs,
+                    activeTvId = activeTvId,
+                    onSwitch = switchTo,
+                    onSettings = { onOpen(Route.Settings) },
+                    power = power,
+                )
+            }
         },
         bottomBar = bottomBar,
     ) { padding ->
