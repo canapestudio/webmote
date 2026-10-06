@@ -5,13 +5,13 @@ package io.github.krank56.webmote.core.faketv
  * then `adb reverse tcp:3001 tcp:3001` and pair with 127.0.0.1 in the app.
  *
  * Type a command and Enter: `accept` / `decline` (the pairing prompt), `off` / `on`, `vol <n>`,
- * `mute`, `quit`.
+ * `mute`, `app <id>` (bring an app to the front, e.g. `app netflix`), `quit`.
  */
 fun main() {
     val tv = FakeTv(port = 3001)
     tv.promptAnswer = PromptAnswer.Wait
     tv.powerOn()
-    println("Fake TV on wss://${tv.host}:${tv.port}. Commands: accept, decline, off, on, vol <n>, mute, quit")
+    println("Fake TV on wss://${tv.host}:${tv.port}. Commands: accept, decline, off, on, vol <n>, mute, app <id>, quit")
     while (true) {
         val line = readlnOrNull()?.trim() ?: break
         val words = line.split(' ')
@@ -22,6 +22,10 @@ fun main() {
             "on" -> tv.powerOn()
             "vol" -> tv.changeVolumeFromRemote(words.getOrNull(1)?.toIntOrNull())
             "mute" -> tv.changeVolumeFromRemote(tv.volume, muted = !tv.muted)
+            "app" -> words.getOrNull(1)?.let { appId ->
+                tv.foregroundApp = appId
+                tv.push(FakeTv.GET_FOREGROUND_APP, FakeTv.foregroundAppPayload(appId))
+            }
             "quit" -> break
             else -> Unit
         }

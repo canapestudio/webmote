@@ -47,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
@@ -56,9 +57,12 @@ import io.github.krank56.webmote.R
 import io.github.krank56.webmote.core.Capability
 import io.github.krank56.webmote.core.MediaKey
 import io.github.krank56.webmote.core.PictureSetting
+import io.github.krank56.webmote.core.Player
 import io.github.krank56.webmote.core.RemoteButton
+import io.github.krank56.webmote.core.TvApp
 import io.github.krank56.webmote.core.TvSession
 import io.github.krank56.webmote.core.TvState
+import io.github.krank56.webmote.ui.apps.AppIcon
 import io.github.krank56.webmote.ui.common.LabelledIconButton
 import io.github.krank56.webmote.ui.common.LabelledIconToggleButton
 import io.github.krank56.webmote.ui.common.Notice
@@ -72,14 +76,15 @@ private enum class RemoteSheetKind { Numbers, Keyboard, Inputs, Picture }
 
 /**
  * Everyday control: the D-pad with Mute, Settings, Back and Home around it, volume, brightness, the
- * media keys, and shortcuts to the sheets. It fits the screen without scrolling: the D-pad gets the
- * height the rows below leave.
+ * media keys (the player row while a player app is in front), and shortcuts to the sheets. It fits
+ * the screen without scrolling: the D-pad gets the height the rows below leave.
  */
 @Composable
 fun RemoteTab(session: TvSession, state: TvState) {
     var sheet by rememberSaveable { mutableStateOf<RemoteSheetKind?>(null) }
     val pointerOk = state.capabilities.pointer != Capability.Unavailable
     val pictureOk = state.capabilities.pictureWrites != Capability.Unavailable
+    val player = state.player
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         FitColumn(
@@ -94,7 +99,7 @@ fun RemoteTab(session: TvSession, state: TvState) {
             modifier = Modifier.widthIn(max = 480.dp).fillMaxSize().padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
             SoundAndPicture(state = state, session = session, pictureOk = pictureOk)
-            MediaRow(session)
+            if (player != null) PlayerRow(player, state.apps, session) else MediaRow(session)
             ShortcutsRow(onOpen = { sheet = it })
         }
     }
@@ -277,6 +282,41 @@ private fun MediaRow(session: TvSession) {
             Icons.Rounded.FastForward,
             stringResource(R.string.remote_fast_forward),
             onClick = { session.media(MediaKey.FastForward) },
+        )
+    }
+}
+
+/**
+ * The media row while a player app is in front: the app's icon, then seek back, play/pause, stop and
+ * seek forward. Seeking goes the way the app's player seeks.
+ */
+@Composable
+private fun PlayerRow(player: Player, apps: List<TvApp>, session: TvSession) {
+    // Until the TV has listed its apps, the player is named by its ID.
+    val app = apps.firstOrNull { it.id == player.appId } ?: TvApp(player.appId, title = player.appId, iconUrl = null, pinned = false)
+    Row(
+        Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Box(Modifier.clearAndSetSemantics { contentDescription = app.title }) {
+            AppIcon(app, session, size = 40.dp)
+        }
+        RemoteIconButton(
+            Icons.Rounded.FastRewind,
+            stringResource(R.string.player_seek_back),
+            onClick = session::seekBack,
+        )
+        PlayPauseButton(onClick = session::playPause)
+        RemoteIconButton(
+            Icons.Rounded.Stop,
+            stringResource(R.string.remote_stop),
+            onClick = { session.media(MediaKey.Stop) },
+        )
+        RemoteIconButton(
+            Icons.Rounded.FastForward,
+            stringResource(R.string.player_seek_forward),
+            onClick = session::seekForward,
         )
     }
 }

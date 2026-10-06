@@ -190,6 +190,9 @@
     <string name="licences_usage_aiowebostv">The connection handshake and the webOS 26 unsigned pairing manifest</string>
     <string name="licences_usage_lgtvcompanion">The current unsigned pairing manifest and the hidden-alert workaround</string>
     <string name="licences_usage_lgtv2">Wake-on-LAN to both of the TV’s network adapters</string>
+    <!-- Player view -->
+    <string name="player_seek_back">Skip back</string>
+    <string name="player_seek_forward">Skip forward</string>
     <!-- Simple mode -->
     <string name="simple_mode">Simple mode</string>
     <string name="simple_mode_use">Use Simple mode</string>

@@ -17,6 +17,10 @@ public data class TvState(
     val inputs: List<TvInput> = emptyList(),
     /** The TV's apps, pinned favourites first. */
     val apps: List<TvApp> = emptyList(),
+    /** The ID of the app in front on the TV (`netflix`, `com.webos.app.livetv`…), or null when it isn't known. */
+    val foregroundAppId: String? = null,
+    /** The foreground app when it's a known player app, such as YouTube or Netflix; null for any other app. */
+    val player: Player? = null,
     val capabilities: Capabilities = Capabilities(),
 )
 
@@ -98,6 +102,21 @@ public enum class EnergySaving(internal val key: String) {
 }
 
 public data class TvInput(val id: String, val label: String)
+
+/** A known player app in front on the TV: what the player controls act on. */
+public data class Player(
+    val appId: String,
+    /** Whether it's playing, when the TV says. */
+    val playback: PlaybackState = PlaybackState.Unknown,
+)
+
+public enum class PlaybackState {
+    Playing,
+    Paused,
+
+    /** The TV doesn't say whether the player is playing. */
+    Unknown,
+}
 
 public data class TvApp(
     val id: String,

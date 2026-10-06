@@ -11,8 +11,8 @@ Website: <https://webmote.canapestudio.app>
 ## Features
 
 - **Remote:** D-pad with OK, Back, Home, Settings and Mute around it, a volume slider that follows
-  the TV, a brightness slider, media keys, inputs, a number pad with channels and colour keys, and
-  a live keyboard.
+  the TV, a brightness slider, media keys (they follow YouTube, Netflix and other players), inputs,
+  a number pad with channels and colour keys, and a live keyboard.
 - **Picture:** brightness, contrast, colour and energy saving. If a TV ignores picture changes,
   Webmote greys the controls out instead of pretending they work.
 - **Touchpad and apps:** a Magic Remote-style touchpad and a grid of the TV's apps with pinned

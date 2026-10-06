@@ -83,7 +83,7 @@ TV model / firmware tested: ________  Phone / Android version: ________  Date: _
 
 | ✓ | Check | Notes |
 |---|---|---|
-| ☐ | Play/pause, stop, rewind and fast-forward (the media row) work in a video app. **Note how the play/pause toggle behaves (it alternates, starting with play).** | |
+| ☐ | Play/pause, stop, rewind and fast-forward (the media row) work in a video app that has no player row, such as the TV's own video player. **Note how the play/pause toggle behaves (it alternates, starting with play).** | |
 | ☐ | The input picker lists the TV's inputs and switches to the chosen one. | |
 | ☐ | 123 sheet: digits, channel ± (on live TV) and the red/green/yellow/blue keys work. | |
 | ☐ | Keyboard: in a TV search field, each typed letter appears as typed; backspace deletes; Enter submits. | |
@@ -155,6 +155,18 @@ details were never captured on webOS 26 with an unsigned key. Note what you see;
 | ☐ | MAC capture: `connectionmanager/getinfo` answers with the unsigned manifest (Diagnostics shows both MACs). | |
 | ☐ | Tiles: a tap with the app fully closed starts the service (relies on SystemUI's tile-click allow-list, not a documented API). | |
 | ☐ | Volume keys: the phone routes keys to the remote MediaSession (some phones may require a media route). | |
+
+## Player view
+
+| ✓ | Check | Notes |
+|---|---|---|
+| ☐ | Start YouTube, Netflix, Prime Video, Disney+ and Plex in turn with the physical remote: within a second the media row becomes the player row, starting with the app's icon. **Note any app it doesn't appear for.** | |
+| ☐ | Start a player app from the Apps tab: the player row appears too. | |
+| ☐ | Go back to live TV, an HDMI input and the home screen with the physical remote: the media row (rewind, play/pause, stop, fast-forward) comes back each time. | |
+| ☐ | In the player row, play/pause alternates play and pause, like the media row's, and stop stops. Seek back and forward rewind and fast-forward. **Note the apps where seeking does nothing.** | |
+| ☐ | TalkBack reads the player row's icon as the app's name. | |
+| ☐ | There's no player card at the top of the Remote tab; with the player row, the tab still fits without scrolling. | |
+| ☐ | With two TVs, switching TVs shows the player row for the new TV's app only. | |
 
 ## Simple mode
 

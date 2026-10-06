@@ -189,6 +189,9 @@
     <string name="licences_usage_aiowebostv">L’établissement de la connexion et le manifeste d’association non signé de webOS 26</string>
     <string name="licences_usage_lgtvcompanion">Le manifeste d’association non signé actuel et l’astuce de l’alerte masquée</string>
     <string name="licences_usage_lgtv2">Le Wake-on-LAN vers les deux cartes réseau de la TV</string>
+    <!-- Player view -->
+    <string name="player_seek_back">Reculer</string>
+    <string name="player_seek_forward">Avancer</string>
     <!-- Simple mode -->
     <string name="simple_mode">Mode simplifié</string>
     <string name="simple_mode_use">Utiliser le mode simplifié</string>

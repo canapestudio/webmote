@@ -4,6 +4,7 @@ import io.github.krank56.webmote.core.internal.CatalogControl
 import io.github.krank56.webmote.core.internal.Commands
 import io.github.krank56.webmote.core.internal.Connector
 import io.github.krank56.webmote.core.internal.PictureControl
+import io.github.krank56.webmote.core.internal.PlayerControl
 import io.github.krank56.webmote.core.internal.PointerControl
 import io.github.krank56.webmote.core.internal.PowerControl
 import io.github.krank56.webmote.core.internal.SessionCore
@@ -33,10 +34,11 @@ public class TvSession(
     private val picture = PictureControl(core)
     private val catalog = CatalogControl(core)
     private val commands = Commands(core)
+    private val player = PlayerControl(core, commands)
     private val power = PowerControl(core, connector)
 
     init {
-        core.features += listOf(power, volume, pointer, picture, catalog, commands)
+        core.features += listOf(power, volume, pointer, picture, catalog, player, commands)
     }
 
     public val state: StateFlow<TvState> = core.state.asStateFlow()
@@ -123,6 +125,12 @@ public class TvSession(
 
     /** Alternates play and pause, starting with play. */
     public fun playPause(): Unit = onSession { commands.playPause() }
+
+    /** Seeks back in the foreground app, the way its player seeks; any other app gets the media controls' rewind. */
+    public fun seekBack(): Unit = onSession { player.seekBack() }
+
+    /** Seeks forward in the foreground app, the way its player seeks; any other app gets the media controls' fast-forward. */
+    public fun seekForward(): Unit = onSession { player.seekForward() }
 
     public fun channelUp(): Unit = onSession { commands.channelUp() }
 

@@ -130,6 +130,9 @@ class FakeTv(
         "com.webos.app.livetv" to "Live TV",
     )
 
+    /** The app in front, as `getForegroundAppInfo` reports it to a new subscriber. Changes go out with [push]. */
+    @Volatile var foregroundApp: String = HOME_SCREEN
+
     // Wake-on-LAN
 
     /** Whether a magic packet for one of this TV's MACs powers it on. */
@@ -584,6 +587,7 @@ class FakeTv(
             }
         }
         on("ssap://system.launcher/launch") { ok() }
+        on(GET_FOREGROUND_APP) { foregroundAppPayload(foregroundApp) }
         listOf("play", "pause", "stop", "rewind", "fastForward").forEach { on("ssap://media.controls/$it") { ok() } }
         listOf("insertText", "deleteCharacters", "sendEnterKey").forEach { on("ssap://com.webos.service.ime/$it") { ok() } }
 
@@ -742,6 +746,9 @@ class FakeTv(
         const val SET_PIN = "ssap://pairing/setPin"
         const val GET_VOLUME = "ssap://audio/getVolume"
         const val GET_SETTINGS = "ssap://settings/getSystemSettings"
+        const val GET_FOREGROUND_APP = "ssap://com.webos.applicationManager/getForegroundAppInfo"
+        /** The home screen's app ID on recent webOS versions; not yet captured on webOS 26. */
+        const val HOME_SCREEN = "com.webos.app.home"
         const val CREATE_ALERT = "ssap://system.notifications/createAlert"
         const val CLOSE_ALERT = "ssap://system.notifications/closeAlert"
         const val LUNA_SET_SETTINGS = "luna://com.webos.settingsservice/setSystemSettings"
@@ -767,6 +774,14 @@ class FakeTv(
             packet.size == 102 &&
                 (0 until 6).all { packet[it] == 0xFF.toByte() } &&
                 (0 until 16).all { rep -> (0 until 6).all { packet[6 + rep * 6 + it] == mac[it] } }
+
+        /** A `getForegroundAppInfo` reply or update with [appId] in front. The session only reads `appId`. */
+        fun foregroundAppPayload(appId: String): JsonObject = ok {
+            put("subscribed", true)
+            put("appId", appId)
+            put("windowId", "")
+            put("processId", "")
+        }
 
         /** A successful reply payload. */
         fun ok(build: kotlinx.serialization.json.JsonObjectBuilder.() -> Unit = {}): JsonObject = buildJsonObject {
