@@ -181,6 +181,8 @@
     <string name="connection_wake_failed">Didn’t wake</string>
     <string name="licences_title">Open-source licences</string>
     <string name="licences_intro">Webmote’s connection to your TV is written from scratch. These open-source projects document how LG TVs behave and served as references. Tap a project to read its licence notice.</string>
+    <string name="licences_this_app">This app</string>
+    <string name="licences_webmote_usage">Free software under the GNU General Public License v3, with a permission for the Google Play libraries. Its source code is public.</string>
     <string name="licences_references">Reference projects</string>
     <string name="licences_libraries">Libraries in this app</string>
     <string name="licences_full_texts">Licence texts</string>

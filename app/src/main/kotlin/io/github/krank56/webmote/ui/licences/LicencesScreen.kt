@@ -21,10 +21,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
@@ -55,15 +57,25 @@ fun LicencesScreen(onBack: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+            item { Header(stringResource(R.string.licences_this_app)) }
+            item(key = "webmote") { CreditCard(webmote) }
             item { Header(stringResource(R.string.licences_references)) }
             items(referenceProjects, key = { "ref:" + it.name }) { credit -> CreditCard(credit) }
             item { Header(stringResource(R.string.licences_libraries)) }
             items(libraries, key = { "lib:" + it.name }) { credit -> CreditCard(credit) }
             item { Header(stringResource(R.string.licences_full_texts)) }
+            item { ExpandableText(title = Licence.Gpl3.title, subtitle = null, body = gplText()) }
             item { ExpandableText(title = Licence.Apache2.title, subtitle = null, body = APACHE_TEXT) }
             item { ExpandableText(title = Licence.Mit.title, subtitle = null, body = MIT_TEXT) }
         }
     }
+}
+
+/** The GPLv3's full text, kept as a raw resource rather than a 35 KB constant. */
+@Composable
+private fun gplText(): String {
+    val resources = LocalResources.current
+    return remember { resources.openRawResource(R.raw.gpl_3_0).bufferedReader().use { it.readText() } }
 }
 
 @Composable

@@ -27,7 +27,7 @@ export const GOOGLE_PLAY = {
  * └──────────────────────────────────────────────────────────────────────────────┘
  */
 export const OPEN_SOURCE = {
-  public: false,
+  public: true,
   sourceUrl: 'https://github.com/canapestudio/webmote',
   liberapayUrl: 'https://liberapay.com/canapestudio/',
   fdroid: {

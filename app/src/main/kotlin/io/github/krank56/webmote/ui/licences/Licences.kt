@@ -12,7 +12,23 @@ import io.github.krank56.webmote.R
 enum class Licence(val title: String) {
     Mit("MIT License"),
     Apache2("Apache License 2.0"),
+    Gpl3("GNU General Public License v3"),
 }
+
+/** Where Webmote's own source code is published. */
+const val SOURCE_URL = "https://github.com/canapestudio/webmote"
+
+/** Webmote's own notice, as in the repository's NOTICE file; the full GPLv3 text is a raw resource. */
+const val WEBMOTE_NOTICE = """Webmote, a remote for LG webOS TVs
+Copyright (C) 2026 Canapé Studio
+
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+Additional permission under GNU GPL version 3 section 7
+
+If you modify this Program, or any covered work, by linking or combining it with the Google Play Billing Library or other Google Play client libraries published by Google LLC (or a modified version of those libraries), containing parts covered by the terms of those libraries' own licence agreements, the licensors of this Program grant you additional permission to convey the resulting work."""
 
 data class Credit(
     val name: String,
@@ -22,6 +38,15 @@ data class Credit(
     val licence: Licence,
     /** What Webmote used the project for, shown under its name (translated). */
     @StringRes val usage: Int? = null,
+)
+
+/** Webmote itself: free software, with its source published. */
+val webmote = Credit(
+    name = "Webmote",
+    url = SOURCE_URL,
+    copyright = "Copyright (C) 2026 Canapé Studio",
+    licence = Licence.Gpl3,
+    usage = R.string.licences_webmote_usage,
 )
 
 /** Projects Webmote's protocol client used as references. The client itself is written from scratch. */
@@ -97,6 +122,7 @@ val libraries: List<Credit> = listOf(
 fun Credit.noticeText(): String = when (licence) {
     Licence.Mit -> "$copyright\n\n$MIT_TEXT"
     Licence.Apache2 -> "$copyright\n\n$APACHE_NOTICE"
+    Licence.Gpl3 -> WEBMOTE_NOTICE
 }
 
 /** The standard Apache-2.0 notice that accompanies Apache-licensed work. */
