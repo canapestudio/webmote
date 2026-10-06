@@ -213,4 +213,10 @@
     <string name="simple_numbers_title">Type the channel number</string>
     <string name="simple_close">Close</string>
     <string name="simple_problem">Webmote needs setting up again. Ask the person who set it up.</string>
+    <!-- Gyro pointer -->
+    <string name="touchpad_point_with_phone">Point with phone</string>
+    <string name="touchpad_point_hint">Hold and turn the phone to point\nTap to click\nDrag with two fingers to scroll</string>
+    <string name="touchpad_pointing">Pointing</string>
+    <string name="touchpad_pointing_hint">Turn the phone to move the pointer\nLift your finger to stop</string>
+    <string name="settings_pointing_speed">Pointing speed</string>
 </resources>

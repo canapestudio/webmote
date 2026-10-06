@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Mouse
 import androidx.compose.material.icons.rounded.OpenWith
+import androidx.compose.material.icons.rounded.ScreenRotation
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
@@ -70,6 +71,7 @@ import io.github.krank56.webmote.core.TvState
 import io.github.krank56.webmote.ui.Route
 import io.github.krank56.webmote.ui.common.BackScaffold
 import io.github.krank56.webmote.ui.common.SectionHeader
+import io.github.krank56.webmote.ui.touchpad.rememberHasGyroscope
 
 /**
  * Settings: manage the saved TVs (use, rename, re-pair, forget, add), the remote's preferences, and
@@ -91,6 +93,8 @@ fun SettingsScreen(
     val sensitivity by settings.touchpadSensitivity.collectAsStateWithLifecycle()
     val simpleMode by settings.simpleMode.collectAsStateWithLifecycle()
     val showArrows by settings.showArrows.collectAsStateWithLifecycle()
+    val pointingSpeed by settings.pointingSpeed.collectAsStateWithLifecycle()
+    val hasGyroscope = rememberHasGyroscope()
     val registryActiveId by host.registry.activeTvId.collectAsStateWithLifecycle()
     val activeId = state.tvId ?: registryActiveId
     var renamingId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -149,7 +153,26 @@ fun SettingsScreen(
                     onChange = settings::setVolumeKeys,
                 )
             }
-            item { SensitivityRow(sensitivity = sensitivity, onChange = settings::setTouchpadSensitivity) }
+            item {
+                SensitivityRow(
+                    icon = Icons.Rounded.Mouse,
+                    title = stringResource(R.string.settings_sensitivity),
+                    sensitivity = sensitivity,
+                    range = AppSettings.MIN_SENSITIVITY..AppSettings.MAX_SENSITIVITY,
+                    onChange = settings::setTouchpadSensitivity,
+                )
+            }
+            if (hasGyroscope) {
+                item {
+                    SensitivityRow(
+                        icon = Icons.Rounded.ScreenRotation,
+                        title = stringResource(R.string.settings_pointing_speed),
+                        sensitivity = pointingSpeed,
+                        range = AppSettings.MIN_POINTING_SPEED..AppSettings.MAX_POINTING_SPEED,
+                        onChange = settings::setPointingSpeed,
+                    )
+                }
+            }
 
             item { Header(stringResource(R.string.simple_mode)) }
             item {
@@ -328,11 +351,17 @@ private fun LinkRow(icon: ImageVector, title: String, summary: String?, onClick:
     )
 }
 
+/** A slider for a speed multiplier: touchpad sensitivity or pointing speed. */
 @Composable
-private fun SensitivityRow(sensitivity: Float, onChange: (Float) -> Unit) {
+private fun SensitivityRow(
+    icon: ImageVector,
+    title: String,
+    sensitivity: Float,
+    range: ClosedFloatingPointRange<Float>,
+    onChange: (Float) -> Unit,
+) {
     var value by remember { mutableFloatStateOf(sensitivity) }
     LaunchedEffect(sensitivity) { value = sensitivity }
-    val title = stringResource(R.string.settings_sensitivity)
     ListItem(
         headlineContent = { Text(title) },
         supportingContent = {
@@ -342,12 +371,12 @@ private fun SensitivityRow(sensitivity: Float, onChange: (Float) -> Unit) {
                     value = value,
                     onValueChange = { value = it },
                     onValueChangeFinished = { onChange(value) },
-                    valueRange = AppSettings.MIN_SENSITIVITY..AppSettings.MAX_SENSITIVITY,
+                    valueRange = range,
                     modifier = Modifier.semantics { contentDescription = title },
                 )
             }
         },
-        leadingContent = { Icon(Icons.Rounded.Mouse, contentDescription = null) },
+        leadingContent = { Icon(icon, contentDescription = null) },
     )
 }
 

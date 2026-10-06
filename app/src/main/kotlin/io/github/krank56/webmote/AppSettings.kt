@@ -38,6 +38,16 @@ class AppSettings(context: Context) {
     /** Whether Simple mode's screen shows the arrows, OK and Back. */
     val showArrows: StateFlow<Boolean> = _showArrows.asStateFlow()
 
+    private val _pointWithPhone = MutableStateFlow(prefs.getBoolean(POINT_WITH_PHONE, false))
+
+    /** Whether holding the touchpad points the TV's pointer by turning the phone. */
+    val pointWithPhone: StateFlow<Boolean> = _pointWithPhone.asStateFlow()
+
+    private val _pointingSpeed = MutableStateFlow(prefs.getFloat(POINTING_SPEED, DEFAULT_POINTING_SPEED))
+
+    /** Multiplies how far the pointer moves for a given turn of the phone. */
+    val pointingSpeed: StateFlow<Float> = _pointingSpeed.asStateFlow()
+
     fun setHaptics(enabled: Boolean) {
         prefs.edit { putBoolean(HAPTICS, enabled) }
         _haptics.value = enabled
@@ -69,10 +79,24 @@ class AppSettings(context: Context) {
         _showArrows.value = enabled
     }
 
+    fun setPointWithPhone(enabled: Boolean) {
+        prefs.edit { putBoolean(POINT_WITH_PHONE, enabled) }
+        _pointWithPhone.value = enabled
+    }
+
+    fun setPointingSpeed(speed: Float) {
+        val value = speed.coerceIn(MIN_POINTING_SPEED, MAX_POINTING_SPEED)
+        prefs.edit { putFloat(POINTING_SPEED, value) }
+        _pointingSpeed.value = value
+    }
+
     companion object {
         const val DEFAULT_SENSITIVITY = 1.5f
         const val MIN_SENSITIVITY = 0.5f
         const val MAX_SENSITIVITY = 4f
+        const val DEFAULT_POINTING_SPEED = 1f
+        const val MIN_POINTING_SPEED = 0.5f
+        const val MAX_POINTING_SPEED = 3f
 
         private const val HAPTICS = "haptics"
         private const val VOLUME_KEYS = "volume_keys"
@@ -80,5 +104,7 @@ class AppSettings(context: Context) {
         private const val WAKE_HINT_DISMISSED = "wake_hint_dismissed"
         private const val SIMPLE_MODE = "simple_mode"
         private const val SHOW_ARROWS = "show_arrows"
+        private const val POINT_WITH_PHONE = "point_with_phone"
+        private const val POINTING_SPEED = "pointing_speed"
     }
 }

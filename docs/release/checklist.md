@@ -194,6 +194,28 @@ details were never captured on webOS 26 with an unsigned key. Note what you see;
 | ☐ | With one TV saved there are no TV buttons. With two saved, both names show as large buttons at the top, the active one highlighted, on the Simple, off and problem screens; tapping the other switches to it. | |
 | ☐ | At 200% font size the TV buttons stay two to a row with their names shrinking to fit, the buttons below still fit without scrolling, and the off and problem screens' text isn't cut off. TalkBack reads each TV's name and which one is selected; in French the problem sentence is in French. | |
 
+## Gyro pointer
+
+| ✓ | Check | Notes |
+|---|---|---|
+| ☐ | Touchpad → Point with phone on: holding the touchpad and turning the phone moves the pointer left, right, up and down, the same with the phone flat, tilted or upright. | |
+| ☐ | While pointing, the touchpad changes colour and says so; moving the finger on it doesn't move the pointer. | |
+| ☐ | A quick tap clicks; a two-finger drag scrolls, also when the second finger lands while pointing. | |
+| ☐ | Lifting the finger stops the pointer where it is, without clicking. | |
+| ☐ | Press the touchpad and start turning the phone straight away, as you naturally would: it points, rather than becoming a finger drag because the thumb shifted in the first 200 ms. **If it often turns into a drag, note it: finger drags may need to be ignored altogether while Point with phone is on.** | |
+| ☐ | Point with phone off: dragging, tapping and two-finger scrolling work exactly as before. | |
+| ☐ | The switch keeps its state after restarting the app. | |
+| ☐ | TalkBack announces the switch and its state, and the touchpad's mode ("Point with phone", "Pointing"). | |
+| ☐ | On a phone or emulator without a gyroscope, the switch isn't shown. | |
+| ☐ | Pointing starts with a haptic tick; none with "Vibrate on button presses" off. | |
+| ☐ | Held still while pointing, the pointer stays put: no drift, no shaking. | |
+| ☐ | Slow turns aim precisely at small targets (a key on the TV's keyboard); a quick turn crosses the screen in one go. | |
+| ☐ | Fast turns don't leave the pointer lagging behind or stuttering. **If they do, the pointer socket is flooded: cap the aim tracker's output at about 60 moves per second.** | |
+| ☐ | Settings → Pointing speed sits next to Touchpad sensitivity (not shown without a gyroscope), changes how far the pointer goes, and survives a restart. | |
+| ☐ | Switching apps or locking the phone while pointing stops the pointer; back in the app, nothing moves until the touchpad is held again. | |
+| ☐ | Phone in French: "Pointer avec le téléphone", "Vitesse du pointeur" and the touchpad's pointing hints. | |
+| ☐ | **Tune the aim tracker's dead zone, smoothing and gain constants (`AimTracker.kt`) on this phone and TV; note the chosen values on the gyro pointer's ticket 02.** | |
+
 ## Throughout
 
 | ✓ | Check | Notes |

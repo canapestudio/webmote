@@ -15,8 +15,8 @@ Website: <https://webmote.canapestudio.app>
   a number pad with channels and colour keys, and a live keyboard.
 - **Picture:** brightness, contrast, colour and energy saving. If a TV ignores picture changes,
   Webmote greys the controls out instead of pretending they work.
-- **Touchpad and apps:** a Magic Remote-style touchpad and a grid of the TV's apps with pinned
-  favourites.
+- **Touchpad and apps:** a Magic Remote-style touchpad (or point with the phone itself) and a grid
+  of the TV's apps with pinned favourites.
 - **Without opening the app:** Quick Settings tiles (Power, Mute, Screen off, Open remote), two
   home-screen widgets, a notification with controls, and the phone's volume keys, even when locked.
 - **Simple mode:** one screen of large, labelled buttons, for anyone who finds a full remote too

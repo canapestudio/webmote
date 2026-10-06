@@ -212,4 +212,10 @@
     <string name="simple_numbers_title">Tapez le numéro de la chaîne</string>
     <string name="simple_close">Fermer</string>
     <string name="simple_problem">Webmote doit être configuré à nouveau. Demandez à la personne qui l’a installé.</string>
+    <!-- Gyro pointer -->
+    <string name="touchpad_point_with_phone">Pointer avec le téléphone</string>
+    <string name="touchpad_point_hint">Maintenez appuyé et tournez le téléphone pour pointer\nTouchez pour cliquer\nFaites glisser à deux doigts pour faire défiler</string>
+    <string name="touchpad_pointing">Pointage en cours</string>
+    <string name="touchpad_pointing_hint">Tournez le téléphone pour déplacer le pointeur\nLevez le doigt pour arrêter</string>
+    <string name="settings_pointing_speed">Vitesse du pointeur</string>
 </resources>
