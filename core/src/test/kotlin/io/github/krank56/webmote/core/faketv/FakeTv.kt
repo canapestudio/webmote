@@ -766,7 +766,29 @@ class FakeTv(
             .addSubjectAlternativeName("localhost")
             .build()
 
-        private fun reservePort(): Int = ServerSocket(0).use { it.localPort }
+        /**
+         * Ports for fake TVs come from below every OS's ephemeral range (macOS and Windows 49152+,
+         * Linux 32768+). A fake TV binds its port only while it's on, so between picking a port and
+         * binding it (and after every power cycle) the port sits free: an ephemeral port could be
+         * handed to another socket meanwhile, and the bind would fail with "Address already in use".
+         */
+        private val portRange = 20000 until 32000
+        private val nextPort = java.util.concurrent.atomic.AtomicInteger(kotlin.random.Random.nextInt(portRange.count()))
+
+        private fun reservePort(): Int {
+            repeat(portRange.count()) {
+                val port = portRange.first + Math.floorMod(nextPort.getAndIncrement(), portRange.count())
+                if (isFree(port)) return port
+            }
+            error("No free port in $portRange")
+        }
+
+        private fun isFree(port: Int): Boolean = runCatching {
+            ServerSocket().use { socket ->
+                socket.reuseAddress = true
+                socket.bind(java.net.InetSocketAddress(InetAddress.getLoopbackAddress(), port))
+            }
+        }.isSuccess
 
         fun macBytes(mac: String): ByteArray = mac.split(':', '-').map { it.toInt(16).toByte() }.toByteArray()
 
