@@ -219,4 +219,93 @@
     <string name="touchpad_pointing">Pointing</string>
     <string name="touchpad_pointing_hint">Turn the phone to move the pointer\nLift your finger to stop</string>
     <string name="settings_pointing_speed">Pointing speed</string>
+    <!-- Service remote -->
+    <string name="settings_advanced">Advanced</string>
+    <string name="service_title">Service remote</string>
+    <string name="settings_service_summary">Every key the TV knows, including LG’s service menus</string>
+    <string name="settings_beta">Beta</string>
+    <string name="service_pointer_unavailable">The TV won’t take button presses, so none of these keys work.</string>
+    <string name="service_warning_keys">Every key the TV knows is here, including LG’s service menus, InStart and EzAdjust.</string>
+    <string name="service_warning_risk">Service menus change factory settings. A wrong value can break the picture or the sound, or void the warranty. Webmote asks before opening one.</string>
+    <string name="service_warning_accept">I understand</string>
+    <string name="service_confirm_title">Open %1$s?</string>
+    <string name="service_confirm_risk">%1$s is a service menu on %2$s. It changes factory settings: a wrong value can break the picture or the sound, or void the warranty.</string>
+    <string name="service_confirm_code">The TV may ask for a service code. Leave the menu with Exit.</string>
+    <string name="service_confirm_open">Open %1$s</string>
+    <string name="service_unconfirmed">Not yet confirmed on webOS 26</string>
+    <string name="service_menu_description">%1$s, service menu</string>
+    <string name="service_key_instart" translatable="false">InStart</string>
+    <string name="service_key_ezadjust" translatable="false">EzAdjust</string>
+    <string name="service_key_advanced_setting">Advanced setting</string>
+    <string name="service_key_power">Power</string>
+    <string name="service_key_exit">Exit</string>
+    <string name="service_key_asterisk" translatable="false">*</string>
+    <string name="service_key_asterisk_description">Star</string>
+    <string name="service_tab_tv">TV, guide</string>
+    <string name="service_tab_tv_description">TV and guide</string>
+    <string name="service_tab_sound">Sound, picture</string>
+    <string name="service_tab_sound_description">Sound and picture</string>
+    <string name="service_tab_menus">Menus, apps</string>
+    <string name="service_tab_menus_description">Menus and apps</string>
+    <string name="service_tab_playback">Playback</string>
+    <string name="service_tab_playback_description">Playback and streaming</string>
+    <string name="service_key_guide">Guide</string>
+    <string name="service_desc_guide">TV guide</string>
+    <string name="service_key_programme">Programme</string>
+    <string name="service_key_list">List</string>
+    <string name="service_desc_list">Channel list</string>
+    <string name="service_key_live_tv">Live TV</string>
+    <string name="service_key_tv" translatable="false">TV</string>
+    <string name="service_key_channel_up" translatable="false">Ch +</string>
+    <string name="service_key_channel_down" translatable="false">Ch −</string>
+    <string name="service_key_flashback" translatable="false">Flashback</string>
+    <string name="service_desc_flashback">Flashback, the previous channel</string>
+    <string name="service_key_favourites">Favourites</string>
+    <string name="service_desc_favourites">Favourite channels</string>
+    <string name="service_key_teletext">Teletext</string>
+    <string name="service_key_text_option">Text option</string>
+    <string name="service_desc_text_option">Teletext options</string>
+    <string name="service_key_record">Record</string>
+    <string name="service_key_recordings">Recordings</string>
+    <string name="service_desc_recordings">Recordings</string>
+    <string name="service_key_subtitles">Subtitles</string>
+    <string name="service_key_audio_description">Audio description</string>
+    <string name="service_desc_audio_description">Audio description</string>
+    <string name="service_key_multi_audio">Multi audio</string>
+    <string name="service_key_volume_up" translatable="false">Vol +</string>
+    <string name="service_key_volume_down" translatable="false">Vol −</string>
+    <string name="service_key_aspect_ratio">Aspect ratio</string>
+    <string name="service_key_picture_mode">Picture mode</string>
+    <string name="service_key_live_zoom">Live zoom</string>
+    <string name="service_key_focus_zoom">Focus zoom</string>
+    <string name="service_key_3d" translatable="false">3D</string>
+    <string name="service_desc_3d">3D mode</string>
+    <string name="service_key_menu" translatable="false">Menu</string>
+    <string name="service_key_quick_menu">Quick menu</string>
+    <string name="service_key_my_apps">My apps</string>
+    <string name="service_key_recent">Recent</string>
+    <string name="service_desc_recent">Recent apps</string>
+    <string name="service_key_input_hub">Input hub</string>
+    <string name="service_key_search">Search</string>
+    <string name="service_key_screen_remote">Screen remote</string>
+    <string name="service_key_info">Info</string>
+    <string name="service_key_emanual">e-Manual</string>
+    <string name="service_desc_emanual">e-Manual, the TV’s user guide</string>
+    <string name="service_key_sleep_timer">Sleep timer</string>
+    <string name="service_key_always_ready" translatable="false">Always Ready</string>
+    <string name="service_key_simplink" translatable="false">SIMPLINK</string>
+    <string name="service_desc_simplink">SIMPLINK, control of HDMI devices</string>
+    <string name="service_key_play">Play</string>
+    <string name="service_key_pause">Pause</string>
+    <string name="service_key_previous">Previous</string>
+    <string name="service_key_next">Next</string>
+    <string name="service_key_netflix" translatable="false">Netflix</string>
+    <string name="service_key_amazon" translatable="false">Amazon</string>
+    <string name="service_key_alexa" translatable="false">Alexa</string>
+    <string name="service_key_yandex" translatable="false">Yandex</string>
+    <string name="service_key_ivi" translatable="false">ivi</string>
+    <string name="service_key_soccer">Soccer</string>
+    <string name="service_key_twin" translatable="false">Twin</string>
+    <string name="service_key_usp" translatable="false">USP</string>
+    <string name="service_key_bendable">Bendable</string>
 </resources>

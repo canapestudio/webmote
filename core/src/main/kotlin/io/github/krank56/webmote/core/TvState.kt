@@ -138,31 +138,109 @@ public data class Capabilities(
 @Serializable
 public enum class Capability { Unknown, Available, Unavailable }
 
-/** Buttons sent on the pointer socket as `type:button` messages. */
-public enum class RemoteButton(internal val wireName: String) {
-    Up("UP"),
-    Down("DOWN"),
-    Left("LEFT"),
-    Right("RIGHT"),
-    Ok("ENTER"),
-    Back("BACK"),
-    Home("HOME"),
+/**
+ * Buttons sent on the pointer socket as `type:button` messages, by the names the reference projects
+ * list (protocol research §4.3).
+ */
+public enum class RemoteButton(
+    internal val wireName: String,
+    /**
+     * Whether the button was seen working on webOS 26 (the research's capture on a C2). The others come
+     * from the reference projects' lists only, and may do nothing on a current TV.
+     */
+    public val confirmedOnWebOs26: Boolean = false,
+    /** Whether it opens one of LG's service menus, which change factory settings. */
+    public val opensServiceMenu: Boolean = false,
+) {
+    Up("UP", confirmedOnWebOs26 = true),
+    Down("DOWN", confirmedOnWebOs26 = true),
+    Left("LEFT", confirmedOnWebOs26 = true),
+    Right("RIGHT", confirmedOnWebOs26 = true),
+    Ok("ENTER", confirmedOnWebOs26 = true),
+    Back("BACK", confirmedOnWebOs26 = true),
+    Home("HOME", confirmedOnWebOs26 = true),
+    /** The quick settings menu. */
     Settings("QMENU"),
-    Info("INFO"),
-    Num0("0"),
-    Num1("1"),
-    Num2("2"),
-    Num3("3"),
-    Num4("4"),
-    Num5("5"),
-    Num6("6"),
-    Num7("7"),
-    Num8("8"),
-    Num9("9"),
-    Red("RED"),
-    Green("GREEN"),
-    Yellow("YELLOW"),
-    Blue("BLUE"),
+    Info("INFO", confirmedOnWebOs26 = true),
+    Num0("0", confirmedOnWebOs26 = true),
+    Num1("1", confirmedOnWebOs26 = true),
+    Num2("2", confirmedOnWebOs26 = true),
+    Num3("3", confirmedOnWebOs26 = true),
+    Num4("4", confirmedOnWebOs26 = true),
+    Num5("5", confirmedOnWebOs26 = true),
+    Num6("6", confirmedOnWebOs26 = true),
+    Num7("7", confirmedOnWebOs26 = true),
+    Num8("8", confirmedOnWebOs26 = true),
+    Num9("9", confirmedOnWebOs26 = true),
+    Red("RED", confirmedOnWebOs26 = true),
+    Green("GREEN", confirmedOnWebOs26 = true),
+    Yellow("YELLOW", confirmedOnWebOs26 = true),
+    Blue("BLUE", confirmedOnWebOs26 = true),
+    Exit("EXIT", confirmedOnWebOs26 = true),
+    Asterisk("ASTERISK"),
+    Power("POWER"),
+    InStart("IN_START", confirmedOnWebOs26 = true, opensServiceMenu = true),
+    EzAdjust("EZ_ADJUST", opensServiceMenu = true),
+    AdvancedSetting("ADVANCE_SETTING", opensServiceMenu = true),
+
+    // TV and guide
+    Guide("GUIDE", confirmedOnWebOs26 = true),
+    Program("PROGRAM"),
+    ChannelList("LIST"),
+    LiveTv("DASH", confirmedOnWebOs26 = true),
+    Tv("TV"),
+    ChannelUp("CHANNELUP", confirmedOnWebOs26 = true),
+    ChannelDown("CHANNELDOWN", confirmedOnWebOs26 = true),
+    Flashback("FLASHBACK"),
+    Favourites("FAVORITES"),
+    Teletext("TELETEXT"),
+    TextOption("TEXTOPTION"),
+    Record("RECORD"),
+    Recordings("RECLIST"),
+
+    // Sound and picture
+    Subtitles("CC"),
+    AudioDescription("AD"),
+    MultiAudio("SAP"),
+    VolumeUp("VOLUMEUP", confirmedOnWebOs26 = true),
+    VolumeDown("VOLUMEDOWN", confirmedOnWebOs26 = true),
+    Mute("MUTE", confirmedOnWebOs26 = true),
+    AspectRatio("ASPECT_RATIO"),
+    PictureMode("EZPIC"),
+    EnergySaving("EYE_Q"),
+    LiveZoom("LIVE_ZOOM"),
+    FocusZoom("MAGNIFIER_ZOOM"),
+    ThreeD("3D_MODE"),
+
+    // Menus and apps
+    Menu("MENU", confirmedOnWebOs26 = true),
+    MyApps("MYAPPS"),
+    Recent("RECENT"),
+    InputHub("INPUT_HUB"),
+    Search("SEARCH"),
+    ScreenRemote("SCREEN_REMOTE"),
+    EManual("EMANUAL"),
+    SleepTimer("TIMER"),
+    AlwaysReady("UPDOWN"),
+    Simplink("HCEC"),
+
+    // Playback and streaming
+    Play("PLAY", confirmedOnWebOs26 = true),
+    Pause("PAUSE", confirmedOnWebOs26 = true),
+    Stop("STOP"),
+    Rewind("REWIND"),
+    FastForward("FASTFORWARD"),
+    Previous("GOTOPREV"),
+    Next("GOTONEXT"),
+    Netflix("NETFLIX", confirmedOnWebOs26 = true),
+    Amazon("AMAZON", confirmedOnWebOs26 = true),
+    Alexa("ALEXA"),
+    Yandex("YANDEX"),
+    Ivi("IVI"),
+    Soccer("SOCCER"),
+    Twin("TWIN"),
+    Usp("USP"),
+    Bendable("BENDABLE"),
 }
 
 public enum class MediaKey(internal val uri: String) {

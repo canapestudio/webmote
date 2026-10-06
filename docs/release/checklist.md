@@ -216,6 +216,99 @@ details were never captured on webOS 26 with an unsigned key. Note what you see;
 | ☐ | Phone in French: "Pointer avec le téléphone", "Vitesse du pointeur" and the touchpad's pointing hints. | |
 | ☐ | **Tune the aim tracker's dead zone, smoothing and gain constants (`AimTracker.kt`) on this phone and TV; note the chosen values on the gyro pointer's ticket 02.** | |
 
+## Service remote
+
+| ✓ | Check | Notes |
+|---|---|---|
+| ☐ | Settings → Advanced shows Service remote with a **Beta** badge (Bêta in French); remove the badge once ticket 03's per-key table is filled in. | |
+| ☐ | Settings → Advanced → Service remote opens a full-screen remote: a back arrow, "Service remote" and the active TV's name under it. There's no way to it from the Remote tab, Simple mode's screen, widgets or tiles. | |
+| ☐ | The first time it opens, a dialog explains what service menus do. Cancel, the phone's Back and a tap outside each return to Settings, and the dialog shows again next time. "I understand" shows the remote, and the dialog never shows again, also after restarting the app. | |
+| ☐ | InStart, EzAdjust and Advanced setting are amber with a warning mark; Power is amber without one. Each of the three asks first ("Open InStart?"), naming the active TV and saying the TV may ask for a service code: Cancel sends nothing, "Open InStart" sends the key. Power is sent at once. With two TVs saved, the dialog names the active one. | |
+| ☐ | **Try InStart, EzAdjust and Advanced setting on the test TV: note whether each opens anything and what it asks for (a code, a PIN, nothing). Change no service setting; leave with Exit.** | |
+| ☐ | Inside a service menu (or any TV menu): the arrows, OK, Back, Exit, the digits and * work. | |
+| ☐ | Every key gives a haptic tick; none with "Vibrate on button presses" off. | |
+| ☐ | Keys not yet confirmed on webOS 26 (the service menus, Power, *, most tab keys) have a small hollow dot in the corner; the one-line legend at the end of the tabs' last row explains it. | |
+| ☐ | When the TV refuses the button connection, every key is disabled and the short notice shows. | |
+| ☐ | Under the always-visible keys, four tabs: TV, guide · Sound, picture · Menus, apps · Playback. The first is selected when the screen opens; the last one used stays selected after a service menu's dialog, and leaving the screen and coming back starts on the first again. | |
+| ☐ | Each tab's keys sit four to a row, in the spec's order. Red, Green, Yellow and Blue show a stripe of their colour. Switching tabs doesn't move the keys above or the legend. | |
+| ☐ | The screen doesn't scroll on a small phone (about 360 × 640 dp) and a large one, at the default font size, with gestures and with three-button navigation: every key is at least 44 dp tall. At 200% the labels shrink to fit instead, no word is split and the screen still doesn't scroll. It may scroll only in split screen, or while the notice shows. **If it scrolls otherwise, note the phone, font size and navigation mode.** | |
+| ☐ | Developer options → Force RTL layout direction: the cross stays on the left of the number pad, and every row keeps its order. | |
+| ☐ | TalkBack reads each key's full name ("InStart, service menu", "Up", "Star", "Audio description", "Focus zoom", "Channel up"…), each tab's full name ("Sound and picture") and whether it's selected, and both dialogs. | |
+| ☐ | In French: the Settings row, the title, both dialogs, the tabs, the legend and every key label are in French. InStart, EzAdjust, Netflix, Amazon, Alexa, Yandex and ivi keep their names. | |
+| ☐ | **Press every key on the test TV and fill in the per-key table below.** | |
+
+Per-key table, filled in on the webOS 26 test TV. Write what each key did, or "nothing", and whether it's
+confirmed (it did what its name says). The app marks as confirmed only the keys in the research's webOS 26
+capture (`RemoteButton.confirmedOnWebOs26`); update them from this table.
+
+| Key (wire name) | What it did | Confirmed? |
+|---|---|---|
+| InStart (`IN_START`) | 2026-10-06, OLED42C54LA: opens the InStart code prompt. No code entered, by choice (warranty). | Yes |
+| EzAdjust (`EZ_ADJUST`) | | |
+| Advanced setting (`ADVANCE_SETTING`) | | |
+| Power (`POWER`) | | |
+| Up, Down, Left, Right (`UP` `DOWN` `LEFT` `RIGHT`) | | |
+| OK (`ENTER`) | | |
+| Back (`BACK`) | | |
+| Exit (`EXIT`) | | |
+| 0–9 (`0`–`9`) | | |
+| * (`ASTERISK`) | | |
+| Guide (`GUIDE`) | | |
+| Programme (`PROGRAM`) | | |
+| List (`LIST`) | | |
+| Live TV (`DASH`) | | |
+| TV (`TV`) | | |
+| Ch + (`CHANNELUP`) | | |
+| Ch − (`CHANNELDOWN`) | | |
+| Flashback (`FLASHBACK`) | | |
+| Favourites (`FAVORITES`) | | |
+| Teletext (`TELETEXT`) | | |
+| Text option (`TEXTOPTION`) | | |
+| Record (`RECORD`) | | |
+| Recordings (`RECLIST`) | | |
+| Red, Green, Yellow, Blue (`RED` `GREEN` `YELLOW` `BLUE`) | | |
+| Subtitles (`CC`) | | |
+| Audio description (`AD`) | | |
+| Multi audio (`SAP`) | | |
+| Vol + (`VOLUMEUP`) | | |
+| Vol − (`VOLUMEDOWN`) | | |
+| Mute (`MUTE`) | | |
+| Aspect ratio (`ASPECT_RATIO`) | | |
+| Picture mode (`EZPIC`) | | |
+| Energy saving (`EYE_Q`) | | |
+| Live zoom (`LIVE_ZOOM`) | | |
+| Focus zoom (`MAGNIFIER_ZOOM`) | | |
+| 3D (`3D_MODE`) | | |
+| Home (`HOME`) | | |
+| Menu (`MENU`) | | |
+| Quick menu (`QMENU`) | | |
+| My apps (`MYAPPS`) | | |
+| Recent (`RECENT`) | | |
+| Input hub (`INPUT_HUB`) | | |
+| Search (`SEARCH`) | | |
+| Screen remote (`SCREEN_REMOTE`) | | |
+| Info (`INFO`) | | |
+| e-Manual (`EMANUAL`) | | |
+| Sleep timer (`TIMER`) | | |
+| Always Ready (`UPDOWN`) | | |
+| SIMPLINK (`HCEC`) | | |
+| Play (`PLAY`) | | |
+| Pause (`PAUSE`) | | |
+| Stop (`STOP`) | | |
+| Rewind (`REWIND`) | | |
+| Fast-forward (`FASTFORWARD`) | | |
+| Previous (`GOTOPREV`) | | |
+| Next (`GOTONEXT`) | | |
+| Netflix (`NETFLIX`) | | |
+| Amazon (`AMAZON`) | | |
+| Alexa (`ALEXA`) | | |
+| Yandex (`YANDEX`) | | |
+| ivi (`IVI`) | | |
+| Soccer (`SOCCER`) | | |
+| Twin (`TWIN`) | | |
+| USP (`USP`) | | |
+| Bendable (`BENDABLE`) | | |
+
 ## Throughout
 
 | ✓ | Check | Notes |

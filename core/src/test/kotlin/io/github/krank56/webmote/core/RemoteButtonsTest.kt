@@ -57,6 +57,46 @@ class RemoteButtonsTest {
     }
 
     @Test
+    fun `every button is sent as a button message, by the name the reference projects list`() {
+        pairWithPointer()
+        assertEquals(RemoteButton.entries.toSet(), wireNames.keys, "buttons without an expected name")
+
+        wireNames.keys.forEach(h.session::press)
+
+        h.eventually { h.tv.pointerMessages.size == wireNames.size }
+        assertEquals(wireNames.values.map(::button), h.tv.pointerMessages)
+    }
+
+    @Test
+    fun `the buttons that open a service menu are InStart, EzAdjust and Advanced setting`() {
+        pairWithPointer()
+
+        RemoteButton.entries.filter { it.opensServiceMenu }.forEach(h.session::press)
+
+        h.eventually { h.tv.pointerMessages.size >= 3 }
+        h.settle()
+        assertEquals(setOf("IN_START", "EZ_ADJUST", "ADVANCE_SETTING"), h.tv.pointerMessages.map(::nameOf).toSet())
+        assertEquals(3, h.tv.pointerMessages.size)
+    }
+
+    @Test
+    fun `the buttons confirmed on webOS 26 are the ones seen working on a webOS 26 TV`() {
+        pairWithPointer()
+
+        val confirmed = RemoteButton.entries.filter { it.confirmedOnWebOs26 }
+        confirmed.forEach(h.session::press)
+
+        h.eventually { h.tv.pointerMessages.size == confirmed.size }
+        // The research's capture on a C2 running webOS 26, plus the keys tried on the test TV
+        // (docs/research/webos-protocol.md §4.3).
+        val verified = (
+            "LEFT RIGHT DOWN UP HOME MENU BACK ENTER DASH INFO EXIT MUTE RED GREEN BLUE YELLOW VOLUMEUP VOLUMEDOWN " +
+                "CHANNELUP CHANNELDOWN PLAY PAUSE NETFLIX GUIDE AMAZON IN_START"
+            ).split(' ') + (0..9).map { "$it" }
+        assertEquals(verified.toSet(), h.tv.pointerMessages.map(::nameOf).toSet())
+    }
+
+    @Test
     fun `a TV that refuses the pointer socket has no pointer capability, and the session remembers it`() {
         h.tv.pointerSocketAvailable = false
         h.pair()
@@ -156,7 +196,51 @@ class RemoteButtonsTest {
 
     private fun button(name: String) = "type:button\nname:$name\n\n"
 
+    /** The button name in a `type:button` message; fails on any other message. */
+    private fun nameOf(message: String): String {
+        assertTrue(message.startsWith("type:button\nname:") && message.endsWith("\n\n"), "not a button message: $message")
+        return message.removePrefix("type:button\nname:").removeSuffix("\n\n")
+    }
+
     private companion object {
         const val GET_POINTER_SOCKET = "ssap://com.webos.service.networkinput/getPointerInputSocket"
+
+        /** Every button and the name it's sent by (docs/research/webos-protocol.md §4.3). */
+        val wireNames = mapOf(
+            RemoteButton.Up to "UP", RemoteButton.Down to "DOWN", RemoteButton.Left to "LEFT",
+            RemoteButton.Right to "RIGHT", RemoteButton.Ok to "ENTER", RemoteButton.Back to "BACK",
+            RemoteButton.Home to "HOME", RemoteButton.Settings to "QMENU", RemoteButton.Info to "INFO",
+            RemoteButton.Num0 to "0", RemoteButton.Num1 to "1", RemoteButton.Num2 to "2", RemoteButton.Num3 to "3",
+            RemoteButton.Num4 to "4", RemoteButton.Num5 to "5", RemoteButton.Num6 to "6", RemoteButton.Num7 to "7",
+            RemoteButton.Num8 to "8", RemoteButton.Num9 to "9",
+            RemoteButton.Red to "RED", RemoteButton.Green to "GREEN", RemoteButton.Yellow to "YELLOW",
+            RemoteButton.Blue to "BLUE", RemoteButton.Exit to "EXIT", RemoteButton.Asterisk to "ASTERISK",
+            RemoteButton.Power to "POWER", RemoteButton.InStart to "IN_START", RemoteButton.EzAdjust to "EZ_ADJUST",
+            RemoteButton.AdvancedSetting to "ADVANCE_SETTING",
+            // TV and guide
+            RemoteButton.Guide to "GUIDE", RemoteButton.Program to "PROGRAM", RemoteButton.ChannelList to "LIST",
+            RemoteButton.LiveTv to "DASH", RemoteButton.Tv to "TV", RemoteButton.ChannelUp to "CHANNELUP",
+            RemoteButton.ChannelDown to "CHANNELDOWN", RemoteButton.Flashback to "FLASHBACK",
+            RemoteButton.Favourites to "FAVORITES", RemoteButton.Teletext to "TELETEXT",
+            RemoteButton.TextOption to "TEXTOPTION", RemoteButton.Record to "RECORD", RemoteButton.Recordings to "RECLIST",
+            // Sound and picture
+            RemoteButton.Subtitles to "CC", RemoteButton.AudioDescription to "AD", RemoteButton.MultiAudio to "SAP",
+            RemoteButton.VolumeUp to "VOLUMEUP", RemoteButton.VolumeDown to "VOLUMEDOWN", RemoteButton.Mute to "MUTE",
+            RemoteButton.AspectRatio to "ASPECT_RATIO", RemoteButton.PictureMode to "EZPIC",
+            RemoteButton.EnergySaving to "EYE_Q", RemoteButton.LiveZoom to "LIVE_ZOOM",
+            RemoteButton.FocusZoom to "MAGNIFIER_ZOOM", RemoteButton.ThreeD to "3D_MODE",
+            // Menus and apps
+            RemoteButton.Menu to "MENU", RemoteButton.MyApps to "MYAPPS", RemoteButton.Recent to "RECENT",
+            RemoteButton.InputHub to "INPUT_HUB", RemoteButton.Search to "SEARCH",
+            RemoteButton.ScreenRemote to "SCREEN_REMOTE", RemoteButton.EManual to "EMANUAL",
+            RemoteButton.SleepTimer to "TIMER", RemoteButton.AlwaysReady to "UPDOWN", RemoteButton.Simplink to "HCEC",
+            // Playback and streaming
+            RemoteButton.Play to "PLAY", RemoteButton.Pause to "PAUSE", RemoteButton.Stop to "STOP",
+            RemoteButton.Rewind to "REWIND", RemoteButton.FastForward to "FASTFORWARD", RemoteButton.Previous to "GOTOPREV",
+            RemoteButton.Next to "GOTONEXT", RemoteButton.Netflix to "NETFLIX", RemoteButton.Amazon to "AMAZON",
+            RemoteButton.Alexa to "ALEXA", RemoteButton.Yandex to "YANDEX", RemoteButton.Ivi to "IVI",
+            RemoteButton.Soccer to "SOCCER", RemoteButton.Twin to "TWIN", RemoteButton.Usp to "USP",
+            RemoteButton.Bendable to "BENDABLE",
+        )
     }
 }

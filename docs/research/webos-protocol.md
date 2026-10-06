@@ -491,6 +491,7 @@ homebridge also lists `CLICK` (it sends `type:click`), `FAVORITES`, `FLASHBACK`,
 Observations:
 - **MENU vs QMENU**: both are annotated "Quick Settings Menu" in aiowebostv and bscpylgtv. No source names a button for the full settings menu. Alternative from `BSC README.md`: `launch_app_with_params com.palm.app.settings "{\"target\": \"PictureMode\"}"`, which is `ssap://system.launcher/launch` with `{"id":"com.palm.app.settings","params":{"target":"PictureMode"}}`. Other `target` values are **UNCONFIRMED**.
 - Verified working on a C2 running webOS 26 with an unsigned manifest (https://github.com/home-assistant/core/issues/172703#issuecomment-4854461050): LEFT RIGHT DOWN UP HOME MENU BACK ENTER DASH INFO EXIT MUTE RED GREEN BLUE YELLOW VOLUMEUP VOLUMEDOWN CHANNELUP CHANNELDOWN PLAY PAUSE NETFLIX GUIDE AMAZON 0-9.
+- Seen on the test TV (LG OLED42C54LA, webOS 10.3.1, unsigned manifest, 2026-10-06): IN_START opens the InStart service menu's code prompt. No code was entered.
 - LGTV Companion's README note that virtual button presses were "deprecated and made obsolete by firmware changes from LG in 2026" was reversed in v5.7.0: "restored all functionality, including virtual button press functionality".
 
 ---

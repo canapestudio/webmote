@@ -31,6 +31,7 @@ import io.github.krank56.webmote.ui.off.TvOffScreen
 import io.github.krank56.webmote.ui.pairing.PairingProgressScreen
 import io.github.krank56.webmote.ui.pairing.PairingScreen
 import io.github.krank56.webmote.ui.settings.DiagnosticsScreen
+import io.github.krank56.webmote.ui.service.ServiceRemoteScreen
 import io.github.krank56.webmote.ui.settings.SettingsScreen
 import io.github.krank56.webmote.ui.simple.SimpleProblemScreen
 import io.github.krank56.webmote.ui.simple.SimpleScreen
@@ -38,7 +39,7 @@ import io.github.krank56.webmote.ui.status.ConnectingScreen
 import io.github.krank56.webmote.ui.status.ProblemScreen
 
 /** Screens opened on top of the TV's state screen, kept on a small back stack. */
-enum class Route { Settings, AddTv, Diagnostics, Licences }
+enum class Route { Settings, AddTv, Diagnostics, Licences, ServiceRemote }
 
 /** What fills the window: an opened [Route], or the screen the active TV's state calls for. */
 private sealed interface Screen {
@@ -108,6 +109,7 @@ fun WebmoteApp(host: SessionHost) {
                         )
                         Route.Diagnostics -> DiagnosticsScreen(tvs = tvs, state = state, onBack = back)
                         Route.Licences -> LicencesScreen(onBack = back)
+                        Route.ServiceRemote -> ServiceRemoteScreen(host = host, tvs = tvs, state = state, onBack = back)
                     }
                     Screen.FirstPairing -> PairingScreen(host = host, state = state, tvs = tvs, onBack = null, onPaired = {})
                     Screen.Main -> if (simpleMode) {

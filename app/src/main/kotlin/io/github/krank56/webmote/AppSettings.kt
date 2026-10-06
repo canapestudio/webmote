@@ -48,6 +48,11 @@ class AppSettings(context: Context) {
     /** Multiplies how far the pointer moves for a given turn of the phone. */
     val pointingSpeed: StateFlow<Float> = _pointingSpeed.asStateFlow()
 
+    private val _serviceWarningAccepted = MutableStateFlow(prefs.getBoolean(SERVICE_WARNING_ACCEPTED, false))
+
+    /** Whether the user has accepted the warning shown the first time the service remote opens. */
+    val serviceWarningAccepted: StateFlow<Boolean> = _serviceWarningAccepted.asStateFlow()
+
     fun setHaptics(enabled: Boolean) {
         prefs.edit { putBoolean(HAPTICS, enabled) }
         _haptics.value = enabled
@@ -90,6 +95,11 @@ class AppSettings(context: Context) {
         _pointingSpeed.value = value
     }
 
+    fun acceptServiceWarning() {
+        prefs.edit { putBoolean(SERVICE_WARNING_ACCEPTED, true) }
+        _serviceWarningAccepted.value = true
+    }
+
     companion object {
         const val DEFAULT_SENSITIVITY = 1.5f
         const val MIN_SENSITIVITY = 0.5f
@@ -106,5 +116,6 @@ class AppSettings(context: Context) {
         private const val SHOW_ARROWS = "show_arrows"
         private const val POINT_WITH_PHONE = "point_with_phone"
         private const val POINTING_SPEED = "pointing_speed"
+        private const val SERVICE_WARNING_ACCEPTED = "service_warning_accepted"
     }
 }

@@ -21,6 +21,7 @@ Website: <https://webmote.canapestudio.app>
   home-screen widgets, a notification with controls, and the phone's volume keys, even when locked.
 - **Simple mode:** one screen of large, labelled buttons, for anyone who finds a full remote too
   much.
+- **Service remote:** every key the TV knows, including LG's service menus, behind Settings.
 - **Turn the TV on** with Wake-on-LAN, **several TVs**, English and French.
 
 ## Requirements

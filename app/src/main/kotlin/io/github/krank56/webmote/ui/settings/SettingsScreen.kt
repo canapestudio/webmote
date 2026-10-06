@@ -1,9 +1,11 @@
 package io.github.krank56.webmote.ui.settings
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
@@ -14,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.BugReport
+import androidx.compose.material.icons.rounded.Build
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
@@ -34,6 +37,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
@@ -48,6 +52,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -75,7 +80,8 @@ import io.github.krank56.webmote.ui.touchpad.rememberHasGyroscope
 
 /**
  * Settings: manage the saved TVs (use, rename, re-pair, forget, add), the remote's preferences, and
- * the way to Diagnostics and the licences. [onDone] returns to the remote, e.g. to show a re-pair.
+ * the way to the service remote, Diagnostics and the licences. [onDone] returns to the remote, e.g. to
+ * show a re-pair.
  */
 @Composable
 fun SettingsScreen(
@@ -192,6 +198,17 @@ fun SettingsScreen(
                     summary = stringResource(R.string.simple_show_arrows_summary),
                     checked = showArrows,
                     onChange = settings::setShowArrows,
+                )
+            }
+
+            item { Header(stringResource(R.string.settings_advanced)) }
+            item {
+                LinkRow(
+                    icon = Icons.Rounded.Build,
+                    title = stringResource(R.string.service_title),
+                    summary = stringResource(R.string.settings_service_summary),
+                    badge = stringResource(R.string.settings_beta),
+                    onClick = { onOpen(Route.ServiceRemote) },
                 )
             }
 
@@ -342,9 +359,28 @@ private fun SwitchRow(
 }
 
 @Composable
-private fun LinkRow(icon: ImageVector, title: String, summary: String?, onClick: () -> Unit) {
+private fun LinkRow(
+    icon: ImageVector,
+    title: String,
+    summary: String?,
+    badge: String? = null,
+    onClick: () -> Unit,
+) {
     ListItem(
-        headlineContent = { Text(title) },
+        headlineContent = {
+            if (badge == null) {
+                Text(title)
+            } else {
+                // A feature not yet checked on a real TV: the badge is read with the title.
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(title)
+                    Badge(
+                        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    ) { Text(badge) }
+                }
+            }
+        },
         supportingContent = summary?.let { { Text(it) } },
         leadingContent = { Icon(icon, contentDescription = null) },
         modifier = Modifier.clickable(role = Role.Button, onClick = onClick),
