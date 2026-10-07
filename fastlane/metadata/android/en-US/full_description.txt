@@ -1,10 +1,10 @@
 Webmote turns your phone into a fast, private remote for LG TVs running webOS (2018 models and later). Open it and press a button, or don't open it at all: use a Quick Settings tile, a home-screen widget or your phone's volume keys.
 
 <b>Everything on one screen</b>
-• D-pad with OK, Back, Home, Settings and Info
-• Volume slider that follows the TV's real level, with mute and ±
+• D-pad with OK, and Back, Home, Settings and Mute around it
+• Volume slider that follows the TV's real level (− and + instead when the sound goes to a soundbar)
 • Brightness slider (backlight, or OLED light on OLED sets)
-• Play/pause, stop, rewind and fast-forward
+• Play/pause, stop, rewind and fast-forward; when YouTube, Netflix or another player is on screen, the row shows that app and skips back and forward in it
 • Input picker (HDMI 1, 2, 3…)
 • 123 pad with channels and the red, green, yellow and blue keys
 • Live keyboard: type on your phone and the text appears on the TV as you type
@@ -13,7 +13,10 @@ Webmote turns your phone into a fast, private remote for LG TVs running webOS (2
 Adjust brightness, contrast, colour and energy saving from a Picture sheet that shows the TV's current values. If your TV ignores picture changes, Webmote greys the controls out and tells you why instead of pretending they work.
 
 <b>Touchpad and apps</b>
-Move the TV's pointer like a Magic Remote, tap to click and scroll with two fingers. Launch Netflix, YouTube and the rest from a grid of your TV's apps, and pin your favourites to the top.
+Move the TV's pointer like a Magic Remote, tap to click and scroll with two fingers, or point with the phone itself: hold the touchpad and turn the phone. Launch Netflix, YouTube and the rest from a grid of your TV's apps, and pin your favourites to the top.
+
+<b>Simple mode</b>
+One screen of large, labelled buttons: power, volume, channels, arrows, the number pad and your favourite apps. Made for anyone who finds a full remote too much; Settings stays behind a long press so nothing changes by accident.
 
 <b>Without opening the app</b>
 • Quick Settings tiles: Power, Mute, Screen off (sound keeps playing) and Open remote
@@ -26,6 +29,9 @@ When the TV is off, one tap on Turn on wakes it with Wake-on-LAN, and the remote
 
 <b>Several TVs</b>
 Save every TV in the house, rename them ("Living room", "Bedroom") and switch between them from the top bar.
+
+<b>Service remote (beta)</b>
+In Settings: every key the TV knows, including LG's service menus, with a warning and a confirmation before one opens.
 
 <b>Private by design</b>
 No account, no analytics. Webmote talks only to your TVs on your own network. Each TV's security certificate is recorded when you pair it, so another device can't pretend to be your TV.

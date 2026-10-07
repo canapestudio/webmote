@@ -1,10 +1,10 @@
 Webmote transforme votre téléphone en télécommande rapide et respectueuse de votre vie privée pour les TV LG sous webOS (modèles 2018 et plus récents). Ouvrez l’appli et appuyez sur un bouton, ou ne l’ouvrez même pas : une tuile de réglages rapides, un widget sur l’écran d’accueil ou les touches de volume de votre téléphone suffisent.
 
 <b>Tout sur un seul écran</b>
-• Pavé directionnel avec OK, Retour, Accueil, Paramètres et Infos
-• Curseur de volume qui suit le niveau réel de la TV, avec sourdine et ±
+• Pavé directionnel avec OK, entouré de Retour, Accueil, Paramètres et Muet
+• Curseur de volume qui suit le niveau réel de la TV (− et + à la place quand le son passe par une barre de son)
 • Curseur de luminosité (rétroéclairage, ou lumière OLED sur les TV OLED)
-• Lecture/pause, arrêt, retour et avance rapides
+• Lecture/pause, arrêt, retour et avance rapides ; quand YouTube, Netflix ou un autre lecteur est à l’écran, la rangée affiche l’appli et recule ou avance dedans
 • Choix de l’entrée (HDMI 1, 2, 3…)
 • Pavé 123 avec les chaînes et les touches rouge, verte, jaune et bleue
 • Clavier en direct : tapez sur votre téléphone, le texte s’affiche sur la TV au fur et à mesure
@@ -13,7 +13,10 @@ Webmote transforme votre téléphone en télécommande rapide et respectueuse de
 Réglez la luminosité, le contraste, la couleur et l’économie d’énergie depuis un panneau Image qui affiche les valeurs actuelles de la TV. Si votre TV ignore les changements d’image, Webmote grise les réglages et explique pourquoi, au lieu de faire semblant qu’ils fonctionnent.
 
 <b>Pavé tactile et applis</b>
-Déplacez le pointeur de la TV comme avec une Magic Remote, touchez pour cliquer et faites défiler à deux doigts. Lancez Netflix, YouTube et les autres depuis la grille des applis de votre TV, et épinglez vos favorites en haut.
+Déplacez le pointeur de la TV comme avec une Magic Remote, touchez pour cliquer et faites défiler à deux doigts, ou pointez avec le téléphone lui-même : maintenez le pavé tactile et tournez le téléphone. Lancez Netflix, YouTube et les autres depuis la grille des applis de votre TV, et épinglez vos favorites en haut.
+
+<b>Mode simplifié</b>
+Un seul écran de grands boutons avec leur nom : allumage, volume, chaînes, flèches, pavé numérique et vos applis favorites. Pensé pour tous ceux qu’une télécommande complète intimide ; les Paramètres restent derrière un appui long, pour que rien ne change par erreur.
 
 <b>Sans ouvrir l’appli</b>
 • Tuiles de réglages rapides : Alimentation, Sourdine, Écran éteint (le son continue) et Ouvrir la télécommande
@@ -26,6 +29,9 @@ Quand la TV est éteinte, un appui sur Allumer la réveille par Wake-on-LAN, et 
 
 <b>Plusieurs TV</b>
 Enregistrez toutes les TV de la maison, renommez-les (« Salon », « Chambre ») et passez de l’une à l’autre depuis la barre du haut.
+
+<b>Télécommande de service (bêta)</b>
+Dans les Paramètres : toutes les touches que la TV connaît, y compris les menus de service LG, avec un avertissement et une confirmation avant d’en ouvrir un.
 
 <b>Respect de la vie privée</b>
 Pas de compte, pas de statistiques. Webmote ne communique qu’avec vos TV, sur votre propre réseau. Le certificat de sécurité de chaque TV est enregistré lors de l’association, pour qu’aucun autre appareil ne puisse se faire passer pour elle.
